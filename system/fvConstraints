@@ -1,0 +1,145 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      fvConstraints;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//Limits the temperature to be between minimum and maximum values.
+
+limitHe
+{
+    type            limitMag;
+    selectionMode   all;//cellSet, cellZone, points
+    field           h;
+    min             47000;
+    max             2.1e6;
+}
+
+limitRho
+{
+    type            limitMag;
+    selectionMode   all;//cellSet, cellZone, points
+    field           rho;
+    min             0.1;
+    max             755;
+}
+
+//Limits the pressure to be between minimum and maximum values.
+limitp
+{
+    type            limitPressure;
+
+    min             5e5;
+    max             9e7;
+    
+    //minFactor       0.9;
+    //maxFactor       1.5;
+}
+
+//Limits the temperature to be between minimum and maximum values.
+
+limitT
+{
+    type            limitTemperature;
+    selectionMode   all;
+    min             200;
+    max             600;
+    field           T;
+}
+
+//limitTemperature
+//{
+//    type	limitTemperature;
+//    active	true;
+//    limitTemperatureCoeffs
+//    {
+//        selectionMode all;
+//        Tmin	200;
+//        Tmax	600;
+//    }
+//}
+
+//Limits the velocity magnitude to the specified max value
+/*
+limitU
+{  
+    type            limitMag;
+    selectionMode   all;//cellSet, cellZone, points
+    field           U;
+    max             50;
+}
+*/
+
+/*
+//Fixed temperature equation constraint
+fixedTemperature
+{
+    type            fixedTemperatureConstraint;
+
+    selectionMode   all;
+
+    phase           gas; // Optional phase name
+
+    // Uniform temperature constraint
+    mode            uniform;
+    temperature     constant 500; // Uniform temperature
+
+    // // Looked-up field temperature constraint
+    // T            T; // Temperature field name
+}
+
+//Constrain the field values within a specified region.
+porosityTurbulence //example to set the turbulence properties within a porous region
+{
+    type            fixedValueConstraint;
+
+    selectionMode   cellZone;
+    cellZone        porosity;
+
+    fieldValues
+    {
+        k           1;
+        epsilon     150;
+    }
+}
+
+//Calculates and applies the force necessary to maintain the specified mean 
+    velocity.
+meanVelocityConstraint 
+{
+    type            meanVelocityForce;
+
+    selectionMode   all;
+
+    U               U;          // Name of velocity field
+
+    Ubar            (10.0 0 0); // Desired mean velocity
+    relaxation      0.2;        // Optional relaxation factor
+}
+
+//Calculates and applies the force necessary to maintain the specified mean
+    velocity averaged over the specified patch.
+patchMeanVelocityForce1
+{
+    type            patchMeanVelocityForce;
+
+    selectionMode   all;
+
+    U               U;          // Name of velocity field
+
+    patch           inlet;      // Name of the patch
+
+    Ubar            (10.0 0 0); // Desired mean velocity
+    relaxation      0.2;        // Optional relaxation factor
+}
+*/
+// ************************************************************************* //

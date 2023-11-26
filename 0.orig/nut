@@ -1,0 +1,49 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format          ascii;
+    class           volScalarField;
+    object          nut;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [ 0 2 -1 0 0 0 0 ];
+
+internalField   uniform 1e-7;
+
+boundaryField
+{
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+    }
+    "injectorWall.*"
+    {
+        type            nutkWallFunction;
+        value           $internalField;
+    }
+    inlet
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+    }
+    "(front|back)"
+    {
+        type            wedge;
+        value           $internalField;
+    }
+    
+    #includeEtc "caseDicts/setConstraintTypes"
+}
+
+
+// ************************************************************************* //

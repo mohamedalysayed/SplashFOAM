@@ -1,0 +1,141 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  10
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+dChannel    2e-3;
+lChannel    4e-3;
+dBulk       10e-3;
+lBulk       2e-3;
+degAzimut   3;
+
+x1  5e-4;
+x2  #calc "$dChannel / 2";
+x3  #calc "$x2 + $dBulk / 2";
+y1  0;
+y2  $dChannel;
+z1  0;
+z2  $lChannel;
+z3  #calc "$lBulk + $lChannel";
+
+vertices
+(
+    ($x1 $y1 $z1)
+    ($x2 $y1 $z1)
+    ($x2 $y1 $z2)
+    ($x1 $y1 $z2)
+    
+    ($x1 $y2 $z1)
+    ($x2 $y2 $z1)
+    ($x2 $y2 $z2)
+    ($x1 $y2 $z2)  
+    
+    ($x1 $y1 $z3)
+    ($x2 $y1 $z3)
+    ($x2 $y2 $z3)
+    ($x1 $y2 $z3) 
+    
+    ($x3 $y1 $z2)
+    ($x3 $y1 $z3)
+    ($x3 $y2 $z2)
+    ($x3 $y2 $z3)        
+);
+
+dX              2e-5;
+dZ              2e-5;
+nXChannel       #calc "$dChannel / $dX / 4";
+nZChannel       #calc "$lChannel / $dZ";
+nRMainBlock     #calc "( $dBulk / $dChannel ) * $nXChannel";
+nZMainBlock     #calc "( $lBulk / $lChannel ) * $nZChannel";
+nY              1;
+
+blocks
+(
+    hex ( 0  1  5 4 3 2 6 7)    ($nXChannel   $nY  $nZChannel)   simpleGrading (1 1 1) // main block
+    hex ( 3 2 6 7 8 9 10 11 )   ($nXChannel   $nY  $nZMainBlock) simpleGrading (1 1 1) // edge below gap
+    hex ( 2 12 14 6 9 13 15 10) ($nRMainBlock $nY  $nZMainBlock) simpleGrading (1 1 1) // gap
+);
+
+edges
+(
+);
+
+defaultPatch
+{
+    type empty;
+}
+
+boundary
+(
+    inlet
+    {
+        type patch;
+        faces
+        (
+            ( 8  9 10 11)
+            ( 9 13 15 10)
+        );
+    }
+    outlet
+    {
+        type patch;
+        faces
+        (
+            ( 0  1  5  4)
+        );
+    }
+    injectorWall
+    {
+        type wall;
+        faces
+        (            
+            ( 1  5  6  2)
+            ( 2 12 14  6)
+            (12 14 15 13)
+        );
+    }
+    front
+    {
+        type empty;
+        faces
+        (
+            ( 0  1  2  3)
+            ( 3  2  9  8)
+            ( 2 12 13  9)
+        );
+    }    
+    wedge
+    {
+        type empty;
+        faces
+        (
+            ( 4  5  6  7)
+            ( 7  6 10 11)
+            ( 6 14 15 10)
+        );
+    }
+    symmetry
+    {
+        type symmetry;
+        faces
+        (
+            ( 0  4  7  3)
+            ( 3  7 11  8)
+        );
+    }
+);
+
+
+// ************************************************************************* //
