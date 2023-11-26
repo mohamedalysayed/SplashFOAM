@@ -104,8 +104,8 @@ class TerminalApp:
         self.browse_button.grid(row=1, column=2, pady=5, padx=10, sticky="ew")
 
         # Create a label for the "Fuel Selector" dropdown
-        self.fuel_selector_label = ttk.Label(self.root, text="Fuel Selector:")
-        self.fuel_selector_label.grid(row=2, column=0, pady=5, padx=10, sticky="w")
+        self.fuel_selector_label = ttk.Label(self.root, text="Fuel of choice:", font=("TkDefaultFont", 12, "bold"), foreground="green")
+        self.fuel_selector_label.grid(row=1, column=0, pady=5, padx=10, sticky="w")
 
         # Define the fuel options
         fuels = ["Methanol", "Ammonia", "Dodecane"]
@@ -115,12 +115,12 @@ class TerminalApp:
 
         # Create a dropdown menu for fuel selection
         self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=fuels)
-        self.fuel_selector.grid(row=2, column=1, pady=5, padx=10, sticky="w")
+        self.fuel_selector.grid(row=1, column=1, pady=5, padx=10, sticky="w")
         self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
 
         # Create a label for status messages
         self.status_label = ttk.Label(self.root, text="", foreground="blue")
-        self.status_label.grid(row=1, column=0, pady=5, padx=10, sticky="w")
+        self.status_label.grid(row=2, column=0, pady=5, padx=10, sticky="w")
 
         # ... (other initialization code)
 
