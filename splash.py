@@ -19,23 +19,23 @@ class ReplacePropertiesPopup:
         self.new_values_thermo_type = {}
 
         self.popup = tk.Toplevel(parent.root)
-        self.popup.title("Replace Properties")
+        self.popup.title("Update Physical Properties")
         self.popup.geometry("500x600")  # Set the size of the popup window
 
         # Create a label for the "thermoType" group
-        thermo_type_label = ttk.Label(self.popup, text="thermoType", font=("TkDefaultFont", 12, "bold"))
+        thermo_type_label = ttk.Label(self.popup, text="thermoType", font=("TkDefaultFont", 15, "bold"), foreground="red")
         thermo_type_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
 
         # Show old values of the thermoType block as labels
         row_counter = 1
         for param in thermo_type_params:
             ttk.Label(self.popup, text=f"{param}").grid(row=row_counter, column=1, sticky="w", padx=30, pady=2)
-            label = ttk.Label(self.popup, text=str(old_values_thermo_type.get(param, "")))
+            label = ttk.Label(self.popup, text=str(old_values_thermo_type.get(param, "")), foreground="blue")
             label.grid(row=row_counter, column=2, pady=2)
             row_counter += 1
 
         # Create a label for the "mixture" group
-        mixture_label = ttk.Label(self.popup, text="mixture", font=("TkDefaultFont", 12, "bold"))
+        mixture_label = ttk.Label(self.popup, text="mixture", font=("TkDefaultFont", 15, "bold"), foreground="red")
         mixture_label.grid(row=row_counter, column=0, sticky="w", padx=10, pady=10)
         row_counter += 1
 
@@ -44,6 +44,7 @@ class ReplacePropertiesPopup:
             ttk.Label(self.popup, text=f"{param}").grid(row=row_counter, column=1, sticky="w", padx=30, pady=2)
             entry = ttk.Entry(self.popup)
             entry.insert(0, str(old_values_mixture.get(param, "")))  # Pre-fill with old values if available
+            entry.config(font=("TkDefaultFont", 9, "bold"), foreground="blue")
             entry.grid(row=row_counter, column=2, pady=2)
             self.new_values_thermo_type[param] = entry
             row_counter += 1
@@ -77,18 +78,11 @@ class ReplacePropertiesPopup:
         # Combine the header, FoamFile, and updated body content
         file_content = f'{self.parent.header}{foamfile_content}{body_content}'
         # file_content = f'{foamfile_content}{body_content}'
-
-#        with open(self.parent.selected_file_path, 'w') as file:
-#            file.write(file_content)
-
-#        self.parent.status_label.config(text="Values replaced successfully", foreground="green")
-#        tk.messagebox.showinfo("Update", "Mixture block updated successfully.")
-#        self.popup.destroy()
         
         # Show a confirmation popup
         confirmation = tk.messagebox.askyesno("Confirmation", "Are you sure you want to update the file?")
         if confirmation:
-            # Write the updated content to the file
+            # Write the updated content to the file/
             with open(self.parent.selected_file_path, 'w') as file:
                 file.write(file_content)
 
@@ -140,6 +134,7 @@ class TerminalApp:
      \\\\/     M anipulation  |
 \\*---------------------------------------------------------------------------*/\n"""
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
+        #self.thermo_type_params.config(foreground="blue")
         self.mixture_params = ["molWeight", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
 
     def browse_directory(self):
@@ -159,6 +154,8 @@ class TerminalApp:
                                        for match in re.finditer(f'{param}\s+(\S+)(;|;//.*)', file_content)}
 
             self.open_replace_properties_popup(old_values_mixture, old_values_thermo_type)
+        else:
+            tk.messagebox.showerror("Error", "Selected file is not a physicalProperties file! Please select a valid file first.")
 
     def open_replace_properties_popup(self, old_values_mixture, old_values_thermo_type):
         selected_file = self.selected_file_path
