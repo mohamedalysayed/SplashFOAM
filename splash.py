@@ -52,7 +52,8 @@ class ReplacePropertiesPopup:
 
         # Create an "Update" button that calls the replace_values method for the mixture block
         style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
+        #style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
+        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         updateButton = ttk.Button(self.popup, text="Update", command=self.replace_mixture_values).grid(row=row_counter, column=2, pady=10, padx=10)
         addButton = ttk.Button(self.popup, text="Add parameter", command=self.add_missing_parameters).grid(row=row_counter_plus, column=2, pady=10, padx=10)
         #updateButton.pack()
@@ -114,9 +115,11 @@ class ReplacePropertiesPopup:
                 file.write(file_content)
 
             self.status_label.config(text="Parameters added successfully", foreground="green")
+                
             
             
 class TerminalApp:
+        
     def __init__(self, root):
         self.root = root
         self.root.config(background="white") # black
@@ -127,12 +130,15 @@ class TerminalApp:
 
         # Create a button to open a directory dialog
         style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
+        #style.configure("TButton", background="#3EAAAF")
+        # --> style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
+        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         self.browse_button = ttk.Button(self.root, text="Update Physical Properties", command=self.browse_directory)
         self.browse_button.grid(row=1, column=2, pady=5, padx=10, sticky="ew")
 
         # Create a label for the "Fuel Selector" dropdown
-        self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options", font=("TkDefaultFont", 10, "bold")) # , foreground="green")
+        #self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options", font=("TkDefaultFont", 10, "bold"), background="lightblue") # , foreground="green")
+        self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options →", font=("TkDefaultFont", 12), background="lightblue") # , foreground="green")
         self.fuel_selector_label.grid(row=1, column=0, pady=5, padx=10, sticky="w")
 
         # Define the fuel options
@@ -141,11 +147,17 @@ class TerminalApp:
         # Create a StringVar to store the selected fuel
         self.selected_fuel = tk.StringVar()
 
+        # Set a default value for the dropdown
+        default_value = "Methanol"
+        self.selected_fuel.set(default_value)
+
         # Create a dropdown menu for fuel selection
         self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=fuels)
         self.fuel_selector.grid(row=1, column=1, pady=5, padx=10, sticky="w")
-        self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
 
+        # Bind an event handler to the <<ComboboxSelected>> event
+        self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
+       
         # Create a label for status messages
         self.status_label = ttk.Label(self.root, text="", foreground="blue")
         self.status_label.grid(row=2, column=0, pady=5, padx=10, sticky="w")
