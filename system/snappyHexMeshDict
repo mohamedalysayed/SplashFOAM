@@ -1,0 +1,181 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  10
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#includeEtc "caseDicts/mesh/generation/snappyHexMeshDict.cfg"
+
+castellatedMesh on;
+snap            on;
+addLayers       off;
+
+geometry
+{
+    CAD
+    {
+        type triSurfaceMesh;
+        file "CAD.stl";
+        regions
+        {
+            injectorWall     { name injectorWall; }  
+            injectorWallFine { name injectorWallFine; }            
+            inlet            { name inlet; }
+            outlet           { name outlet; }            
+            symmetry         { name symmetry; }
+            front            { name front; }
+            back             { name back; }
+        }
+    }
+};
+
+castellatedMeshControls
+{
+    features
+    (
+      //{ file "CAD.eMesh"; level 0; }
+    );
+
+    refinementSurfaces
+    {
+        CAD
+        {
+            level (0 0);
+            patchInfo { type wall; }
+
+            regions
+            {
+                injectorWallFine
+                {
+                    level (4 4);
+                    patchInfo
+                    {
+                        type wall;
+                        inGroups (wall);
+                    }
+                }
+                /*
+                inlet
+                {
+                    level (1 1);
+                    patchInfo
+                    {
+                        type patch;
+                        inGroups (inlet);
+                    }
+                }
+
+                outlet
+                {
+                    level (0 0);
+                    patchInfo
+                    {
+                        type patch;
+                        inGroups (outlet);
+                    }
+                }
+
+                
+
+                symmetry
+                {
+                    level (0 0);
+                    patchInfo
+                    {
+                        type symmetry;
+                        inGroups (symmetry);
+                    }
+                }
+
+                front
+                {
+                    level (0 0);
+                    patchInfo
+                    {
+                        type empty;
+                        inGroups (empty);
+                    }
+                }
+
+                back
+                {
+                    level (0 0);
+                    patchInfo
+                    {
+                        type empty;
+                        inGroups (empty);
+                    }
+                }
+                */
+            }
+        }
+    }
+
+    refinementRegions
+    {
+        CAD
+        {
+            mode    inside;
+            level   0;
+        }
+    }
+
+    insidePoint (5e-4 5e-3 5e-4); // Offset from (0 0 0) to avoid
+                                     // coinciding with face or edge
+    nCellsBetweenLevels 9;
+}
+
+snapControls
+{
+    features
+    (
+        { file "CAD.eMesh"; }
+    );
+    
+    explicitFeatureSnap    off;
+    implicitFeatureSnap    on;
+
+    nSmoothPatch            0;
+    tolerance               1.0;
+    nSolveIter              50;
+    nRelaxIter              30; 
+}
+
+addLayersControls
+{
+    layers
+    {
+        "CAD.*"
+        {
+            nSurfaceLayers 2;
+        }
+    }
+
+    relativeSizes       true; // false, usually with firstLayerThickness
+    expansionRatio      1.2;
+    finalLayerThickness 0.5;
+    minThickness        1e-3;
+//  firstLayerThickness 0.01;
+
+//  maxThicknessToMedialRatio 0.6;
+}
+
+writeFlags
+(
+//    scalarLevels
+    layerSets
+    layerFields
+);
+
+mergeTolerance 1e-6;
+
+// ************************************************************************* //

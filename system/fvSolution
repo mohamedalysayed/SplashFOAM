@@ -1,0 +1,133 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  10
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "alpha.ammonia.*"
+    {
+        //nAlphaCorr      1;
+        //nAlphaSubCycles 2;
+
+        nAlphaCorr      2;
+        nAlphaSubCycles 1;
+
+        //MULESCorr       yes;
+        //nLimiterIter    60;
+
+        MULESCorr       no;
+        nLimiterIter    5;
+
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0;
+        minIter         2;
+        maxIter         5;
+    }
+
+    "pcorr.*"
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       0.0001;
+        //tolerance       1e-5;
+        relTol          0;
+    }
+
+    //".*(rho|rhoFinal)"
+    //{
+    //    solver          diagonal;
+    //}
+
+    p_rgh
+    {
+        $pcorr;
+        tolerance       1e-8;
+        //relTol          0.001;
+        relTol          0.01;
+    }
+
+    //p_rghFinal
+    //{
+    //    $p_rgh;
+    //    relTol          0;
+    //}
+
+    p_rghFinal
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner  GAMG;
+            tolerance       1e-8;
+            relTol          0;
+            nVcycles        2;
+            smoother        DICGaussSeidel;
+            nPreSweeps      2;
+        }
+        tolerance       1e-8;
+        relTol          0;
+        maxIter         20;
+    }
+
+
+    Phi
+    {
+        $p_rgh;
+    }
+
+    "(U|T|k|omega|epsilon)"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-8;
+        relTol          0.01;
+    }
+
+    "(U|T|k|omega|epsilon)Final"
+    {
+        $U;
+        relTol          0;
+    }
+}
+
+potentialFlow
+{
+    nNonOrthogonalCorrectors 10;
+}
+
+PIMPLE
+{
+    //momentumPredictor   yes;
+    momentumPredictor no;
+    correctPhi          no;
+    correctMeshPhi      no;
+    nOuterCorrectors    3;
+    //nCorrectors         3;
+    nCorrectors         1;
+    nNonOrthogonalCorrectors 0;
+}
+
+relaxationFactors
+{
+    equations
+    {
+        ".*"                     1;
+    }
+}
+
+
+// ************************************************************************* //
