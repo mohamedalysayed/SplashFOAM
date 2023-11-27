@@ -7,6 +7,8 @@ import subprocess
 import os
 import re 
 import signal
+import shutil  # For file copying
+          
 
 
 class ReplacePropertiesPopup:
@@ -20,7 +22,7 @@ class ReplacePropertiesPopup:
 
         self.popup = tk.Toplevel(parent.root)
         self.popup.title("Update Physical Properties")
-        self.popup.geometry("500x600")  # Set the size of the popup window
+        self.popup.geometry("520x650")  # Set the size of the popup window
 
         # Create a label for the "thermoType" group
         thermo_type_label = ttk.Label(self.popup, text="thermoType", font=("TkDefaultFont", 15, "bold"), foreground="red")
@@ -129,12 +131,19 @@ class TerminalApp:
         self.fuels = ["Methanol", "Ammonia", "Dodecane"]
 
         # Create a button to open a directory dialog
-        style = ttk.Style()
+        style1 = ttk.Style()
         #style.configure("TButton", background="#3EAAAF")
         # --> style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
-        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
-        self.browse_button = ttk.Button(self.root, text="Update Physical Properties", command=self.browse_directory)
-        self.browse_button.grid(row=1, column=2, pady=5, padx=10, sticky="ew")
+        style1.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+        self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
+        self.browse_button.grid(row=1, column=2, pady=10, padx=10, sticky="ew")
+        
+        # Create a button to import a geometry
+        style2 = ttk.Style()
+        style2.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+        self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
+        self.import_button.grid(row=0, column=2, pady=10, padx=10)
+
 
         # Create a label for the "Fuel Selector" dropdown
         #self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options", font=("TkDefaultFont", 10, "bold"), background="lightblue") # , foreground="green")
@@ -160,7 +169,7 @@ class TerminalApp:
        
         # Create a label for status messages
         self.status_label = ttk.Label(self.root, text="", foreground="blue")
-        self.status_label.grid(row=2, column=0, pady=5, padx=10, sticky="w")
+        self.status_label.grid(row=0, column=0, pady=5, padx=10, sticky="w")
 
         # ... (other initialization code)
         self.selected_file_path = None
@@ -173,7 +182,7 @@ class TerminalApp:
      \\\\/     M anipulation  |
 \\*---------------------------------------------------------------------------*/\n"""
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
-        self.mixture_params = ["molWeight", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
+        self.mixture_params = ["molWeight", "rho", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
 
     def browse_directory(self):
         selected_file = filedialog.askopenfilename()
@@ -241,7 +250,7 @@ class TerminalApp:
             
         
         # Use find and exec to run sed on all files under the 'constant' directory
-        #sed_command = f"sed -i 's/{current_fuel}/{selected_fuel}/g' {self.selected_file_path}" # maybe change to one higher level up in case we need to change all files
+        #sed_command = f"sed -i 's/{current_fuel}/{selected_fuel}/g' {self.selected_file_path}" 
         sed_command = f"find {case_directory}/constant -type f -exec sed -i 's/{current_fuel}/{selected_fuel}/g' {{}} +"
         
         # Execute the sed command
@@ -261,12 +270,74 @@ class TerminalApp:
 
         # Update the status label
         self.status_label.config(text=f"Fuel replaced. Selected fuel: {selected_fuel}", foreground="green")
-       
+        
+        
+    def import_geometry(self):
+        file_path = filedialog.askopenfilename(
+            title="Select Geometry File",
+            filetypes=[("STL Files", "*.stl"), ("OBJ Files", "*.obj"), ("All Files", "*.*")],
+            #initialdir=os.path.expanduser("~"),
+            initialdir=os.path.dirname(self.selected_file_path) if self.selected_file_path else None
+        )
+
+        if file_path:
+            self.selected_file_path = file_path
+            meshing_folder = os.path.join(os.path.dirname(self.selected_file_path), "Meshing")
+            self.status_label.config(text="The geometry file is successfully imported!", foreground="blue")
+
+            # Create the Meshing folder if it doesn't exist
+            if not os.path.exists(meshing_folder):
+                os.makedirs(meshing_folder)
+
+            # Copy and rename the geometry file
+            geometry_filename = f"CAD.{file_path.split('.')[-1].lower()}"
+            geometry_dest = os.path.join(meshing_folder, geometry_filename)
+            shutil.copyfile(self.selected_file_path, geometry_dest)
+
+            print(f"Geometry imported to: {geometry_dest}")
+            
+        #Check if a file is selected
+        if not self.selected_file_path:
+            self.status_label.config(text="No file selected for import", foreground="red")
+            return
             
 if __name__ == "__main__":
     root = tk.Tk()
     app = TerminalApp(root)
-    root.mainloop()            
+    root.mainloop()   
+        
+#    def import_geometry(self):
+#        # Ask the user to select a geometry file
+#        geometry_file = filedialog.askopenfilename(
+#            #filetypes=[("Geometry files", "*.stl;*.obj"), ("All files", "*.*")],
+#            filetypes=[("Geometry files", "*.stl"), ("All files", "*.*")],
+#            initialdir=os.path.dirname(self.selected_file_path) if self.selected_file_path else None
+#        )
+
+#        if geometry_file:
+#            # Get the destination path for the "Meshing" folder
+#            meshing_folder = os.path.join(os.path.dirname(self.selected_file_path), "Meshing")
+
+#            # Check if the "Meshing" folder exists; if not, create it
+#            if not os.path.exists(meshing_folder):
+#                os.makedirs(meshing_folder)
+
+#            # Copy the selected geometry file to the "Meshing" folder and rename it to "CAD.stl"
+#            geometry_file_name = "CAD.stl"
+#            destination_path = os.path.join(meshing_folder, geometry_file_name)
+#            shutil.copy(geometry_file, destination_path)
+
+#            # Update the status label
+#            self.status_label.config(text=f"Geometry file {geometry_file_name} imported to Meshing folder", foreground="green")
+#        else:
+#            self.status_label.config(text="Geometry import canceled", foreground="blue")
+#            
+#        # Check if a file is selected
+#        if not self.selected_file_path:
+#            self.status_label.config(text="No file selected for import", foreground="red")
+#            return
+           
+         
             
 #        # Configure rows and columns to expand
 #        self.root.grid_columnconfigure(0, weight=1)
