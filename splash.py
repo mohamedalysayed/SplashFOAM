@@ -1,4 +1,3 @@
-#from tkinter import *
 import tkinter as tk 
 from tkinter.simpledialog import askstring
 from tkinter import ttk, filedialog, messagebox, simpledialog
@@ -7,8 +6,11 @@ import subprocess
 import os
 import re 
 import signal
+import time  # Add this import for demonstration purposes
 import shutil  # For file copying
-          
+import threading  # Import threading for running simulation in a separate thread
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class ReplacePropertiesPopup:
@@ -54,12 +56,11 @@ class ReplacePropertiesPopup:
 
         # Create an "Update" button that calls the replace_values method for the mixture block
         style = ttk.Style()
+        
         #style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
         style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
-        updateButton = ttk.Button(self.popup, text="Update", command=self.replace_mixture_values).grid(row=row_counter, column=2, pady=10, padx=10)
+        updateButton = ttk.Button(self.popup, text="Update", command=self.replace_mixture_values).grid(row=row_counter,         column=2, pady=10, padx=10)
         addButton = ttk.Button(self.popup, text="Add parameter", command=self.add_missing_parameters).grid(row=row_counter_plus, column=2, pady=10, padx=10)
-        #updateButton.pack()
-        #addButton.pack()
 
         
     def replace_mixture_values(self):
@@ -120,33 +121,73 @@ class ReplacePropertiesPopup:
                 
             
             
-class TerminalApp:
-        
+class TerminalApp:  
     def __init__(self, root):
         self.root = root
         self.root.config(background="white") # black
-        self.root.title("Splash some colors here!")
+        self.root.title("Splash - OpenFOAM")
+        
+        # Create a button to initialize the case directory
+        self.initialize_case_button = ttk.Button(self.root, text="Initialize Case", command=self.initialize_case)
+        self.initialize_case_button.grid(row=2, column=2, pady=10, padx=10, sticky="ew")
+        
+        # --------------------------------------> Run a sim and plot residuals----------------------
+        # Create a button to run simulation
+        self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_openfoam_simulation)
+        self.run_simulation_button.grid(row=3, column=2, pady=10, padx=10, sticky="ew")
+        
+#        # Create a progress bar
+#        self.progress_bar = ttk.Progressbar(self.root, mode="indeterminate", length=200)
+#        self.progress_bar.grid(row=4, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
+
+#         # Create a progress bar
+#        self.progress_bar = ttk.Progressbar(self.root, mode="indeterminate", length=200, style="TProgressbar")
+#        self.progress_bar.grid(row=4, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
+
+#        # Create a canvas for the custom progress bar
+#        self.progress_bar_canvas = tk.Canvas(self.root, width=200, height=20, background="#78c850", bd=0, highlightthickness=0)
+#        self.progress_bar_canvas.grid(row=4, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
+
+        # Create a canvas for the custom progress bar
+        self.progress_bar_canvas = tk.Canvas(self.root, width=200, height=20, background="white", bd=0, highlightthickness=0)
+        self.progress_bar_canvas.grid(row=4, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
+
+
+
+#        # Create a frame for the plots
+#        self.plot_frame = ttk.Frame(self.root)
+#        self.plot_frame.grid(row=3, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
+
+#        # Initialize Matplotlib figure and axis
+#        self.fig, self.ax = plt.subplots()
+#        self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
+#        self.canvas_widget = self.canvas.get_tk_widget()
+#        self.canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        # Initialize variables for simulation thread
+        self.simulation_thread = None
+        self.simulation_running = False
+
+        # --------------------------------------> Run a sim and plot residuals----------------------        
         
         # Initialize the available fuels to choose from
         self.fuels = ["Methanol", "Ammonia", "Dodecane"]
 
         # Create a button to open a directory dialog
-        style1 = ttk.Style()
+        style = ttk.Style()
         #style.configure("TButton", background="#3EAAAF")
         # --> style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
-        style1.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
         self.browse_button.grid(row=1, column=2, pady=10, padx=10, sticky="ew")
         
         # Create a button to import a geometry
-        style2 = ttk.Style()
-        style2.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+        style = ttk.Style()
+        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
         self.import_button.grid(row=0, column=2, pady=10, padx=10)
 
-
         # Create a label for the "Fuel Selector" dropdown
-        #self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options", font=("TkDefaultFont", 10, "bold"), background="lightblue") # , foreground="green")
         self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options →", font=("TkDefaultFont", 12), background="lightblue") # , foreground="green")
         self.fuel_selector_label.grid(row=1, column=0, pady=5, padx=10, sticky="w")
 
@@ -162,7 +203,7 @@ class TerminalApp:
 
         # Create a dropdown menu for fuel selection
         self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=fuels)
-        self.fuel_selector.grid(row=1, column=1, pady=5, padx=10, sticky="w")
+        self.fuel_selector.grid(row=2, column=0, pady=10, padx=10, sticky="w")
 
         # Bind an event handler to the <<ComboboxSelected>> event
         self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
@@ -271,7 +312,7 @@ class TerminalApp:
         # Update the status label
         self.status_label.config(text=f"Fuel replaced. Selected fuel: {selected_fuel}", foreground="green")
         
-        
+       
     def import_geometry(self):
         file_path = filedialog.askopenfilename(
             title="Select Geometry File",
@@ -301,10 +342,141 @@ class TerminalApp:
             self.status_label.config(text="No file selected for import", foreground="red")
             return
             
+    # --------------------- running the simulation ---------------------------
+    def initialize_case(self):
+        selected_directory = filedialog.askdirectory()
+        if selected_directory:
+            self.selected_file_path = selected_directory
+            self.status_label.config(text=f"Case directory identified: {selected_directory}", foreground="blue")
+            self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
+        else:
+            self.status_label.config(text="No directory selected.", foreground="red")
+            self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
+            
+    def run_simulation(self):
+        if not self.simulation_running:
+            # Start the simulation in a separate thread
+            self.simulation_thread = threading.Thread(target=self.run_openfoam_simulation)
+            self.simulation_thread.start()
+            self.simulation_running = True
+        else:
+            tk.messagebox.showinfo("Simulation Running", "Simulation is already running.")
+
+    def run_openfoam_simulation(self):
+        if self.selected_file_path is None:
+            tk.messagebox.showerror("Error", "Please initialize the case directory before running the simulation.")
+            return
+
+        allrun_script = os.path.join(self.selected_file_path, "Allrun")
+        if os.path.exists(allrun_script):
+            # Add execution permissions to the Allrun script
+            chmod_command = ["chmod", "+x", allrun_script]
+            subprocess.run(chmod_command, check=True)
+
+            try:
+                # Schedule the start of the progress bar with a short delay
+                self.root.after(1, self.start_progress_bar)
+                
+                # Now run the simulation (replace this with your actual simulation code)
+                process = subprocess.run(["./Allrun"], cwd=self.selected_file_path, check=True, capture_output=True, text=True)
+                print(process.stdout)
+                print(process.stderr)
+
+                # Add a pop-up message indicating that the simulation is finished
+                tk.messagebox.showinfo("Simulation Finished", "Simulation completed successfully.")
+            except subprocess.CalledProcessError as e:
+                tk.messagebox.showerror("Error", f"Error running Allrun script: {e.stderr}")
+            finally:
+                # Stop the progress bar
+                self.stop_progress_bar()
+        else:
+            tk.messagebox.showerror("Error", "Allrun script not found!")
+
+##    def start_progress_bar(self):
+##        # Start the progress bar
+##        self.progress_bar.start()
+
+##    def stop_progress_bar(self):
+##        # Stop the progress bar
+##        self.progress_bar.stop()
+
+    def start_progress_bar(self):
+        # Start the custom progress bar with a sliding and fading effect
+        self.progress_bar_canvas.delete("progress")
+        self.progress_bar_canvas.coords("progress", 0, 0, 0, 20)
+        self.fade_progress_color(0)
+
+    def fade_progress_color(self, progress):
+        # Darken the color by reducing the intensity
+        intensity = int(255 - (progress * 2.55))
+        color = "#{:02x}{:02x}{:02x}".format(intensity, 200, 80)
+
+        # Set the new color and adjust the progress bar position
+        self.progress_bar_canvas.itemconfig("progress", fill=color)
+        self.progress_bar_canvas.coords("progress", progress, 0, progress + 200, 20)
+
+        # Schedule the next fade iteration
+        if progress < 100:
+            self.root.after(50, lambda: self.fade_progress_color(progress + 1))
+
+    def stop_progress_bar(self):
+        # Stop the custom progress bar
+        self.progress_bar_canvas.delete("progress")
+        self.progress_bar_canvas.create_rectangle(0, 0, 200, 20, fill="lightblue", outline="#78c850", tags="progress")
+
+
+#        # Monitor residuals using foamMonitor
+#        self.monitor_residuals()
+
+#    def monitor_residuals(self):
+#        residuals_file = os.path.join(os.path.dirname(self.selected_file_path), "postProcessing", "residuals", "0", "residuals.dat")
+
+#        # Check if the residuals file exists
+#        if not os.path.exists(residuals_file):
+#            tk.messagebox.showerror("Error", "Residuals file not found!")
+#            return
+
+#        # Run foamMonitor to continuously monitor residuals
+#        foam_monitor_command = f"foamMonitor -l {residuals_file}"
+#        process = subprocess.Popen(foam_monitor_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+
+#        # Read and display residuals in real-time
+#        for line in iter(process.stdout.readline, b''):
+#            print(line.decode("utf-8"))
+
+#            # Extract residuals from the output and update the plot
+#            residuals = [float(x) for x in re.findall(r"residual\s*=\s*([\d.]+)", line.decode("utf-8"))]
+
+#            if residuals:
+#                self.update_plot(residuals)
+
+#        process.stdout.close()
+#        process.stderr.close()
+
+#        # Wait for foamMonitor to finish
+#        process.wait()
+
+#        # Update UI
+#        self.simulation_running = False
+#        print("Residual monitoring completed.")
+
+#    def update_plot(self, residuals):
+#        # Update the plot with new residuals
+#        self.ax.clear()
+#        self.ax.plot(residuals, label="Residuals")
+#        self.ax.set_xlabel("Iteration")
+#        self.ax.set_ylabel("Residual Value")
+#        self.ax.legend()
+#        self.canvas.draw()
+    # --------------------- running the simulation ---------------------------
+            
+            
 if __name__ == "__main__":
     root = tk.Tk()
     app = TerminalApp(root)
     root.mainloop()   
+     
+     
         
 #    def import_geometry(self):
 #        # Ask the user to select a geometry file
