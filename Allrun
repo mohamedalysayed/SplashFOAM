@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# Run from this directory
+cd "${0%/*}" || exit 1
+
+# Source tutorial run functions
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+
+# Example with runApplication:
+# - runs blockMesh in background
+# - redirecting standard output to log.blockMesh
+# - does *not* run in log file already exists
+
+# Removing old solution 
+foamListTimes -rm
+
+rm log.*
+rm -r dynamicCode
+rm -r postProcessing
+rm -r 0
+
+foamDictionary system/controlDict -entry writeFormat -set ascii
+
+#runApplication blockMesh
+#runApplication extrudeMesh
+
+# Creating the initialization directory
+cp -r 0.orig/ 0
+setFields
+
+#foamDictionary system/decomposeParDict -entry numberOfSubdomains -set 6
+#decomposePar -force
+
+#mpirun -np 6 compressibleInterFoam -parallel > out-mediumMesh-MS-parallel6procs.dat & 
+compressibleInterFoam > log & 
+
+sleep 2
+
+foamMonitor -l postProcessing/residuals/0/residuals.dat 
+#------------------------------------------------------------------------------
