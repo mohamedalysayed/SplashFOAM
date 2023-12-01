@@ -1,3 +1,10 @@
+Code Instructions:
+-------------------
+
+1- Meshing takes place inside constant/geometry in a newly created folder names "Meshing"
+
+
+
 Your GUI code for OpenFOAM looks well-structured and organized. It appears to be a good start for building a graphical user interface for OpenFOAM simulations. I'll provide some feedback and suggestions to enhance and improve your code:
 
 Consistent Styling:

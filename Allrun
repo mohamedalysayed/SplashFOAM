@@ -34,6 +34,8 @@ setFields
 #mpirun -np 6 compressibleInterFoam -parallel > out-mediumMesh-MS-parallel6procs.dat & 
 compressibleInterFoam > log & 
 
+tail -10f log 
+
 sleep 2
 
 foamMonitor -l postProcessing/residuals/0/residuals.dat 

@@ -1,4 +1,5 @@
 import tkinter as tk 
+import tkinter.simpledialog  # Import simpledialog for user input
 from tkinter.simpledialog import askstring
 from tkinter import ttk, filedialog, messagebox, simpledialog
 from PIL import Image, ImageTk
@@ -10,7 +11,7 @@ import time  # Add this import for demonstration purposes
 import shutil  # For file copying
 import threading  # Import threading for running simulation in a separate thread
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkinter import Listbox
 
 
 class ReplacePropertiesPopup:
@@ -118,78 +119,73 @@ class ReplacePropertiesPopup:
                 file.write(file_content)
 
             self.status_label.config(text="Parameters added successfully", foreground="green")
-                
-            
-            
+
+#__________________
+#
+# TERMINAL APP 
+#__________________           
 class TerminalApp:  
     def __init__(self, root):
         self.root = root
         self.root.config(background="white") # black
         self.root.title("Splash - OpenFOAM")
         
-        # Create a button to initialize the case directory
-        self.initialize_case_button = ttk.Button(self.root, text="Initialize Case", command=self.initialize_case)
-        self.initialize_case_button.grid(row=2, column=2, pady=10, padx=10, sticky="ew")
+        # Display a welcome message
+        self.show_welcome_message()
         
-        # --------------------------------------> Run a sim and plot residuals----------------------
-        # Create a button to run simulation
-        self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_openfoam_simulation)
-        self.run_simulation_button.grid(row=3, column=2, pady=10, padx=10, sticky="ew")
+        #  Source OpenFOAM Libraries
+        #self.source_openfoam_libraries()
         
-#        # Create a progress bar
-#        self.progress_bar = ttk.Progressbar(self.root, mode="indeterminate", length=200)
-#        self.progress_bar.grid(row=4, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
+        # Add logos
+        self.add_logos()
 
-#         # Create a progress bar
-#        self.progress_bar = ttk.Progressbar(self.root, mode="indeterminate", length=200, style="TProgressbar")
-#        self.progress_bar.grid(row=4, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
-
-#        # Create a canvas for the custom progress bar
-#        self.progress_bar_canvas = tk.Canvas(self.root, width=200, height=20, background="#78c850", bd=0, highlightthickness=0)
-#        self.progress_bar_canvas.grid(row=4, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
-
-        # Create a canvas for the custom progress bar
-        self.progress_bar_canvas = tk.Canvas(self.root, width=200, height=20, background="white", bd=0, highlightthickness=0)
-        self.progress_bar_canvas.grid(row=4, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
-
-
-
-#        # Create a frame for the plots
-#        self.plot_frame = ttk.Frame(self.root)
-#        self.plot_frame.grid(row=3, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
-
-#        # Initialize Matplotlib figure and axis
-#        self.fig, self.ax = plt.subplots()
-#        self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
-#        self.canvas_widget = self.canvas.get_tk_widget()
-#        self.canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
-        # Initialize variables for simulation thread
-        self.simulation_thread = None
-        self.simulation_running = False
-
-        # --------------------------------------> Run a sim and plot residuals----------------------        
-        
-        # Initialize the available fuels to choose from
-        self.fuels = ["Methanol", "Ammonia", "Dodecane"]
-
-        # Create a button to open a directory dialog
-        style = ttk.Style()
-        #style.configure("TButton", background="#3EAAAF")
-        # --> style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
-        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
-        self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
-        self.browse_button.grid(row=1, column=2, pady=10, padx=10, sticky="ew")
-        
         # Create a button to import a geometry
         style = ttk.Style()
         style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
         self.import_button.grid(row=0, column=2, pady=10, padx=10)
+        
+        # Create a button to open a directory dialog
+        style = ttk.Style()
+        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
+        self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
+        self.browse_button.grid(row=1, column=2, pady=10, padx=10, sticky="ew")
+        
+        # Create a button to initialize the case directory
+        style = ttk.Style()
+        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
+        self.initialize_case_button = ttk.Button(self.root, text="Initialize Case", command=self.initialize_case)
+        self.initialize_case_button.grid(row=2, column=2, pady=10, padx=10, sticky="ew")
+        
+        # Create a button to run simulation
+        style = ttk.Style()
+        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
+        #self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_openfoam_simulation)
+        self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
+        self.run_simulation_button.grid(row=3, column=2, pady=10, padx=10, sticky="ew")
+        
+        # Stop Simulation Button
+        style = ttk.Style()
+        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
+        #style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+        self.stop_simulation_button = ttk.Button(self.root, text="Stop Simulation", command=self.stop_simulation)
+        self.stop_simulation_button.grid(row=4, column=2, pady=10, padx=10, sticky="ew")
+        #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
+        
+        # Create a canvas for the custom progress bar
+        self.progress_bar_canvas = tk.Canvas(self.root, width=200, height=20, background="white", bd=0, highlightthickness=0)
+        self.progress_bar_canvas.grid(row=6, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
 
+        # Initialize variables for simulation thread
+        self.simulation_thread = None
+        self.simulation_running = False
+        
+        # Initialize the available fuels to choose from
+        self.fuels = ["Methanol", "Ammonia", "Dodecane"]
+        
         # Create a label for the "Fuel Selector" dropdown
-        self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options →", font=("TkDefaultFont", 12), background="lightblue") # , foreground="green")
-        self.fuel_selector_label.grid(row=1, column=0, pady=5, padx=10, sticky="w")
+        self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options ▼", font=("TkDefaultFont", 12), background="cyan") # , foreground="green")
+        self.fuel_selector_label.grid(row=1, column=0, pady=10, padx=10, sticky="w")
 
         # Define the fuel options
         fuels = ["Methanol", "Ammonia", "Dodecane"]
@@ -278,8 +274,8 @@ class TerminalApp:
             return None
                   
     def on_fuel_selected(self, event):
-        selected_fuel = self.selected_fuel.get().lower()
-        if selected_fuel:
+        selected_fuel = self.fuel_options_menu.get().lower()
+        if selected_fuel and selected_fuel != "Fuel Options":
             current_fuel = self.detect_current_fuel()
             if current_fuel:
                 self.status_label.config(text=f"Current fuel: {current_fuel}", foreground="blue")
@@ -307,17 +303,61 @@ class TerminalApp:
         except FileNotFoundError:
             # Handle the case where the file does not exist
             pass
-        # -----------------------------------------------------------------------------------------------------<
-
+            
         # Update the status label
         self.status_label.config(text=f"Fuel replaced. Selected fuel: {selected_fuel}", foreground="green")
+        # -----------------------------------------------------------------------------------------------------<
+
+            
+    # -------------- Welcome Message --------------------------    
+    def show_welcome_message(self):
+        welcome_message = "Welcome to Splash - OpenFOAM!\n\n"\
+                          "This is your interactive OpenFOAM simulation tool.\n"\
+                          "Start by importing geometry and configuring your case."
+
+        # You can choose to display the welcome message in a label or a messagebox
+        # Label Example:
+        welcome_label = ttk.Label(self.root, text=welcome_message, font=("TkDefaultFont", 12), background="lightblue")
+        welcome_label.grid(row=0, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
+
+        # OR
+
+        # Messagebox Example:
+        messagebox.showinfo("Welcome", welcome_message)
+        welcome_label.destroy()
+    # -------------- Welcome Message --------------------------    
+    
+    # -------------- Main logos --------------------------    
+    def add_logos(self):
+
+        # Load and display SMLT logo
+        #self.logo_image = Image.open("logoWinGD.jpg")  # Replace with your logo file name
+        self.logo_image = Image.open("logos/simulitica_logo.png")  # Replace with your logo file name
+        self.logo_image = self.logo_image.resize((100, 60))
+        self.logo_image = ImageTk.PhotoImage(self.logo_image)
+        self.logo_label = tk.Label(self.root, image=self.logo_image)
+        self.logo_label.grid(row=3, column=0, pady=10, padx=10, sticky="ew")
+
+#        # Load and display openfoam logo
+#        #self.logo_image = Image.open("logoWinGD.jpg")  # Replace with your logo file name
+#        self.logo_image = Image.open("logos/simulitica_logo.png")  # Replace with your logo file name
+#        self.logo_image = self.logo_image.resize((100, 60))
+#        self.logo_image = ImageTk.PhotoImage(self.logo_image)
+#        self.logo_label = tk.Label(self.root, image=self.logo_image)
+#        self.logo_label.grid(row=3, column=0, pady=10, padx=10, sticky="ew")
+
+        # Create a label for copyright text
+        self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
+        self.copyright_label.grid(row=4, column=0, pady=10, padx=10, sticky="ew")
+            
+   # -------------- Main logos --------------------------        
         
-       
+        
+    # -------------- importing the geometry --------------------------------------------------------------------    
     def import_geometry(self):
         file_path = filedialog.askopenfilename(
             title="Select Geometry File",
             filetypes=[("STL Files", "*.stl"), ("OBJ Files", "*.obj"), ("All Files", "*.*")],
-            #initialdir=os.path.expanduser("~"),
             initialdir=os.path.dirname(self.selected_file_path) if self.selected_file_path else None
         )
 
@@ -334,13 +374,64 @@ class TerminalApp:
             geometry_filename = f"CAD.{file_path.split('.')[-1].lower()}"
             geometry_dest = os.path.join(meshing_folder, geometry_filename)
             shutil.copyfile(self.selected_file_path, geometry_dest)
-
-            print(f"Geometry imported to: {geometry_dest}")
             
-        #Check if a file is selected
-        if not self.selected_file_path:
-            self.status_label.config(text="No file selected for import", foreground="red")
-            return
+            # CAD programs logo paths 
+            freecad_logo_path = os.path.join("logos", "freecad_logo.png")
+            gmsh_logo_path = os.path.join("logos", "gmsh_logo.png")
+            paraview_logo_path = os.path.join("logos", "paraview_logo.png")
+
+
+            # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
+            popup = tk.Toplevel(self.root)
+            popup.title("Choose CAD Viewer")
+            popup.geometry("400x400")
+
+            def open_freecad():
+                subprocess.run(["freecad", geometry_dest, "&"], check=True)
+                # Zoom to fit
+                try:
+                    doc = FreeCAD.ActiveDocument
+                    doc.getObject(geometry_filename).ViewObject.Proxy.fit()
+                except Exception as e:
+                    print(f"Error zooming to fit in FreeCAD: {e}")
+                popup.destroy()
+
+            def open_gmsh():
+                subprocess.run(["gmsh", geometry_dest, "&"], check=True)
+                popup.destroy()
+
+            def open_paraview():
+                subprocess.run(["paraview", geometry_dest], check=True)
+                popup.destroy()
+
+            # Load logos
+            freecad_logo = Image.open(freecad_logo_path).resize((160, 50), Image.ANTIALIAS)
+            gmsh_logo = Image.open(gmsh_logo_path).resize((80, 70), Image.ANTIALIAS)
+            paraview_logo = Image.open(paraview_logo_path).resize((200, 40), Image.ANTIALIAS)
+
+            freecad_logo = ImageTk.PhotoImage(freecad_logo)
+            gmsh_logo = ImageTk.PhotoImage(gmsh_logo)
+            paraview_logo = ImageTk.PhotoImage(paraview_logo)
+
+            # Create buttons with logos for the CAD viewers
+            freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
+            freecad_button.image = freecad_logo
+            freecad_button.pack(side=tk.TOP, padx=30, pady=10)
+
+            gmsh_button = ttk.Button(popup, text="Open in Gmsh", command=open_gmsh, image=gmsh_logo, compound="top")
+            gmsh_button.image = gmsh_logo
+            gmsh_button.pack(side=tk.TOP, padx=20, pady=10)
+
+            paraview_button = ttk.Button(popup, text="Open in ParaView", command=open_paraview, image=paraview_logo, compound="top")
+            paraview_button.image = paraview_logo
+            paraview_button.pack(side=tk.TOP, padx=30, pady=10)
+
+            popup.mainloop()
+    
+        else:
+            tk.messagebox.showerror("Error", "No file selected for import")
+        # -------------- importing the geometry --------------------------------------------------------------------    
+            
             
     # --------------------- running the simulation ---------------------------
     def initialize_case(self):
@@ -352,54 +443,69 @@ class TerminalApp:
         else:
             self.status_label.config(text="No directory selected.", foreground="red")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
-            
-    def run_simulation(self):
-        if not self.simulation_running:
-            # Start the simulation in a separate thread
-            self.simulation_thread = threading.Thread(target=self.run_openfoam_simulation)
-            self.simulation_thread.start()
-            self.simulation_running = True
-        else:
-            tk.messagebox.showinfo("Simulation Running", "Simulation is already running.")
 
-    def run_openfoam_simulation(self):
+
+    def run_simulation(self):
         if self.selected_file_path is None:
             tk.messagebox.showerror("Error", "Please initialize the case directory before running the simulation.")
             return
 
+        if not self.simulation_running:
+            self.simulation_thread = threading.Thread(target=self.run_openfoam_simulation)
+            self.simulation_thread.start()
+            self.simulation_running = True
+            self.stop_simulation_button["state"] = tk.NORMAL
+        else:
+            tk.messagebox.showinfo("Simulation Running", "Simulation is already running.")
+
+    def run_openfoam_simulation(self):
         allrun_script = os.path.join(self.selected_file_path, "Allrun")
         if os.path.exists(allrun_script):
-            # Add execution permissions to the Allrun script
             chmod_command = ["chmod", "+x", allrun_script]
             subprocess.run(chmod_command, check=True)
 
             try:
-                # Schedule the start of the progress bar with a short delay
-                self.root.after(1, self.start_progress_bar)
-                
-                # Now run the simulation (replace this with your actual simulation code)
-                process = subprocess.run(["./Allrun"], cwd=self.selected_file_path, check=True, capture_output=True, text=True)
+                self.start_progress_bar()
+                process = subprocess.run(["./Allrun"], cwd=self.selected_file_path, text=True, capture_output=True)
                 print(process.stdout)
                 print(process.stderr)
 
-                # Add a pop-up message indicating that the simulation is finished
-                tk.messagebox.showinfo("Simulation Finished", "Simulation completed successfully.")
+                if "Execution halted" not in process.stderr:
+                    tk.messagebox.showinfo("Simulation Finished", "Simulation completed successfully.")
+                else:
+                    tk.messagebox.showerror("Simulation Error", "There was an error during simulation. Check the console output.")
             except subprocess.CalledProcessError as e:
                 tk.messagebox.showerror("Error", f"Error running Allrun script: {e.stderr}")
             finally:
-                # Stop the progress bar
                 self.stop_progress_bar()
+                self.stop_simulation_button["state"] = tk.DISABLED
         else:
             tk.messagebox.showerror("Error", "Allrun script not found!")
 
-##    def start_progress_bar(self):
-##        # Start the progress bar
-##        self.progress_bar.start()
+    def stop_simulation(self):
+        if not self.simulation_running:
+            tk.messagebox.showinfo("Nothing to Stop", "There's no simulation currently running to stop.")
+            return
 
-##    def stop_progress_bar(self):
-##        # Stop the progress bar
-##        self.progress_bar.stop()
+        control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
+        if os.path.exists(control_dict_path):
+            try:
+                self.replace_end_time_with_write_now(control_dict_path)
+                tk.messagebox.showinfo("Stop Simulation", "Simulation stopped successfully.")
+                self.replace_write_now_with_end_time(control_dict_path)
+            except subprocess.CalledProcessError as e:
+                tk.messagebox.showerror("Error", f"Error stopping simulation: {e.stderr}")
+        else:
+            tk.messagebox.showerror("Error", "controlDict file not found!")
 
+        self.stop_simulation_button["state"] = tk.DISABLED
+
+    def replace_end_time_with_write_now(self, control_dict_path):
+        subprocess.run(["sed", "-i", 's/endTime/writeNow/g', control_dict_path], check=True)
+    def replace_write_now_with_end_time(self, control_dict_path):
+        subprocess.run(["sed", "-i", 's/writeNow/endTime/g', control_dict_path], check=True)
+        
+                
     def start_progress_bar(self):
         # Start the custom progress bar with a sliding and fading effect
         self.progress_bar_canvas.delete("progress")
@@ -423,6 +529,38 @@ class TerminalApp:
         # Stop the custom progress bar
         self.progress_bar_canvas.delete("progress")
         self.progress_bar_canvas.create_rectangle(0, 0, 200, 20, fill="lightblue", outline="#78c850", tags="progress")
+         
+    
+###    def source_openfoam_libraries(self):
+###        # Get the path to the user's home directory
+###        home_directory = os.path.expanduser("~")
+
+###        # Construct the full path to the OpenFOAM bashrc file
+###        openfoam_bashrc = os.path.join(home_directory, "OpenFOAM", "OpenFOAM-v2012", "etc", "bashrc")
+
+###        # Set up the environment for OpenFOAM by sourcing the relevant bashrc file
+###        source_command = f"source {openfoam_bashrc} && exec $SHELL"
+###        subprocess.run(source_command, shell=True, check=True)
+
+###        # Now the environment should be set up, and you can run the 'of11' command
+###        current_directory = os.getcwd()
+###        process = subprocess.run(["of11"], cwd=current_directory, check=True, capture_output=True, text=True)
+###        
+###        # Check if the command was successful
+###        if process.returncode == 0:
+###            # Print only if the command was successful
+###            print("Command output:", process.stdout)
+###        else:
+###            # Print both stdout and stderr if the command failed
+###            print("Command output:", process.stdout)
+###            print("Command error:", process.stderr)
+        
+        
+        
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TerminalApp(root)
+    root.mainloop()   
 
 
 #        # Monitor residuals using foamMonitor
@@ -471,13 +609,7 @@ class TerminalApp:
     # --------------------- running the simulation ---------------------------
             
             
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = TerminalApp(root)
-    root.mainloop()   
-     
-     
-        
+
 #    def import_geometry(self):
 #        # Ask the user to select a geometry file
 #        geometry_file = filedialog.askopenfilename(
