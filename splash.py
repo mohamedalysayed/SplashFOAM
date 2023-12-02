@@ -150,26 +150,35 @@ class TerminalApp:
         style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
         self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
         self.browse_button.grid(row=1, column=2, pady=10, padx=10, sticky="ew")
+        self.geometry_loaded = False
+        
+        # Create a mesh type variable
+        self.mesh_type_var = tk.StringVar(value="Cartesian")
+        # Create a button to create the mesh
+        style = ttk.Style()
+        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
+        self.create_mesh_button = ttk.Button(self.root, text="Create Mesh", command=self.create_mesh)
+        self.create_mesh_button.grid(row=2, column=2, pady=10, padx=10)
         
         # Create a button to initialize the case directory
         style = ttk.Style()
         style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
         self.initialize_case_button = ttk.Button(self.root, text="Initialize Case", command=self.initialize_case)
-        self.initialize_case_button.grid(row=2, column=2, pady=10, padx=10, sticky="ew")
+        self.initialize_case_button.grid(row=3, column=2, pady=10, padx=10, sticky="ew")
         
         # Create a button to run simulation
         style = ttk.Style()
         style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
         #self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_openfoam_simulation)
         self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
-        self.run_simulation_button.grid(row=3, column=2, pady=10, padx=10, sticky="ew")
+        self.run_simulation_button.grid(row=4, column=2, pady=10, padx=10, sticky="ew")
         
         # Stop Simulation Button
         style = ttk.Style()
         style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
         #style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         self.stop_simulation_button = ttk.Button(self.root, text="Stop Simulation", command=self.stop_simulation)
-        self.stop_simulation_button.grid(row=4, column=2, pady=10, padx=10, sticky="ew")
+        self.stop_simulation_button.grid(row=5, column=2, pady=10, padx=10, sticky="ew")
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
         # Create a canvas for the custom progress bar
@@ -365,6 +374,8 @@ class TerminalApp:
             self.selected_file_path = file_path
             meshing_folder = os.path.join(os.path.dirname(self.selected_file_path), "Meshing")
             self.status_label.config(text="The geometry file is successfully imported!", foreground="blue")
+            # To enable meshing to start
+            self.geometry_loaded = True
 
             # Create the Meshing folder if it doesn't exist
             if not os.path.exists(meshing_folder):
@@ -529,6 +540,45 @@ class TerminalApp:
         # Stop the custom progress bar
         self.progress_bar_canvas.delete("progress")
         self.progress_bar_canvas.create_rectangle(0, 0, 200, 20, fill="lightblue", outline="#78c850", tags="progress")
+        
+    def create_mesh(self):
+        # Check if geometry is loaded
+        if not self.geometry_loaded:
+            messagebox.showinfo("Geometry Not Loaded", "Please load a geometry before creating the mesh.")
+            return
+
+        # Ask the user for mesh type using clickable buttons
+        mesh_type = self.ask_mesh_type()
+
+        if mesh_type is not None:
+            # Execute the meshing command based on the selected mesh type
+            if mesh_type == "Cartesian":
+                # Execute Cartesian mesh command
+                pass  # Replace with the actual command
+            elif mesh_type == "Polyhedral":
+                # Execute Polyhedral mesh command
+                pass  # Replace with the actual command
+            elif mesh_type == "Tetrahedral":
+                # Execute Polyhedral mesh command
+                pass  # Replace with the actual command
+
+    def ask_mesh_type(self):
+        # Create a popup to ask the user for mesh type
+        popup = tk.Toplevel(self.root)
+
+        # Add clickable buttons for mesh type
+        ttk.Radiobutton(popup, text="Cartesian", variable=self.mesh_type_var, value="Cartesian").pack()
+        ttk.Radiobutton(popup, text="Polyhedral", variable=self.mesh_type_var, value="Polyhedral").pack()
+        ttk.Radiobutton(popup, text="Tetrahedral", variable=self.mesh_type_var, value="Tetrahedral").pack()
+
+        # Add a button to confirm the selection
+        ttk.Button(popup, text="OK", command=popup.destroy).pack()
+
+        # Wait for the popup to be closed
+        self.root.wait_window(popup)
+
+        # Return the selected mesh type
+        return self.mesh_type_var.get()
          
     
 ###    def source_openfoam_libraries(self):
