@@ -201,7 +201,6 @@ class TerminalApp:
         self.stop_button.grid(row=8, column=0, pady=10, padx=10, sticky="ew")
         self.add_tooltip(self.stop_button, "Click to stop terminal command")
 
-  
         # Create a ttk.Style to configure the progress bar
         self.style = ttk.Style()
         self.style.configure("Custom.Horizontal.TProgressbar", thickness=20, troughcolor="lightgray", background="lightblue")
@@ -211,23 +210,11 @@ class TerminalApp:
         self.load_geometry_button.grid(row=9, column=0, pady=10, padx=10)
         self.add_tooltip(self.load_geometry_button, "Magicbox! click to see what's inside :)")
         
-
-      # Create a canvas for the custom progress bar
-#        self.progress_bar_canvas = tk.Canvas(self.root, width=200, height=20, background="white", bd=0, highlightthickness=0)
-#        self.progress_bar_canvas.grid(row=8, column=1, columnspan=3, pady=10, padx=10, sticky="ew")
-        
         # Create a progress bar with the custom style
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
         self.progress_bar_canvas.grid(row=8, column=1, padx=10, pady=10)
         self.progress_bar_canvas_flag=True
-        
-#        # Create a button to plot results using xmgrace
-#        self.plot_results_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results)
-#        self.plot_results_button.grid(row=8, column=0, pady=10, padx=10)
-#        self.add_tooltip(self.plot_results_button, "Click to plot simulation results using xmgrace")
 
-        
-        
         # Initialize variables for simulation thread
         self.simulation_thread = None
         self.simulation_running = False
@@ -610,8 +597,6 @@ class TerminalApp:
             # Execute the meshing command based on the selected mesh type
             if mesh_type == "Cartesian":
                 # Execute Cartesian mesh command
-                #pass  # Replace with the actual command
-                
                 # Running "AllmeshCartesian" script here
                 cartMesh_script = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
                 if os.path.exists(cartMesh_script):
@@ -619,53 +604,56 @@ class TerminalApp:
                     subprocess.run(chmod_command, check=True)
 
                     try:
-                    
                         # Activating the progress bar "again" - to be on the safe side
-                        self.progress_bar_canvas_flag=True
-                
+                        self.progress_bar_canvas_flag = True
                         self.start_progress_bar()
-##                        process = subprocess.run(["./AllmeshCartesian"], cwd=self.geometry_dest_path, text=True, capture_output=True)
-##                        print(process.stdout)
-##                        print(process.stderr)
 
-                        #____________________________________________________________________
+                        # Create a popup to get mesh parameters from the user
+                        mesh_params = ["maxCellSize", "boundaryCellSize"]  # Add other parameters as needed
+                        values = self.ask_mesh_parameters(mesh_params)
+
+                        # Generate the meshing command based on user input
+                        command = [f"./{os.path.basename(cartMesh_script)}"]
+                        for param, value in values.items():
+                            if value:
+                                command.extend([param, value])
+
                         # Create a new terminal window and execute the command
                         self.terminal_process = subprocess.Popen(
-                            #f"gnome-terminal -- bash -c 'source ~/.bashrc'",
-                            f"gnome-terminal -- bash -c 'cd {self.geometry_dest_path}; ./AllmeshCartesian; exec bash'",
+                            f"gnome-terminal -- bash -c 'cd {self.geometry_dest_path}; {' '.join(command)}; exec bash'",
                             shell=True,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             text=True,
                             preexec_fn=os.setsid,  # Create a new process group
-                        )  
-                        
+                        )
+
                         # Monitor the terminal process and display the output
                         self.monitor_terminal()
-                        #____________________________________________________________________
 
-                        #if "Execution halted" not in process.stderr:
-##                        if "END" not in process.stdout:
-##                            tk.messagebox.showinfo("Meshing is Finished", "Mesh construction was completed successfully.")
-##                        else:
-##                            tk.messagebox.showerror("Meshing Error", "There was an error during meshing. Check the console output.")
                     except subprocess.CalledProcessError as e:
                         tk.messagebox.showerror("Error", f"Error running AllmeshCartesian script: {e.stderr}")
                     finally:
-                        pass
-                        #self.progress_bar_canvas_flag=False
+                        self.progress_bar_canvas_flag = False
                 else:
                     tk.messagebox.showerror("Error", "AllmeshCartesian script not found!")
-                
-                # Mesh process should be over now - stop the progree bar 
-                self.progress_bar_canvas_flag=False
-                
+
             elif mesh_type == "Polyhedral":
                 # Execute Polyhedral mesh command
                 pass  # Replace with the actual command
             elif mesh_type == "Tetrahedral":
-                # Execute Polyhedral mesh command
+                # Execute Tetrahedral mesh command
                 pass  # Replace with the actual command
+
+    def ask_mesh_parameters(self, mesh_params):
+        # Create a popup to ask the user for mesh parameters
+        values = {}
+        for param in mesh_params:
+            value = tkinter.simpledialog.askstring("Mesh Parameter", f"Enter a value for {param}:")
+            if value is not None:
+                values[param] = value # FLAG: now the new values should be written back to AllmeshCartesian.. (stopped here!)
+        return values
+        
                 
     def ask_mesh_type(self):
         # Create a popup to ask the user for mesh type
