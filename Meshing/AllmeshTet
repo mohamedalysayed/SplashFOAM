@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Run from this directory
+cd "${0%/*}" || exit 1
+
+# Source tutorial run functions
+#. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+
+#source ~/.bashrc 
+#of2306
+. /usr/lib/openfoam/openfoam2306/etc/bashrc
+
+# Removing old mesh
+rm -rf log.cartesianMesh 
+rm -rf constant/polyMesh 
+rm -rf VTK
+
+# build the mesh in cartesian mode 
+cartesianMesh > log.cartesianMesh & 
+
+# Wait a second before executing the next line 
+sleep 6 # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
+
+# Saving the mesh in VTK format (for CAD viewers)
+foamToVTK
+
+# tail -10f log.cartesianMesh # race condition  
+
+#runApplication blockMesh
+#runApplication extrudeMesh
+
+#foamDictionary system/decomposeParDict -entry numberOfSubdomains -set 6
+#decomposePar -force
+#------------------------------------------------------------------------------

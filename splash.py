@@ -10,6 +10,7 @@ import signal
 import time  # Add this import for demonstration purposes
 import shutil  # For file copying
 import threading  # Import threading for running simulation in a separate thread
+from tkinter import scrolledtext # for terminal inside the program
 import matplotlib.pyplot as plt
 from tkinter import Listbox
 
@@ -141,50 +142,92 @@ class TerminalApp:
 
         # Create a button to import a geometry
         style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+        #style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black") # lightblue 
+        #style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black") # lightblue 
+        style.configure("TButton", width=15, height=10, relief="solid", background="#ffffe0", foreground="black") # thinner buttons 
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
-        self.import_button.grid(row=0, column=2, pady=10, padx=10)
+        self.import_button.grid(row=0, column=0, pady=10, padx=10)
+        self.add_tooltip(self.import_button, "Click to import the geometry to be simulated")        
         
         # Create a button to open a directory dialog
-        style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
         self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
-        self.browse_button.grid(row=1, column=2, pady=10, padx=10, sticky="ew")
+        self.browse_button.grid(row=1, column=0, pady=10, padx=10, sticky="ew")
+        self.add_tooltip(self.browse_button, "Click to change the physical properties of your fluid")
         self.geometry_loaded = False
         
         # Create a mesh type variable
         self.mesh_type_var = tk.StringVar(value="Cartesian")
+        
         # Create a button to create the mesh
-        style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
         self.create_mesh_button = ttk.Button(self.root, text="Create Mesh", command=self.create_mesh)
-        self.create_mesh_button.grid(row=2, column=2, pady=10, padx=10)
+        self.create_mesh_button.grid(row=2, column=0, pady=10, padx=20)
+        self.add_tooltip(self.create_mesh_button, "Click to start building your mesh")
         
         # Create a button to initialize the case directory
-        style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
         self.initialize_case_button = ttk.Button(self.root, text="Initialize Case", command=self.initialize_case)
-        self.initialize_case_button.grid(row=3, column=2, pady=10, padx=10, sticky="ew")
+        self.initialize_case_button.grid(row=3, column=0, pady=10, padx=10, sticky="ew")
+        self.add_tooltip(self.initialize_case_button, "Click to choose the running directory of your case")
         
         # Create a button to run simulation
-        style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
-        #self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_openfoam_simulation)
         self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
-        self.run_simulation_button.grid(row=4, column=2, pady=10, padx=10, sticky="ew")
+        self.run_simulation_button.grid(row=4, column=0, pady=10, padx=10, sticky="ew")
+        self.add_tooltip(self.run_simulation_button, "Click to start your simulation")
         
         # Stop Simulation Button
-        style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black")
-        #style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         self.stop_simulation_button = ttk.Button(self.root, text="Stop Simulation", command=self.stop_simulation)
-        self.stop_simulation_button.grid(row=5, column=2, pady=10, padx=10, sticky="ew")
+        self.stop_simulation_button.grid(row=5, column=0, pady=10, padx=10, sticky="ew")
+        self.add_tooltip(self.stop_simulation_button, "Click to terminate your simulation")
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
-        # Create a canvas for the custom progress bar
-        self.progress_bar_canvas = tk.Canvas(self.root, width=200, height=20, background="white", bd=0, highlightthickness=0)
-        self.progress_bar_canvas.grid(row=6, column=0, columnspan=3, pady=10, padx=10, sticky="ew")
+        # Create a button to plot results using xmgrace
+        self.plot_results_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results)
+        self.plot_results_button.grid(row=6, column=0, pady=10, padx=10)
+        self.add_tooltip(self.plot_results_button, "Click to plot simulation results using xmgrace")
 
+         # Create a button to execute the command
+        self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
+        self.execute_button.grid(row=7, column=0, pady=10, padx=10, sticky="ew")
+        self.add_tooltip(self.execute_button, "Click to run a terminal command")
+
+        # Create an entry field for entering the command with a default sentence
+        default_sentence = "top"
+        self.entry = ttk.Entry(self.root, width=20)
+        self.entry.grid(row=7, column=1, pady=10, padx=10, sticky="ew")
+        self.entry.insert(0, default_sentence) 
+
+
+        # Create a button to stop the command execution
+        self.stop_button = ttk.Button(self.root, text="Stop Command", command=self.stop_command, state=tk.DISABLED)
+        self.stop_button.grid(row=8, column=0, pady=10, padx=10, sticky="ew")
+        self.add_tooltip(self.stop_button, "Click to stop terminal command")
+
+  
+        # Create a ttk.Style to configure the progress bar
+        self.style = ttk.Style()
+        self.style.configure("Custom.Horizontal.TProgressbar", thickness=20, troughcolor="lightgray", background="lightblue")
+        
+        # Test button [10-12 taken!]
+        self.load_geometry_button = ttk.Button(self.root, text="Test button", command=self.import_geometry)
+        self.load_geometry_button.grid(row=9, column=0, pady=10, padx=10)
+        self.add_tooltip(self.load_geometry_button, "Magicbox! click to see what's inside :)")
+        
+
+      # Create a canvas for the custom progress bar
+#        self.progress_bar_canvas = tk.Canvas(self.root, width=200, height=20, background="white", bd=0, highlightthickness=0)
+#        self.progress_bar_canvas.grid(row=8, column=1, columnspan=3, pady=10, padx=10, sticky="ew")
+        
+        # Create a progress bar with the custom style
+        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
+        self.progress_bar_canvas.grid(row=8, column=1, padx=10, pady=10)
+        self.progress_bar_canvas_flag=True
+        
+#        # Create a button to plot results using xmgrace
+#        self.plot_results_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results)
+#        self.plot_results_button.grid(row=8, column=0, pady=10, padx=10)
+#        self.add_tooltip(self.plot_results_button, "Click to plot simulation results using xmgrace")
+
+        
+        
         # Initialize variables for simulation thread
         self.simulation_thread = None
         self.simulation_running = False
@@ -193,8 +236,8 @@ class TerminalApp:
         self.fuels = ["Methanol", "Ammonia", "Dodecane"]
         
         # Create a label for the "Fuel Selector" dropdown
-        self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options ▼", font=("TkDefaultFont", 12), background="cyan") # , foreground="green")
-        self.fuel_selector_label.grid(row=1, column=0, pady=10, padx=10, sticky="w")
+        self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options ▼", font=("TkDefaultFont", 12), background="#ffffe0") # , foreground="green")
+        self.fuel_selector_label.grid(row=0, column=1, pady=10, padx=10, sticky="w")
 
         # Define the fuel options
         fuels = ["Methanol", "Ammonia", "Dodecane"]
@@ -208,18 +251,20 @@ class TerminalApp:
 
         # Create a dropdown menu for fuel selection
         self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=fuels)
-        self.fuel_selector.grid(row=2, column=0, pady=10, padx=10, sticky="w")
+        self.fuel_selector.grid(row=1, column=1, pady=10, padx=10, sticky="w")
 
         # Bind an event handler to the <<ComboboxSelected>> event
         self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
        
         # Create a label for status messages
         self.status_label = ttk.Label(self.root, text="", foreground="blue")
-        self.status_label.grid(row=0, column=0, pady=5, padx=10, sticky="w")
+        self.status_label.grid(row=6, column=1, pady=10, padx=10, sticky="w")
 
         # ... (other initialization code)
         self.selected_file_path = None
         self.selected_file_content = None
+        self.geometry_dest_path = None
+        
         self.header = """/*--------------------------------*- C++ -*----------------------------------*\\
   =========                 |
   \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -230,6 +275,10 @@ class TerminalApp:
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
         self.mixture_params = ["molWeight", "rho", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
 
+    def run_terminal_command(self, command):
+        # Your existing method for running terminal commands goes here
+        pass
+    
     def browse_directory(self):
         selected_file = filedialog.askopenfilename()
 
@@ -320,7 +369,7 @@ class TerminalApp:
             
     # -------------- Welcome Message --------------------------    
     def show_welcome_message(self):
-        welcome_message = "Welcome to Splash - OpenFOAM!\n\n"\
+        welcome_message = "Welcome to Splash OpenFOAM!\n\n"\
                           "This is your interactive OpenFOAM simulation tool.\n"\
                           "Start by importing geometry and configuring your case."
 
@@ -330,35 +379,39 @@ class TerminalApp:
         welcome_label.grid(row=0, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
 
         # OR
-
+        #self.root.after(3000, welcome_label.destroy)
+        
         # Messagebox Example:
-        messagebox.showinfo("Welcome", welcome_message)
+        whatnot = "Once you hit OK, you will never see life the same way again!"
+        messagebox.showinfo("Welcome", whatnot)
         welcome_label.destroy()
+        
+
     # -------------- Welcome Message --------------------------    
     
     # -------------- Main logos --------------------------    
     def add_logos(self):
 
+        # Load and display openfoam logo
+        self.logo_openfoam = Image.open("logos/openfoam_logo.png")  
+        self.logo_openfoam = self.logo_openfoam.resize((140, 40))
+        self.logo_openfoam = ImageTk.PhotoImage(self.logo_openfoam)
+        self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
+        self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
+        self.OF_label.configure(background="white")
+        
         # Load and display SMLT logo
-        #self.logo_image = Image.open("logoWinGD.jpg")  # Replace with your logo file name
-        self.logo_image = Image.open("logos/simulitica_logo.png")  # Replace with your logo file name
-        self.logo_image = self.logo_image.resize((100, 60))
-        self.logo_image = ImageTk.PhotoImage(self.logo_image)
-        self.logo_label = tk.Label(self.root, image=self.logo_image)
-        self.logo_label.grid(row=3, column=0, pady=10, padx=10, sticky="ew")
-
-#        # Load and display openfoam logo
-#        #self.logo_image = Image.open("logoWinGD.jpg")  # Replace with your logo file name
-#        self.logo_image = Image.open("logos/simulitica_logo.png")  # Replace with your logo file name
-#        self.logo_image = self.logo_image.resize((100, 60))
-#        self.logo_image = ImageTk.PhotoImage(self.logo_image)
-#        self.logo_label = tk.Label(self.root, image=self.logo_image)
-#        self.logo_label.grid(row=3, column=0, pady=10, padx=10, sticky="ew")
+        self.logo_simulitica = Image.open("logos/simulitica_logo.png") 
+        self.logo_simulitica = self.logo_simulitica.resize((140, 70))
+        self.logo_simulitica = ImageTk.PhotoImage(self.logo_simulitica)
+        self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
+        self.simLabel.grid(row=11, column=0, pady=10, padx=10, sticky="ew")
+        self.simLabel.configure(background="white")
 
         # Create a label for copyright text
         self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
-        self.copyright_label.grid(row=4, column=0, pady=10, padx=10, sticky="ew")
-            
+        self.copyright_label.grid(row=12, column=0, pady=10, padx=10, sticky="ew")
+        self.simLabel.configure(background="white", font="bold")
    # -------------- Main logos --------------------------        
         
         
@@ -384,13 +437,14 @@ class TerminalApp:
             # Copy and rename the geometry file
             geometry_filename = f"CAD.{file_path.split('.')[-1].lower()}"
             geometry_dest = os.path.join(meshing_folder, geometry_filename)
+            self.geometry_dest_path = os.path.join(geometry_dest.split('CAD')[0])
+            #print({self.geometry_dest_path})
             shutil.copyfile(self.selected_file_path, geometry_dest)
             
             # CAD programs logo paths 
             freecad_logo_path = os.path.join("logos", "freecad_logo.png")
             gmsh_logo_path = os.path.join("logos", "gmsh_logo.png")
             paraview_logo_path = os.path.join("logos", "paraview_logo.png")
-
 
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
@@ -425,6 +479,8 @@ class TerminalApp:
             paraview_logo = ImageTk.PhotoImage(paraview_logo)
 
             # Create buttons with logos for the CAD viewers
+            style = ttk.Style()
+            style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black", borderwidth=1) # lightblue 
             freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
             freecad_button.image = freecad_logo
             freecad_button.pack(side=tk.TOP, padx=30, pady=10)
@@ -488,7 +544,7 @@ class TerminalApp:
             except subprocess.CalledProcessError as e:
                 tk.messagebox.showerror("Error", f"Error running Allrun script: {e.stderr}")
             finally:
-                self.stop_progress_bar()
+                #self.stop_progress_bar()
                 self.stop_simulation_button["state"] = tk.DISABLED
         else:
             tk.messagebox.showerror("Error", "Allrun script not found!")
@@ -514,33 +570,33 @@ class TerminalApp:
     def replace_end_time_with_write_now(self, control_dict_path):
         subprocess.run(["sed", "-i", 's/endTime/writeNow/g', control_dict_path], check=True)
     def replace_write_now_with_end_time(self, control_dict_path):
-        subprocess.run(["sed", "-i", 's/writeNow/endTime/g', control_dict_path], check=True)
-        
+        subprocess.run(["sed", "-i", 's/writeNow/endTime/g', control_dict_path], check=True)     
                 
     def start_progress_bar(self):
-        # Start the custom progress bar with a sliding and fading effect
-        self.progress_bar_canvas.delete("progress")
-        self.progress_bar_canvas.coords("progress", 0, 0, 0, 20)
-        self.fade_progress_color(0)
+        self.root.after(100, self.update_progress)
 
-    def fade_progress_color(self, progress):
-        # Darken the color by reducing the intensity
-        intensity = int(255 - (progress * 2.55))
-        color = "#{:02x}{:02x}{:02x}".format(intensity, 200, 80)
+    def update_progress(self):
+        # Update the progress bar value
+        self.progress_bar_canvas.step(5)
 
-        # Set the new color and adjust the progress bar position
-        self.progress_bar_canvas.itemconfig("progress", fill=color)
-        self.progress_bar_canvas.coords("progress", progress, 0, progress + 200, 20)
+        # Check if the flag is activated to stop the progress bar
+        if not self.progress_bar_canvas_flag:
+            self.stop_progress_bar()
+            return  # Exit the method to prevent further updates
 
-        # Schedule the next fade iteration
-        if progress < 100:
-            self.root.after(50, lambda: self.fade_progress_color(progress + 1))
+        # Schedule the update_progress method to be called after 100 milliseconds
+        self.root.after(100, self.update_progress)
 
     def stop_progress_bar(self):
-        # Stop the custom progress bar
-        self.progress_bar_canvas.delete("progress")
-        self.progress_bar_canvas.create_rectangle(0, 0, 200, 20, fill="lightblue", outline="#78c850", tags="progress")
-        
+        # Stop the progress bar
+        self.progress_bar_canvas.stop()
+
+        # Set the mode to 'determinate' to reset the progress bar
+        self.progress_bar_canvas.configure(mode="determinate")
+        self.progress_bar_canvas["value"] = 0
+   
+
+# -------------------------------- MESH CREATION ------------------------------
     def create_mesh(self):
         # Check if geometry is loaded
         if not self.geometry_loaded:
@@ -554,14 +610,63 @@ class TerminalApp:
             # Execute the meshing command based on the selected mesh type
             if mesh_type == "Cartesian":
                 # Execute Cartesian mesh command
-                pass  # Replace with the actual command
+                #pass  # Replace with the actual command
+                
+                # Running "AllmeshCartesian" script here
+                cartMesh_script = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
+                if os.path.exists(cartMesh_script):
+                    chmod_command = ["chmod", "+x", cartMesh_script]
+                    subprocess.run(chmod_command, check=True)
+
+                    try:
+                    
+                        # Activating the progress bar "again" - to be on the safe side
+                        self.progress_bar_canvas_flag=True
+                
+                        self.start_progress_bar()
+##                        process = subprocess.run(["./AllmeshCartesian"], cwd=self.geometry_dest_path, text=True, capture_output=True)
+##                        print(process.stdout)
+##                        print(process.stderr)
+
+                        #____________________________________________________________________
+                        # Create a new terminal window and execute the command
+                        self.terminal_process = subprocess.Popen(
+                            #f"gnome-terminal -- bash -c 'source ~/.bashrc'",
+                            f"gnome-terminal -- bash -c 'cd {self.geometry_dest_path}; ./AllmeshCartesian; exec bash'",
+                            shell=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            text=True,
+                            preexec_fn=os.setsid,  # Create a new process group
+                        )  
+                        
+                        # Monitor the terminal process and display the output
+                        self.monitor_terminal()
+                        #____________________________________________________________________
+
+                        #if "Execution halted" not in process.stderr:
+##                        if "END" not in process.stdout:
+##                            tk.messagebox.showinfo("Meshing is Finished", "Mesh construction was completed successfully.")
+##                        else:
+##                            tk.messagebox.showerror("Meshing Error", "There was an error during meshing. Check the console output.")
+                    except subprocess.CalledProcessError as e:
+                        tk.messagebox.showerror("Error", f"Error running AllmeshCartesian script: {e.stderr}")
+                    finally:
+                        pass
+                        #self.progress_bar_canvas_flag=False
+                else:
+                    tk.messagebox.showerror("Error", "AllmeshCartesian script not found!")
+                
+                # Mesh process should be over now - stop the progree bar 
+                self.progress_bar_canvas_flag=False
+                
             elif mesh_type == "Polyhedral":
                 # Execute Polyhedral mesh command
                 pass  # Replace with the actual command
             elif mesh_type == "Tetrahedral":
                 # Execute Polyhedral mesh command
                 pass  # Replace with the actual command
-
+                
     def ask_mesh_type(self):
         # Create a popup to ask the user for mesh type
         popup = tk.Toplevel(self.root)
@@ -579,7 +684,135 @@ class TerminalApp:
 
         # Return the selected mesh type
         return self.mesh_type_var.get()
-         
+        
+        
+# -------------------------------- MESH CREATION ------------------------------  
+# -------------------------------- Plot results ------------------------------  
+    # Function to plot results using xmgrace
+    def plot_results(self):
+        try:
+            # Check if xmgrace is installed
+            subprocess.run(["xmgrace", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            
+            # Run xmgrace in a new terminal window
+            subprocess.Popen(
+                f"gnome-terminal -- bash -c 'xmgrace; exec bash'",
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                preexec_fn=os.setsid,
+            )
+        except subprocess.CalledProcessError:
+            tk.messagebox.showerror("Error", "xmgrace is not installed or not in the system's PATH.")
+# -------------------------------- Plot results ------------------------------  
+     #=============================================================================
+    def execute_command(self):
+        #command = "source ~/.bashrc"; self.entry.get()
+        command = self.entry.get()
+
+        # Create a new terminal window and execute the command
+        self.terminal_process = subprocess.Popen(
+            #f"gnome-terminal -- bash -c 'source ~/.bashrc'",
+            f"gnome-terminal -- bash -c '{command}; exec bash'",
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            preexec_fn=os.setsid,  # Create a new process group
+        )
+        # Enable the stop button
+        self.stop_button.config(state=tk.NORMAL)
+
+        # Disable the execute button
+        self.execute_button.config(state=tk.DISABLED)
+
+        # Monitor the terminal process and display the output
+        self.monitor_terminal()
+
+    def monitor_terminal(self):
+        if self.terminal_process:
+            try:
+                # Read the standard output and standard error of the terminal
+                output, _ = self.terminal_process.communicate(timeout=0.1)
+                if output:
+                    self.output_text.insert(tk.END, output)
+                    self.output_text.see(tk.END)
+            except subprocess.TimeoutExpired:
+                # The terminal process is still running
+                self.root.after(100, self.monitor_terminal)
+            else:
+                # The terminal process has completed
+                self.execute_button.config(state=tk.NORMAL)
+                self.stop_button.config(state=tk.DISABLED)
+                self.status_label.config(text="Command executed successfully", foreground="green")
+                #self.status_label.delete(0, END)
+# ================================================================
+    def stop_command(self):
+        if self.terminal_process:
+            # Terminate the terminal process and its process group
+            os.killpg(os.getpgid(self.terminal_process.pid), signal.SIGTERM)
+            self.status_label.config(text="Command execution stopped", foreground="red")
+            
+# ===================Tool tip (hover over the button)=============================================
+    def add_tooltip(self, widget, text):
+        widget.bind("<Enter>", lambda event: self.show_tooltip_right(widget, text))
+        widget.bind("<Leave>", lambda event: self.hide_tooltip())
+        
+    def show_tooltip_right(self, widget, text):
+        x, y, _, _ = widget.bbox("insert")
+        x += widget.winfo_rootx() + 150  # Adjust 25 as needed for the desired distance
+        y += widget.winfo_rooty()
+        self.tooltip = tk.Toplevel(widget)
+        self.tooltip.wm_overrideredirect(True)
+        self.tooltip.wm_geometry(f"+{x}+{y}")
+        
+        label = ttk.Label(self.tooltip, text=text, justify='left', background='#ffffe0', relief='solid', borderwidth=1)
+        label.pack(ipadx=1)
+        
+    def hide_tooltip(self):
+        if hasattr(self, "tooltip"):
+            self.tooltip.destroy()
+            del self.tooltip
+
+    
+###class EmbeddedTerminalApp(TerminalApp):
+###    def __init__(self, root):
+###        # Call the constructor of the parent class (TerminalApp)
+###        super().__init__(root)
+
+###        # Create additional GUI components for the embedded terminal
+###        self.terminal_output = scrolledtext.ScrolledText(root, wrap=tk.WORD, height=20, width=80)
+###        self.terminal_output.grid(row=0, column=0, columnspan=2, sticky="nsew")
+
+###        self.input_entry = tk.Entry(root, width=80)
+###        self.input_entry.grid(row=1, column=0, sticky="ew")
+###        self.input_entry.bind("<Return>", self.run_command)
+
+###        self.run_button = tk.Button(root, text="Run Command", command=self.run_command)
+###        self.run_button.grid(row=1, column=1, sticky="ew")
+
+###        # Set row and column weights to allow resizing
+###        root.grid_rowconfigure(0, weight=1)
+###        root.grid_columnconfigure(0, weight=1)
+
+###    def run_command(self, event=None):
+###        command = self.input_entry.get()
+###        self.input_entry.delete(0, tk.END)
+
+###        self.terminal_output.insert(tk.END, f"$ {command}\n")
+
+###        # Call the run_terminal_command method from the parent class
+###        self.run_terminal_command(command)
+
+###    def run_terminal_command(self, command):
+###        try:
+###            process = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+###            self.terminal_output.insert(tk.END, process.stdout)
+###            self.terminal_output.insert(tk.END, process.stderr)
+
+###        except subprocess.CalledProcessError as e:
+###            self.terminal_output.insert(tk.END, f"Error: {e}\n")
     
 ###    def source_openfoam_libraries(self):
 ###        # Get the path to the user's home directory
@@ -610,6 +843,10 @@ class TerminalApp:
 if __name__ == "__main__":
     root = tk.Tk()
     app = TerminalApp(root)
+    
+    # Create an instance of EmbeddedTerminalApp, which inherits from TerminalApp
+    # app = EmbeddedTerminalApp(root)
+    
     root.mainloop()   
 
 
