@@ -763,79 +763,11 @@ class TerminalApp:
         if hasattr(self, "tooltip"):
             self.tooltip.destroy()
             del self.tooltip
-
-    
-###class EmbeddedTerminalApp(TerminalApp):
-###    def __init__(self, root):
-###        # Call the constructor of the parent class (TerminalApp)
-###        super().__init__(root)
-
-###        # Create additional GUI components for the embedded terminal
-###        self.terminal_output = scrolledtext.ScrolledText(root, wrap=tk.WORD, height=20, width=80)
-###        self.terminal_output.grid(row=0, column=0, columnspan=2, sticky="nsew")
-
-###        self.input_entry = tk.Entry(root, width=80)
-###        self.input_entry.grid(row=1, column=0, sticky="ew")
-###        self.input_entry.bind("<Return>", self.run_command)
-
-###        self.run_button = tk.Button(root, text="Run Command", command=self.run_command)
-###        self.run_button.grid(row=1, column=1, sticky="ew")
-
-###        # Set row and column weights to allow resizing
-###        root.grid_rowconfigure(0, weight=1)
-###        root.grid_columnconfigure(0, weight=1)
-
-###    def run_command(self, event=None):
-###        command = self.input_entry.get()
-###        self.input_entry.delete(0, tk.END)
-
-###        self.terminal_output.insert(tk.END, f"$ {command}\n")
-
-###        # Call the run_terminal_command method from the parent class
-###        self.run_terminal_command(command)
-
-###    def run_terminal_command(self, command):
-###        try:
-###            process = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-###            self.terminal_output.insert(tk.END, process.stdout)
-###            self.terminal_output.insert(tk.END, process.stderr)
-
-###        except subprocess.CalledProcessError as e:
-###            self.terminal_output.insert(tk.END, f"Error: {e}\n")
-    
-###    def source_openfoam_libraries(self):
-###        # Get the path to the user's home directory
-###        home_directory = os.path.expanduser("~")
-
-###        # Construct the full path to the OpenFOAM bashrc file
-###        openfoam_bashrc = os.path.join(home_directory, "OpenFOAM", "OpenFOAM-v2012", "etc", "bashrc")
-
-###        # Set up the environment for OpenFOAM by sourcing the relevant bashrc file
-###        source_command = f"source {openfoam_bashrc} && exec $SHELL"
-###        subprocess.run(source_command, shell=True, check=True)
-
-###        # Now the environment should be set up, and you can run the 'of11' command
-###        current_directory = os.getcwd()
-###        process = subprocess.run(["of11"], cwd=current_directory, check=True, capture_output=True, text=True)
-###        
-###        # Check if the command was successful
-###        if process.returncode == 0:
-###            # Print only if the command was successful
-###            print("Command output:", process.stdout)
-###        else:
-###            # Print both stdout and stderr if the command failed
-###            print("Command output:", process.stdout)
-###            print("Command error:", process.stderr)
-        
         
         
 if __name__ == "__main__":
     root = tk.Tk()
     app = TerminalApp(root)
-    
-    # Create an instance of EmbeddedTerminalApp, which inherits from TerminalApp
-    # app = EmbeddedTerminalApp(root)
-    
     root.mainloop()   
 
 

@@ -5,6 +5,81 @@ Code Instructions:
 
 
 
+----------------------
+About Splash 4.12.2023
+----------------------
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Here is an overview of each section in the code:
+
+Geometry Import
+import_geometry(self):
+Opens a file dialog for the user to select a geometry file (STL or OBJ).
+Copies and renames the geometry file to a "Meshing" folder.
+Creates a popup window with logos for FreeCAD, Gmsh, and ParaView, allowing the user to choose a CAD viewer.
+Calls functions (open_freecad, open_gmsh, open_paraview) to open the selected CAD viewer.
+Simulation Running
+initialize_case(self):
+
+Asks the user to select a directory for the simulation case.
+Enables the "Run Simulation" button if a directory is selected.
+run_simulation(self):
+
+Checks if a case directory is initialized.
+Starts a new thread (simulation_thread) to run the OpenFOAM simulation using the run_openfoam_simulation method.
+run_openfoam_simulation(self):
+
+Checks for the existence of an "Allrun" script in the case directory.
+Changes the script's permissions to make it executable.
+Executes the script and displays the output in the console.
+Stops the simulation if an error occurs during execution.
+stop_simulation(self):
+
+Stops the currently running simulation by modifying the controlDict file.
+Displays appropriate messages based on success or failure.
+Mesh Creation
+create_mesh(self):
+
+Checks if a geometry is loaded.
+Asks the user for the mesh type (Cartesian, Polyhedral, Tetrahedral).
+Executes the corresponding meshing command based on the selected type.
+ask_mesh_parameters(self, mesh_params):
+
+Asks the user for mesh parameters (maxCellSize, boundaryCellSize, etc.).
+Returns a dictionary of parameter names and values.
+ask_mesh_type(self):
+
+Creates a popup to ask the user for the mesh type (Cartesian, Polyhedral, Tetrahedral).
+Returns the selected mesh type.
+Plotting Results
+plot_results_xmgrace(self):
+Checks if xmgrace is installed.
+Runs xmgrace in a new terminal window.
+Command Execution
+execute_command(self):
+
+Executes a command entered by the user in a new terminal window.
+Monitors the terminal process and displays the output.
+monitor_terminal(self):
+
+Monitors the terminal process and updates the GUI with the process output.
+stop_command(self):
+
+Stops the currently running command in the terminal.
+Tooltip
+add_tooltip(self, widget, text):
+
+Adds a tooltip to a given widget (button) showing the specified text.
+show_tooltip_right(self, widget, text):
+
+Displays the tooltip to the right of the widget.
+hide_tooltip(self):
+
+Hides the tooltip.
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Your GUI code for OpenFOAM looks well-structured and organized. It appears to be a good start for building a graphical user interface for OpenFOAM simulations. I'll provide some feedback and suggestions to enhance and improve your code:
 
 Consistent Styling:
