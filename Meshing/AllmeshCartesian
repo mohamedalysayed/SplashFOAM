@@ -33,6 +33,14 @@ rm -rf VTK
 # Update the user with the status - spinner goes after 
 echo "Mesh is being crafted..." & 
 
+# Modify mesh parameters 
+foamDictionary system/meshDict -entry minCellSize -set 
+foamDictionary system/meshDict -entry maxCellSize -set 
+foamDictionary system/meshDict -entry boundaryCellSize -set 
+foamDictionary system/meshDict -entry nLayers -set 
+foamDictionary system/meshDict -entry thicknessRatio -set 
+foamDictionary system/meshDict -entry maxFirstLayerThickness -set 
+
 # build the mesh in cartesian mode 
 cartesianMesh > log.cartesianMesh & 
 #cartesianMesh # -> once you change to this, the user will have instantaneos info, however, NO stored info :/ 
@@ -66,6 +74,4 @@ paraview VTK/Meshing_0/internal.vtu &
 #runApplication blockMesh
 #runApplication extrudeMesh
 
-#foamDictionary system/decomposeParDict -entry numberOfSubdomains -set 6
-#decomposePar -force
 #------------------------------------------------------------------------------
