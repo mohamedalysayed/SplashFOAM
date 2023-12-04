@@ -180,9 +180,9 @@ class TerminalApp:
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
         # Create a button to plot results using xmgrace
-        self.plot_results_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results)
-        self.plot_results_button.grid(row=6, column=0, pady=10, padx=10)
-        self.add_tooltip(self.plot_results_button, "Click to plot simulation results using xmgrace")
+        self.plot_results_xmgrace_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results_xmgrace)
+        self.plot_results_xmgrace_button.grid(row=6, column=0, pady=10, padx=10)
+        self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
 
          # Create a button to execute the command
         self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
@@ -658,6 +658,7 @@ class TerminalApp:
     def ask_mesh_type(self):
         # Create a popup to ask the user for mesh type
         popup = tk.Toplevel(self.root)
+        popup.geometry("250x120")
 
         # Add clickable buttons for mesh type
         ttk.Radiobutton(popup, text="Cartesian", variable=self.mesh_type_var, value="Cartesian").pack()
@@ -677,12 +678,12 @@ class TerminalApp:
 # -------------------------------- MESH CREATION ------------------------------  
 # -------------------------------- Plot results ------------------------------  
     # Function to plot results using xmgrace
-    def plot_results(self):
+    def plot_results_xmgrace(self):
         try:
             # Check if xmgrace is installed
             subprocess.run(["xmgrace", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             
-            # Run xmgrace in a new terminal window
+            # Run xmgrace in a new terminal window - FLAG: here we could just run it in the same terminal
             subprocess.Popen(
                 f"gnome-terminal -- bash -c 'xmgrace; exec bash'",
                 shell=True,
