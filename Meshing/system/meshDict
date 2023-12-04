@@ -1,42 +1,36 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                |
-| \\      /  F ield         | cfMesh: A library for mesh generation          | 
-|  \\    /   O peration     |                                                |
-|   \\  /    A nd           | Author: Franjo Juretic                         | 
-|    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2306                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 FoamFile
 {
-    version   2.0;
-    format    ascii;
-    class     dictionary;
-    location  "system";
-    object    meshDict;
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          meshDict;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+surfaceFile     "CAD.stl";
 
-//surfaceFile "constant/geomtry/CAD.stl";// "geom1.stl";
+minCellSize     0.0002;
 
-surfaceFile "CAD.stl";// "geom1.stl";
+maxCellSize     0.0005;
 
-maxCellSize 0.0002; //0.2;
+boundaryCellSize 0.00025;
 
-boundaryCellSize 0.0001;
+boundaryLayers
+{
+    nLayers         5;
+    thicknessRatio  1.1;
+    maxFirstLayerThickness 0.5;
+}
 
-//minCellSize 0.1;
+nLayers         0;
 
-//localRefinement
-//{
-//    patch0000
-//    {
-//        cellSize  0.05;
-//    }
-//    patch0007
-//    {
-//        cellSize  0.05;
-//    }
-//}
 
 // ************************************************************************* //
