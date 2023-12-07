@@ -234,21 +234,21 @@ class TerminalApp:
         self.add_tooltip(self.load_geometry_button, "Magicbox! click to see what's inside :)")
         
         #----------Text Widget with Scrollbar-----------       
-        checkMesh_button = ttk.Button(self.root, text="Mesh Quality", command=self.load_meshChecked)
-        checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(5, 0))
+        checkMesh_button = ttk.Button(self.root, text="Load Mesh Quality", command=self.load_meshChecked)
+        checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(1, 0), padx=10)
         #checkMesh_button.grid(row=2, column=1, pady=1, padx=10, sticky="ew")
-        checkMesh_button['width'] = 15  # Adjust the width as needed\
+        checkMesh_button['width'] = 18  # Adjust the width as needed\
         
         self.text_box = tk.Text(self.root, wrap="none", height=20, width=80)  # Adjust the width as needed
-        self.text_box.grid(row=3, column=1, columnspan=1, padx=5, pady=5, sticky=tk.W, rowspan=5)
+        self.text_box.grid(row=3, column=1, columnspan=1, padx=10, pady=1, sticky=tk.W, rowspan=5)
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=3, column=1, columnspan=1, pady=5, sticky='nse', rowspan=5)
+        self.text_box_scrollbar.grid(row=3, column=1, columnspan=1, pady=1, sticky='nse', rowspan=5)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
         #----------Text Widget with Scrollbar-----------
         
         # Create a progress bar with the custom style
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-        self.progress_bar_canvas.grid(row=9, column=1, padx=10, pady=1)
+        self.progress_bar_canvas.grid(row=9, column=1, padx=50, pady=1)
         self.progress_bar_canvas_flag=True
 
         # Initialize variables for simulation thread
