@@ -34,9 +34,9 @@ rm -rf VTK
 echo "Mesh is being crafted..." & 
 
 # Modify mesh parameters 
-foamDictionary system/meshDict -entry minCellSize -set 
-foamDictionary system/meshDict -entry maxCellSize -set 
-foamDictionary system/meshDict -entry boundaryCellSize -set 
+foamDictionary system/meshDict -entry minCellSize -set 0.0002
+foamDictionary system/meshDict -entry maxCellSize -set 0.0004
+foamDictionary system/meshDict -entry boundaryCellSize -set 0.0003
 foamDictionary system/meshDict -entry nLayers -set 
 foamDictionary system/meshDict -entry thicknessRatio -set 
 foamDictionary system/meshDict -entry maxFirstLayerThickness -set 
@@ -61,9 +61,15 @@ sleep_time=$((clock_time + 1))
 #sleep 4 # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
 sleep $sleep_time # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
 
+echo "Saving the mesh in VTK format..." &
 # Saving the mesh in VTK format (for CAD viewers)
 foamToVTK > log.foamToVTK-Cartesian &
 spinner $!
+
+echo "Checking mesh quality..." &
+checkMesh > meshChecked & 
+spinner $!
+
 
 echo "Opening mesh vtk file(s) in paraview..." &
 sleep 1 # wait a second then open the vtk file in paraview 
