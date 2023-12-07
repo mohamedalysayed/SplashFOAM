@@ -11,6 +11,7 @@ import time  # Add this import for demonstration purposes
 import shutil  # For file copying
 import threading  # Import threading for running simulation in a separate thread
 from tkinter import scrolledtext # for terminal inside the program
+from PIL import Image
 import matplotlib.pyplot as plt
 from tkinter import Listbox
 from collections import defaultdict  # Import defaultdict | for mesh parameters 
@@ -141,26 +142,39 @@ class TerminalApp:
         
         # Add logos
         self.add_logos()
+  
+        # Add a background image
+        #self.add_bgImage()
+        
+        #________________Sliding images_________________
+        self.current_image_index = 0
+        #self.image_paths = ["Resources/Images/racing-car.jpg", "Resources/Images/airplaneEngine.jpg", "Resources/Images/ship5.jpg", "Images/bubbles.jpg"]
+        self.image_paths = ["Resources/Images/airplaneEngine.jpg", "Resources/Images/racing-car.jpg", "Resources/Images/bubbles.jpg"]
+        self.time_delay = 2500  # Setting the time delay in milliseconds
+        self.add_bgImage()
+        self.start_slideshow()
+        #________________Sliding images_________________
         
         # A dictionary to define a help message for each mesh parameter 
         self.PARAMETER_HELP = {
-        "minCellSize": "Help for minCellSize:\nSpecify the minimum cell size.",
-        "maxCellSize": "Help for maxCellSize:\nSpecify the maximum cell size.",
-        "boundaryCellSize": "Help for boundaryCellSize:\nSpecify the cell size near boundaries."}
+        "minCellSize": "minCellSize:\nSpecify the minimum cell size [in meters]. As a first guess you might take divide the size of the smallest element in your geometry divided by 2!",
+        "maxCellSize": "maxCellSize:\nSpecify the maximum cell size [in meters]. As a first guess you might take divide the size of the smallest element in your geometry!",
+        "boundaryCellSize": "boundaryCellSize:\nSpecify the cell size near boundaries. As a first guess you might take divide the size of the smallest element in your geometry divided by 5!"}
         
 
         # Create a button to import a geometry
         style = ttk.Style()
-        #style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black") # lightblue 
-        #style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black") # lightblue 
-        style.configure("TButton", width=15, height=10, relief="solid", background="#ffffe0", foreground="black") # thinner buttons 
+        style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
+        #style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black") 
+        #style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black")
+        #style.configure("TButton", width=15, height=10, relief="solid", background="#ffffe0", foreground="black") # thinner buttons 
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
-        self.import_button.grid(row=0, column=0, pady=10, padx=10)
+        self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.import_button, "Click to import the geometry to be simulated")        
         
         # Create a button to open a directory dialog
         self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
-        self.browse_button.grid(row=1, column=0, pady=10, padx=10, sticky="ew")
+        self.browse_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.browse_button, "Click to change the physical properties of your fluid")
         self.geometry_loaded = False
         
@@ -169,45 +183,45 @@ class TerminalApp:
         
         # Create a button to create the mesh
         self.create_mesh_button = ttk.Button(self.root, text="Create Mesh", command=self.create_mesh)
-        self.create_mesh_button.grid(row=2, column=0, pady=10, padx=20)
+        self.create_mesh_button.grid(row=2, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.create_mesh_button, "Click to start building your mesh")
         
         # Create a button to initialize the case directory
         self.initialize_case_button = ttk.Button(self.root, text="Initialize Case", command=self.initialize_case)
-        self.initialize_case_button.grid(row=3, column=0, pady=10, padx=10, sticky="ew")
+        self.initialize_case_button.grid(row=3, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.initialize_case_button, "Click to choose the running directory of your case")
         
         # Create a button to run simulation
         self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
-        self.run_simulation_button.grid(row=4, column=0, pady=10, padx=10, sticky="ew")
+        self.run_simulation_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.run_simulation_button, "Click to start your simulation")
         
         # Stop Simulation Button
         self.stop_simulation_button = ttk.Button(self.root, text="Stop Simulation", command=self.stop_simulation)
-        self.stop_simulation_button.grid(row=5, column=0, pady=10, padx=10, sticky="ew")
+        self.stop_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.stop_simulation_button, "Click to terminate your simulation")
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
         # Create a button to plot results using xmgrace
         self.plot_results_xmgrace_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results_xmgrace)
-        self.plot_results_xmgrace_button.grid(row=6, column=0, pady=10, padx=10)
+        self.plot_results_xmgrace_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
 
          # Create a button to execute the command
         self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
-        self.execute_button.grid(row=7, column=0, pady=10, padx=10, sticky="ew")
+        self.execute_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
         # Create an entry field for entering the command with a default sentence
         default_sentence = "top"
         self.entry = ttk.Entry(self.root, width=20)
-        self.entry.grid(row=7, column=1, pady=10, padx=10, sticky="ew")
+        self.entry.grid(row=8, column=1, pady=1, padx=10, sticky="ew")
         self.entry.insert(0, default_sentence) 
 
 
         # Create a button to stop the command execution
         self.stop_button = ttk.Button(self.root, text="Stop Command", command=self.stop_command, state=tk.DISABLED)
-        self.stop_button.grid(row=8, column=0, pady=10, padx=10, sticky="ew")
+        self.stop_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.stop_button, "Click to stop terminal command")
 
         # Create a ttk.Style to configure the progress bar
@@ -215,13 +229,26 @@ class TerminalApp:
         self.style.configure("Custom.Horizontal.TProgressbar", thickness=20, troughcolor="lightgray", background="lightblue")
         
         # Test button [10-12 taken!]
-        self.load_geometry_button = ttk.Button(self.root, text="Test button", command=self.import_geometry)
-        self.load_geometry_button.grid(row=9, column=0, pady=10, padx=10)
+        self.load_geometry_button = ttk.Button(self.root, text="Magic box!", command=self.import_geometry)
+        self.load_geometry_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.load_geometry_button, "Magicbox! click to see what's inside :)")
+        
+        #----------Text Widget with Scrollbar-----------       
+        checkMesh_button = ttk.Button(self.root, text="Mesh Quality", command=self.load_meshChecked)
+        checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(5, 0))
+        #checkMesh_button.grid(row=2, column=1, pady=1, padx=10, sticky="ew")
+        checkMesh_button['width'] = 15  # Adjust the width as needed\
+        
+        self.text_box = tk.Text(self.root, wrap="none", height=20, width=80)  # Adjust the width as needed
+        self.text_box.grid(row=3, column=1, columnspan=1, padx=5, pady=5, sticky=tk.W, rowspan=5)
+        self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
+        self.text_box_scrollbar.grid(row=3, column=1, columnspan=1, pady=5, sticky='nse', rowspan=5)
+        self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
+        #----------Text Widget with Scrollbar-----------
         
         # Create a progress bar with the custom style
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-        self.progress_bar_canvas.grid(row=8, column=1, padx=10, pady=10)
+        self.progress_bar_canvas.grid(row=9, column=1, padx=10, pady=1)
         self.progress_bar_canvas_flag=True
 
         # Initialize variables for simulation thread
@@ -232,8 +259,8 @@ class TerminalApp:
         self.fuels = ["Methanol", "Ammonia", "Dodecane"]
         
         # Create a label for the "Fuel Selector" dropdown
-        self.fuel_selector_label = ttk.Label(self.root, text="Fuel Options ▼", font=("TkDefaultFont", 12), background="#ffffe0") # , foreground="green")
-        self.fuel_selector_label.grid(row=0, column=1, pady=10, padx=10, sticky="w")
+        self.fuel_selector_label = ttk.Label(self.root, text="Fuel selector ▼", font=("TkDefaultFont", 12), background="white") # , foreground="green")
+        #self.fuel_selector_label.grid(row=0, column=1, pady=1, padx=10, sticky="w") # can be shown when needed! FLAG
 
         # Define the fuel options
         fuels = ["Methanol", "Ammonia", "Dodecane"]
@@ -247,14 +274,14 @@ class TerminalApp:
 
         # Create a dropdown menu for fuel selection
         self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=fuels)
-        self.fuel_selector.grid(row=1, column=1, pady=10, padx=10, sticky="w")
+        self.fuel_selector.grid(row=1, column=1, pady=1, padx=10, sticky="w")
 
         # Bind an event handler to the <<ComboboxSelected>> event
         self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
        
         # Create a label for status messages
         self.status_label = ttk.Label(self.root, text="", foreground="blue")
-        self.status_label.grid(row=6, column=1, pady=10, padx=10, sticky="w")
+        self.status_label.grid(row=0, column=1, pady=1, padx=10, sticky="w")
 
         # ... (other initialization code)
         self.selected_file_path = None
@@ -383,13 +410,54 @@ class TerminalApp:
         welcome_label.destroy()
         
 
-    # -------------- Welcome Message --------------------------    
+    # -------------- Welcome Message -------------------------- 
+     
+     # -------------- Splash background image(s) --------------------------  
+       
+###    def add_bgImage(self):
+
+###        # Load and display openfoam logo
+###        self.splash_bgImage = Image.open("Resources/Images/racing-car.jpg")  
+###        self.splash_bgImage = self.splash_bgImage.resize((1300, 870))
+###        ##self.splash_bgImage = Image.open("Resources/Images/bubbles.jpg")  
+###        ##self.splash_bgImage = self.splash_bgImage.resize((1300, 850))
+###        #self.splash_bgImage = Image.open("Resources/Images/airplaneEngine.jpg")  
+###        #self.splash_bgImage = self.splash_bgImage.resize((1300, 950))
+###        self.splash_bgImage = ImageTk.PhotoImage(self.splash_bgImage)
+###        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
+###        self.splash_bgImage_label.grid(row=0, column=3, pady=10, padx=10, sticky="ew", rowspan=15)
+###        self.splash_bgImage_label.configure(background="white")  
+
+    def add_bgImage(self):
+        self.splash_bgImage_label = tk.Label(self.root)
+        self.splash_bgImage_label.grid(row=0, column=3, pady=10, padx=10, sticky="ew", rowspan=15)
+        self.splash_bgImage_label.configure(background="white")
+        self.show_next_image()
+
+    def show_next_image(self):
+        image_path = self.image_paths[self.current_image_index]
+        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
+
+        # Load and display the next image in the list
+        splash_bgImage = Image.open(image_path)
+        splash_bgImage = splash_bgImage.resize((1300, 870))
+        splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
+        self.splash_bgImage_label.configure(image=splash_bgImage)
+        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
+
+        # Schedule the next image after the total time delay
+        self.root.after(self.time_delay, self.show_next_image)
+
+    def start_slideshow(self):
+        # Start the slideshow after the pre-specified delay
+        self.root.after(self.time_delay, self.show_next_image)
+        # -------------- Splash background image(s) -------------------------- 
     
     # -------------- Main logos --------------------------    
     def add_logos(self):
 
         # Load and display openfoam logo
-        self.logo_openfoam = Image.open("logos/openfoam_logo.png")  
+        self.logo_openfoam = Image.open("Resources/Logos/openfoam_logo.png")  
         self.logo_openfoam = self.logo_openfoam.resize((140, 40))
         self.logo_openfoam = ImageTk.PhotoImage(self.logo_openfoam)
         self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
@@ -397,7 +465,7 @@ class TerminalApp:
         self.OF_label.configure(background="white")
         
         # Load and display SMLT logo
-        self.logo_simulitica = Image.open("logos/simulitica_logo.png") 
+        self.logo_simulitica = Image.open("Resources/Logos/simulitica_logo.png") 
         self.logo_simulitica = self.logo_simulitica.resize((140, 70))
         self.logo_simulitica = ImageTk.PhotoImage(self.logo_simulitica)
         self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
@@ -407,7 +475,7 @@ class TerminalApp:
         # Create a label for copyright text
         self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
         self.copyright_label.grid(row=12, column=0, pady=10, padx=10, sticky="ew")
-        self.simLabel.configure(background="white", font="bold")
+        self.copyright_label.configure(background="white", font="bold")
    # -------------- Main logos --------------------------        
         
         
@@ -438,9 +506,9 @@ class TerminalApp:
             shutil.copyfile(self.selected_file_path, geometry_dest)
             
             # CAD programs logo paths 
-            freecad_logo_path = os.path.join("logos", "freecad_logo.png")
-            gmsh_logo_path = os.path.join("logos", "gmsh_logo.png")
-            paraview_logo_path = os.path.join("logos", "paraview_logo.png")
+            freecad_logo_path = os.path.join("Resources", "Logos", "freecad_logo.png")
+            gmsh_logo_path = os.path.join("Resources", "Logos", "gmsh_logo.png")
+            paraview_logo_path = os.path.join("Resources", "Logos", "paraview_logo.png")
 
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
@@ -476,7 +544,8 @@ class TerminalApp:
 
             # Create buttons with logos for the CAD viewers
             style = ttk.Style()
-            style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black", borderwidth=1) # lightblue 
+            #style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black", borderwidth=1)
+            style.configure("TButton", padding=10, relief="solid", background="white", foreground="black", borderwidth=1) 
             freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
             freecad_button.image = freecad_logo
             freecad_button.pack(side=tk.TOP, padx=30, pady=10)
@@ -593,6 +662,9 @@ class TerminalApp:
    
 
 # -------------------------------- MESH CREATION ------------------------------
+
+    # Start the journey of mesh creation :)
+   
     def create_mesh(self):
         # Check if geometry is loaded
         if not self.geometry_loaded:
@@ -655,46 +727,6 @@ class TerminalApp:
                 pass  # Replace with the actual command
 
 # _____________________________________Craft your own mesh______________________________________________________
-###    def ask_mesh_parameters(self, mesh_params):
-###        # Read existing values from the AllmeshCartesian script
-###        existing_values = self.read_mesh_parameters_from_script()
-
-###        # Create a popup to ask the user for mesh parameters
-###        popup = tk.Toplevel(self.root)
-###        popup.geometry("250x200")
-###        popup.title("Mesh Parameters")
-
-###        param_entries = {}
-
-###        # Populate the popup with parameter entry fields and their old values
-###        for param in mesh_params:
-###            ttk.Label(popup, text=param).pack()
-###            entry_var = tk.StringVar()
-###            entry_var.set(existing_values.get(param, ""))  # Set the default value from the script
-###            entry = ttk.Entry(popup, textvariable=entry_var)
-###            entry.pack()
-###            param_entries[param] = entry
-
-###        def update_mesh_parameters():
-###            # Get the new values from the entry fields
-###            new_values = {param: entry.get() for param, entry in param_entries.items()}
-
-###            # TODO: Apply the new values to the AllmeshCartesian script
-###            # You need to modify this part based on the structure of your script
-###            self.update_mesh_parameters_in_script(new_values)
-
-###            # Close the popup
-###            popup.destroy()
-
-###        # Add an "Update" button to apply the new values
-###        ttk.Button(popup, text="Update", command=update_mesh_parameters).pack()
-
-###        # Wait for the popup to be closed
-###        self.root.wait_window(popup)
-
-###        # Return the new values or an empty dictionary if the popup was closed without clicking "Update"
-###        return new_values if "new_values" in locals() else {}
-
 
     def ask_mesh_parameters(self, mesh_params):
         # Read existing values from the AllmeshCartesian script
@@ -702,14 +734,14 @@ class TerminalApp:
 
         # Create a popup to ask the user for mesh parameters
         popup = tk.Toplevel(self.root)
-        popup.geometry("500x300")
+        popup.geometry("250x450")
         popup.title("Mesh Parameters")
 
         param_entries = {}
 
         def display_help(param):
             # Get the help text from the dictionary or use a default message
-            help_text = self.PARAMETER_HELP.get(param, f"Help for {param}:\nProvide a brief description or range of values.")
+            help_text = self.PARAMETER_HELP.get(param, f"{param}:\nProvide a brief description or range of values.")
             messagebox.showinfo("Help", help_text)
 
         # Populate the popup with parameter entry fields, their old values, and help buttons
@@ -717,15 +749,22 @@ class TerminalApp:
             frame = ttk.Frame(popup)
             frame.pack(fill=tk.X)
 
-            ttk.Label(frame, text=param).pack(side=tk.LEFT, padx=(0, 10))
+            ttk.Label(frame, text=param).pack()
+            #ttk.Label(frame, text=param).pack(side=tk.LEFT padx=(0, 10))
+            
+            # Add a help button
+            style = ttk.Style()
+            style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black", justify="right")
+            help_button = ttk.Button(frame, text="?", command=lambda param=param: display_help(param), width=1)
+            #help_button.configure(text="?", foreground="blue")
+            help_button.pack(side=tk.RIGHT)
+            #help_button.pack(side=tk.LEFT) 
+            
             entry_var = tk.StringVar()
             entry_var.set(existing_values.get(param, ""))  # Set the default value from the script
             entry = ttk.Entry(frame, textvariable=entry_var)
-            entry.pack(side=tk.LEFT)
-
-            # Add a help button
-            help_button = ttk.Button(frame, text="?", command=lambda param=param: display_help(param), width=3)
-            help_button.pack(side=tk.RIGHT)
+            #entry.pack(side=tk.LEFT)
+            entry.pack()   
 
             param_entries[param] = entry
 
@@ -741,7 +780,7 @@ class TerminalApp:
                 # You need to modify this part based on the structure of your script
                 self.update_mesh_parameters_in_script(new_values)
 
-                # Start the meshing process
+                # Start the meshing process [FLAG!!]
                 self.start_meshing()
 
         # Add an "Update" button to apply the new values
@@ -752,7 +791,6 @@ class TerminalApp:
 
         # Return the new values or an empty dictionary if the popup was closed without clicking "Update"
         return new_values if "new_values" in locals() else {}
-
 
     # ------ rest of fully functioning mesher   
     def read_mesh_parameters_from_script(self):
@@ -814,7 +852,28 @@ class TerminalApp:
         # Return the selected mesh type
         return self.mesh_type_var.get()
         
-# -------------------------------- MESH CREATION ------------------------------  
+# -------------------------------- MESH CREATION ------------------------------ 
+#______________________________________________________________________
+# FLAG: essentially intended to be dedicated for checkMesh script****
+    def load_meshChecked(self):
+            # Specify the path to the "AllmeshCartesian" file
+            allmesh_cartesian_path = os.path.join(self.geometry_dest_path, "meshChecked")
+
+            # Check if the file exists
+            if os.path.exists(allmesh_cartesian_path):
+                # Read the content of the file
+                with open(allmesh_cartesian_path, "r") as file:
+                    content = file.read()
+
+                # Insert the content into the Text widget
+                self.text_box.delete(1.0, "end")  # Clear previous content
+                self.text_box.insert("end", content)
+            else:
+                # If the file doesn't exist, display a message in the Text widget
+                self.text_box.delete(1.0, "end")  # Clear previous content
+                self.text_box.insert("end", "meshChecked file not found.")
+#______________________________________________________________________           
+             
 # -------------------------------- Plot results ------------------------------  
     # Function to plot results using xmgrace
     def plot_results_xmgrace(self):
