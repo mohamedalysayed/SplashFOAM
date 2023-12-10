@@ -37,9 +37,9 @@ echo "Mesh is being crafted..." &
 foamDictionary system/meshDict -entry minCellSize -set 0.0002
 foamDictionary system/meshDict -entry maxCellSize -set 0.0004
 foamDictionary system/meshDict -entry boundaryCellSize -set 0.0003
-foamDictionary system/meshDict -entry nLayers -set 
-foamDictionary system/meshDict -entry thicknessRatio -set 
-foamDictionary system/meshDict -entry maxFirstLayerThickness -set 
+#foamDictionary system/meshDict -entry nLayers -set 
+#foamDictionary system/meshDict -entry thicknessRatio -set 
+#foamDictionary system/meshDict -entry maxFirstLayerThickness -set 
 
 # build the mesh in cartesian mode 
 cartesianMesh > log.cartesianMesh & 

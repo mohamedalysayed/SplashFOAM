@@ -4,12 +4,28 @@
 cd "${0%/*}" || exit 1
 
 # Source tutorial run functions
-. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+#. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
 
-# Example with runApplication:
-# - runs blockMesh in background
-# - redirecting standard output to log.blockMesh
-# - does *not* run in log file already exists
+# Define a spinner to entertain the user while the mesh is being created
+spinner() {
+  local pid=$1
+  local delay=0.1
+  local spinstr='|/-\'
+  while ps -p $pid > /dev/null; do
+    local temp=${spinstr#?}
+    printf " [%c]  " "$spinstr"
+    local spinstr=$temp${spinstr%"$temp"}
+    sleep $delay
+    printf "\b\b\b\b\b\b"
+  done
+  printf "    \b\b\b\b"
+}
+
+#source ~/.bashrc 
+##of2306
+#. /usr/lib/openfoam/openfoam2306/etc/bashrc
+#of11
+. /opt/openfoam11/etc/bashrc
 
 # Removing old solution 
 foamListTimes -rm
@@ -33,10 +49,11 @@ setFields
 
 #mpirun -np 6 compressibleInterFoam -parallel > out-mediumMesh-MS-parallel6procs.dat & 
 compressibleInterFoam > log & 
+tail -10f log  
 
-tail -10f log 
+##tail -10f log  && foamMonitor -l postProcessing/residuals/0/residuals.da
 
-sleep 2
+#sleep 2
 
-foamMonitor -l postProcessing/residuals/0/residuals.dat 
+#foamMonitor -l postProcessing/residuals/0/residuals.dat 
 #------------------------------------------------------------------------------

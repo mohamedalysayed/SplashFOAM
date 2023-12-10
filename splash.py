@@ -213,9 +213,9 @@ class TerminalApp:
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
         # Create an entry field for entering the command with a default sentence
-        default_sentence = "top"
+        default_sentence =  "top" # Or "htop"
         self.entry = ttk.Entry(self.root, width=20)
-        self.entry.grid(row=8, column=1, pady=1, padx=10, sticky="ew")
+        self.entry.grid(row=8, column=1, pady=1, columnspan=2, padx=10, sticky="ew")
         self.entry.insert(0, default_sentence) 
 
 
@@ -229,20 +229,25 @@ class TerminalApp:
         self.style.configure("Custom.Horizontal.TProgressbar", thickness=20, troughcolor="lightgray", background="lightblue")
         
         # Test button [10-12 taken!]
-        self.load_geometry_button = ttk.Button(self.root, text="Magic box!", command=self.import_geometry)
-        self.load_geometry_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.load_geometry_button, "Magicbox! click to see what's inside :)")
+        self.magic_box_button = ttk.Button(self.root, text="Magic box!", command=self.magic_box)
+        self.magic_box_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
+        self.add_tooltip(self.magic_box_button, "Magicbox! click to see what's inside :)")
         
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load Mesh Quality", command=self.load_meshChecked)
         checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(1, 0), padx=10)
         #checkMesh_button.grid(row=2, column=1, pady=1, padx=10, sticky="ew")
+        checkMesh_button['width'] = 18  # Adjust the width as needed
+        
+        checkMesh_button = ttk.Button(self.root, text="Load Log File", command=self.load_log_file)
+        checkMesh_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
+        #checkMesh_button.grid(row=2, column=2, pady=1, padx=10, sticky="ew")
         checkMesh_button['width'] = 18  # Adjust the width as needed\
         
         self.text_box = tk.Text(self.root, wrap="none", height=20, width=80)  # Adjust the width as needed
-        self.text_box.grid(row=3, column=1, columnspan=1, padx=10, pady=1, sticky=tk.W, rowspan=5)
+        self.text_box.grid(row=3, column=1, columnspan=2, padx=10, pady=1, sticky=tk.W, rowspan=5)
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=3, column=1, columnspan=1, pady=1, sticky='nse', rowspan=5)
+        self.text_box_scrollbar.grid(row=3, column=1, columnspan=2, pady=1, sticky='nse', rowspan=5)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
         #----------Text Widget with Scrollbar-----------
         
@@ -281,12 +286,15 @@ class TerminalApp:
        
         # Create a label for status messages
         self.status_label = ttk.Label(self.root, text="", foreground="blue")
-        self.status_label.grid(row=0, column=1, pady=1, padx=10, sticky="w")
+        default_status = "This field will show the status of your work!"
+        self.status_label.grid(row=0, column=1, columnspan=3, pady=1, padx=10, sticky="w")
+        self.status_label.config(text=default_status)
 
         # ... (other initialization code)
         self.selected_file_path = None
         self.selected_file_content = None
         self.geometry_dest_path = None
+        self.control_dict_path = None 
         
         self.header = """/*--------------------------------*- C++ -*----------------------------------*\\
   =========                 |
@@ -598,44 +606,95 @@ class TerminalApp:
 
             try:
                 self.start_progress_bar()
-                process = subprocess.run(["./Allrun"], cwd=self.selected_file_path, text=True, capture_output=True)
-                print(process.stdout)
-                print(process.stderr)
 
-                if "Execution halted" not in process.stderr:
+                # FLAG! In case the controlDict still has more than 1 instance of "writeNow"
+                control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
+                self.replace_write_now_with_end_time(control_dict_path)
+                
+                # Use Popen to capture real-time output
+                process = subprocess.Popen(["./Allrun"], cwd=self.selected_file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+
+                # Continuously read and insert output into the Text widget
+                while True:
+                    line = process.stdout.readline()
+                    if not line:
+                        break
+                    self.text_box.insert("end", line)
+                    self.text_box.see("end")  # Scroll to the end to show real-time updates
+                    self.text_box.update_idletasks()  # Update the widget
+                   
+                # Wait for the process to complete
+                process.communicate()
+
+                # Check the return code and display appropriate messages
+                if process.returncode == 0:
                     tk.messagebox.showinfo("Simulation Finished", "Simulation completed successfully.")
                 else:
                     tk.messagebox.showerror("Simulation Error", "There was an error during simulation. Check the console output.")
             except subprocess.CalledProcessError as e:
                 tk.messagebox.showerror("Error", f"Error running Allrun script: {e.stderr}")
             finally:
-                #self.stop_progress_bar()
+                self.stop_progress_bar()
                 self.stop_simulation_button["state"] = tk.DISABLED
         else:
             tk.messagebox.showerror("Error", "Allrun script not found!")
-
-    def stop_simulation(self):
+            
+        # Now, update the modification timestamp of the controlDict file
+        subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
+        time.sleep(0.1)  # Add a 100ms delay if needed
+        
+        
+    def stop_simulation(self): # FLAG! at the moment, the controlDict file needs to be open and saved and closed, for the function to work :/
         if not self.simulation_running:
             tk.messagebox.showinfo("Nothing to Stop", "There's no simulation currently running to stop.")
             return
 
-        control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
+        control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")  # FLAG! Duplication..
         if os.path.exists(control_dict_path):
             try:
-                self.replace_end_time_with_write_now(control_dict_path)
+                subprocess.run(["sed", "-i", '0,/endTime/s//writeNow/', control_dict_path], check=True)
+                #time.sleep(0.1)  # Add a 100ms delay
+                #subprocess.run(["ex", "-sc", 'wq', control_dict_path], check=True)
+                print(control_dict_path)
+                #subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
+                #subprocess.run(["sync"], check=True)  # Flush file system buffers to disk
+                #time.sleep(0.1)  # Add a 100ms delay
                 tk.messagebox.showinfo("Stop Simulation", "Simulation stopped successfully.")
-                self.replace_write_now_with_end_time(control_dict_path)
             except subprocess.CalledProcessError as e:
                 tk.messagebox.showerror("Error", f"Error stopping simulation: {e.stderr}")
+
         else:
             tk.messagebox.showerror("Error", "controlDict file not found!")
 
+        self.stop_simulation_button["state"] = tk.DISABLED  # FLAG - is that really needed?! 
+        
+        # Enable the user to user "run simulation" button again
+        self.simulation_running = False
+        
+        # Disable the button until a new sim is launched
         self.stop_simulation_button["state"] = tk.DISABLED
 
-    def replace_end_time_with_write_now(self, control_dict_path):
-        subprocess.run(["sed", "-i", 's/endTime/writeNow/g', control_dict_path], check=True)
+    
     def replace_write_now_with_end_time(self, control_dict_path):
-        subprocess.run(["sed", "-i", 's/writeNow/endTime/g', control_dict_path], check=True)     
+        subprocess.run(["sed", "-i", 's/writeNow/endTime/g', control_dict_path], check=True)
+        
+    def load_log_file(self):
+            # Specify the path to the "log" file
+            log_file_path = os.path.join(self.selected_file_path, "log")
+
+            # Check if the file exists
+            if os.path.exists(log_file_path):
+                # Read the content of the file
+                with open(log_file_path, "r") as file:
+                    content = file.read()
+
+                # Insert the content into the Text widget
+                self.text_box.delete(1.0, "end")  # Clear previous content
+                self.text_box.insert("end", content)
+            else:
+                # If the file doesn't exist, display a message in the Text widget
+                self.text_box.delete(1.0, "end")  # Clear previous content
+                self.text_box.insert("end", "log file not found.") 
                 
     def start_progress_bar(self):
         self.root.after(100, self.update_progress)
@@ -954,12 +1013,25 @@ class TerminalApp:
         if hasattr(self, "tooltip"):
             self.tooltip.destroy()
             del self.tooltip
+            
+    def magic_box(self): # Fixing the issue of updating process with the modification in controlDict | FLAG!
+        # Manually touch the controlDict file
+        control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
+        try:
+            subprocess.run(["touch", control_dict_path], check=True)
+        except subprocess.CalledProcessError as e:
+            tk.messagebox.showerror("Error", f"Error touching controlDict: {e.stderr}")
+            
+     
+
         
         
 if __name__ == "__main__":
     root = tk.Tk()
     app = TerminalApp(root)
     root.mainloop()   
+
+
 
 
 #        # Monitor residuals using foamMonitor
