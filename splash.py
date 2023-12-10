@@ -85,7 +85,7 @@ class ReplacePropertiesPopup:
 
         # Replace old values with new ones in the body content for the mixture block
         for param, entry in self.new_values_mixture.items():
-            value = entry.get()
+            value = entry.get() # gets the new values from the user 
             if value != "":
                 old_pattern = f'{param}\\s*([^;]+)'
                 new_pattern = f'{param} {value}'
@@ -122,7 +122,7 @@ class ReplacePropertiesPopup:
             with open(self.selected_file_path, 'a') as file:
                 file.write(file_content)
 
-            self.status_label.config(text="Parameters added successfully", foreground="green")
+            self.status_label.config(text="Parameters added successfully", foreground="blue")
 
 #__________________
 #
@@ -386,7 +386,7 @@ class TerminalApp:
             pass
             
         # Update the status label
-        self.status_label.config(text=f"Fuel replaced. Selected fuel: {selected_fuel}", foreground="green")
+        self.status_label.config(text=f"Fuel replaced. Selected fuel: {selected_fuel}", foreground="blue")
         # -----------------------------------------------------------------------------------------------------<
 
             
@@ -784,7 +784,7 @@ class TerminalApp:
                 self.start_meshing()
 
         # Add an "Update" button to apply the new values
-        ttk.Button(popup, text="Update", command=update_mesh_parameters).pack()
+        ttk.Button(popup, text="Start Meshing!", command=update_mesh_parameters).pack() # update mesh parameters then start meshing.
 
         # Wait for the popup to be closed
         self.root.wait_window(popup)
@@ -925,7 +925,7 @@ class TerminalApp:
                 # The terminal process has completed
                 self.execute_button.config(state=tk.NORMAL)
                 self.stop_button.config(state=tk.DISABLED)
-                self.status_label.config(text="Command executed successfully", foreground="green")
+                self.status_label.config(text="Command executed successfully", foreground="blue")
                 #self.status_label.delete(0, END)
 # ================================================================
     def stop_command(self):
