@@ -19,9 +19,9 @@ surfaceFile     "CAD.stl";
 
 minCellSize     0.0002;
 
-maxCellSize     0.0005;
+maxCellSize     0.0004;
 
-boundaryCellSize 0.00025;
+boundaryCellSize 0.0003;
 
 boundaryLayers
 {
