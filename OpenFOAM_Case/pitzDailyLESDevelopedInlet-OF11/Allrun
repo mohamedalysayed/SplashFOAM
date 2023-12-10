@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Run from this directory
+cd "${0%/*}" || exit 1
+
+# Define a spinner to entertain the user while the mesh is being created
+spinner() {
+  local pid=$1
+  local delay=0.1
+  local spinstr='|/-\'
+  while ps -p $pid > /dev/null; do
+    local temp=${spinstr#?}
+    printf " [%c]  " "$spinstr"
+    local spinstr=$temp${spinstr%"$temp"}
+    sleep $delay
+    printf "\b\b\b\b\b\b"
+  done
+  printf "    \b\b\b\b"
+}
+
+#of11
+. /opt/openfoam11/etc/bashrc
+
+# Removing old solution 
+foamListTimes -rm
+
+rm -f log*
+rm -r dynamicCode
+rm -r postProcessing
+
+foamDictionary system/controlDict -entry writeFormat -set ascii
+
+# Creating the mesh 
+blockMesh
+
+# Creating the initialization directory
+cp -r 0.orig/ 0
+
+#foamDictionary system/decomposeParDict -entry numberOfSubdomains -set 6
+#decomposePar -force
+
+#mpirun -np 6 compressibleInterFoam -parallel > out-mediumMesh-MS-parallel6procs.dat & 
+foamRun > log & 
+tail -10f log  
+
+##tail -10f log  && foamMonitor -l postProcessing/residuals/0/residuals.da
+
+sleep 2
+
+foamMonitor -l postProcessing/residuals/0/residuals.dat 
+#------------------------------------------------------------------------------
