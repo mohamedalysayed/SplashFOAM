@@ -1,29 +1,227 @@
-# Typically, standard library imports come first, followed by third-party libraries, and then local imports.
-import os
-import re
-import signal
-import time
-import shutil # For file copying
-import threading # Import threading for running simulation in a separate thread
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, simpledialog
+import tkinter as tk 
+import tkinter.simpledialog  # Import simpledialog for user input
 from tkinter.simpledialog import askstring
+from tkinter import ttk, filedialog, messagebox, simpledialog
 from PIL import Image, ImageTk
 import subprocess
-from tkinter import scrolledtext
+import os
+import re 
+import signal
+import time  # Add this import for demonstration purposes
+import shutil  # For file copying
+import threading  # Import threading for running simulation in a separate thread
+from tkinter import scrolledtext # for terminal inside the program
+from PIL import Image
 import matplotlib.pyplot as plt
 from tkinter import Listbox
-from collections import defaultdict # Import defaultdict | for mesh parameters 
+from collections import defaultdict  # Import defaultdict | for mesh parameters 
 
-# Importing local classes
-from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
-from ReplaceProperties import ReplacePropertiesPopup
 
-#______________
+
+class SearchWidget:
+    def __init__(self, root, text_widget):
+        self.text_widget = text_widget
+
+        # Create a search bar
+        search_default_sentence = "Search here!"
+        self.search_entry = tk.Entry(root, width=30)
+        self.search_entry.grid(row=2, column=3, padx=10, pady=(0, 10))
+        self.search_entry.insert(0, search_default_sentence)
+        self.search_entry.configure(background="white", foreground="blue")
+
+        style = ttk.Style()
+        style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
+        self.search_button = tk.Button(root, text="Find", command=self.search_text)
+        self.search_button.grid(row=2, column=4, padx=10, pady=(0, 5))
+
+        self.result_label = tk.Label(root, text="")
+        self.result_label.grid(row=1, column=3, pady=(0, 5))
+        self.result_label.configure(background="white", foreground="black")
+
+        # Bind the <Return> key event to the search function
+        self.search_entry.bind("<Return>", lambda event: self.search_text())
+        
+        # Bind the <Up> and <Down> arrow keys
+        root.bind("<Up>", lambda event: self.prev_occurrence())
+        root.bind("<Down>", lambda event: self.next_occurrence())
+
+        # Keep track of search results
+        self.search_results = []
+        self.current_result_index = 0
+
+    def search_text(self):
+        # Get the search term from the entry widget
+        search_term = self.search_entry.get()
+
+        # Clear previous tags
+        self.text_widget.tag_remove("highlight", "1.0", tk.END)
+
+        # Perform the search and highlight occurrences
+        start_pos = "1.0"
+        occurrences = 0
+        self.search_results = []  # Clear previous search results
+
+        while True:
+            start_pos = self.text_widget.search(search_term, start_pos, stopindex=tk.END, nocase=True, exact=True)
+            if not start_pos:
+                break
+            end_pos = f"{start_pos}+{len(search_term)}c"
+            self.text_widget.tag_add("highlight", start_pos, end_pos)
+            self.search_results.append((start_pos, end_pos))
+            occurrences += 1
+            start_pos = end_pos
+
+        # Apply the highlighting tag
+        self.text_widget.tag_config("highlight", background="yellow", foreground="black")
+
+        # Update result label
+        self.result_label.config(text=f"{occurrences} occurrences found!", background="white", foreground="blue")
+        self.current_result_index = 0
+
+    def next_occurrence(self):
+        if self.search_results:
+            # Move to the next occurrence
+            self.current_result_index = (self.current_result_index + 1) % len(self.search_results)
+            start_pos, end_pos = self.search_results[self.current_result_index]
+
+            # Highlight the current occurrence
+            self.text_widget.tag_remove("highlight", "1.0", tk.END)
+            self.text_widget.tag_add("highlight", start_pos, end_pos)
+            self.text_widget.tag_config("highlight", background="yellow", foreground="black")
+
+            # Scroll to the line of the current occurrence
+            line_number = int(start_pos.split(".")[0])
+            self.text_widget.yview_moveto((line_number - 1) / self.get_total_lines())
+
+    def prev_occurrence(self):
+        if self.search_results:
+            # Move to the previous occurrence
+            self.current_result_index = (self.current_result_index - 1) % len(self.search_results)
+            start_pos, end_pos = self.search_results[self.current_result_index]
+
+            # Highlight the current occurrence
+            self.text_widget.tag_remove("highlight", "1.0", tk.END)
+            self.text_widget.tag_add("highlight", start_pos, end_pos)
+            self.text_widget.tag_config("highlight", background="yellow", foreground="black")
+
+            # Scroll to the line of the current occurrence
+            line_number = int(start_pos.split(".")[0])
+            self.text_widget.yview_moveto((line_number - 1) / self.get_total_lines())
+
+    def get_total_lines(self):
+        return int(self.text_widget.index(tk.END).split(".")[0])
+
+
+class ReplacePropertiesPopup:
+    def __init__(self, parent, thermo_type_params, mixture_params, old_values_thermo_type, old_values_mixture):
+        self.parent = parent
+        self.thermo_type_params = thermo_type_params
+        self.mixture_params = mixture_params
+        self.old_values_thermo_type = old_values_thermo_type
+        self.old_values_mixture = old_values_mixture
+        self.new_values_mixture = {}  
+
+        self.popup = tk.Toplevel(parent.root)
+        self.popup.title("Update Physical Properties")
+        self.popup.geometry("520x650")  # Set the size of the popup window
+
+        # Create a label for the "thermoType" group
+        thermo_type_label = ttk.Label(self.popup, text="thermoType", font=("TkDefaultFont", 15, "bold"), foreground="red")
+        thermo_type_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+
+        # Show old values of the thermoType block as labels
+        row_counter = 1
+        for param in thermo_type_params:
+            ttk.Label(self.popup, text=f"{param}").grid(row=row_counter, column=1, sticky="w", padx=30, pady=2)
+            label = ttk.Label(self.popup, text=str(old_values_thermo_type.get(param, "")), foreground="blue")
+            label.grid(row=row_counter, column=2, pady=2)
+            row_counter += 1
+
+        # Create a label for the "mixture" group
+        mixture_label = ttk.Label(self.popup, text="mixture", font=("TkDefaultFont", 15, "bold"), foreground="red")
+        mixture_label.grid(row=row_counter, column=0, sticky="w", padx=10, pady=10)
+        row_counter += 1
+
+        # Create entry fields for each parameter in the "mixture" group
+        for param in mixture_params:
+            ttk.Label(self.popup, text=f"{param}").grid(row=row_counter, column=1, sticky="w", padx=30, pady=2)
+            entry = ttk.Entry(self.popup)
+            entry.insert(0, str(old_values_mixture.get(param, "")))  # Pre-fill with old values if available
+            entry.config(font=("TkDefaultFont", 9, "bold"), foreground="blue")
+            entry.grid(row=row_counter, column=2, pady=2)
+            self.new_values_mixture[param] = entry
+            row_counter += 1
+            row_counter_plus = row_counter + 1 
+
+        # Create an "Update" button that calls the replace_values method for the mixture block
+        style = ttk.Style()
+        
+        #style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
+        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+        updateButton = ttk.Button(self.popup, text="Update", command=self.replace_mixture_values).grid(row=row_counter,         column=2, pady=10, padx=10)
+        addButton = ttk.Button(self.popup, text="Add parameter", command=self.add_missing_parameters).grid(row=row_counter_plus, column=2, pady=10, padx=10)
+
+        
+    def replace_mixture_values(self):
+        file_content = self.parent.selected_file_content
+
+        # Define the lines to be preserved
+        foamfile_start = 'FoamFile\n{'
+        foamfile_end = '}'
+
+        # Extract the FoamFile block content
+        foamfile_content = re.search(f'{foamfile_start}(.*?){foamfile_end}', file_content, re.DOTALL).group()
+
+        # Split the file content into header, FoamFile, and body
+        foamfile_end_position = file_content.find(foamfile_end, file_content.find(foamfile_start)) + len(foamfile_end)
+        foamfile_content = file_content[file_content.find(foamfile_start):foamfile_end_position]
+        body_content = file_content[foamfile_end_position:]
+
+        # Replace old values with new ones in the body content for the mixture block
+        for param, entry in self.new_values_mixture.items():
+            value = entry.get() # gets the new values from the user 
+            if value != "":
+                old_pattern = f'{param}\\s*([^;]+)'
+                new_pattern = f'{param} {value}'
+                body_content = re.sub(old_pattern, new_pattern, body_content)
+
+        # Combine the header, FoamFile, and updated body content
+        file_content = f'{self.parent.header}{foamfile_content}{body_content}'
+        
+        # Show a confirmation popup
+        confirmation = tk.messagebox.askyesno("Confirmation", "Are you sure you want to update the file?")
+        if confirmation:
+            # Write the updated content to the file
+            with open(self.parent.selected_file_path, 'w') as file:
+                file.write(file_content)
+
+            self.parent.status_label.config(text="Values replaced successfully", foreground="green")
+            tk.messagebox.showinfo("Update", "Mixture block updated successfully.")
+            self.popup.destroy()
+        else:
+            tk.messagebox.showinfo("Update Canceled", "No changes were made.")
+            
+    def add_missing_parameters(self):
+        added_values = {}
+        for prop in self.mixture_params:
+            value = simpledialog.askstring("Add Missing Parameter", f"Enter value for {prop}:")
+            if value is not None:
+                added_values[prop] = value
+
+        if added_values:
+            file_content = self.selected_file_content
+            for prop, value in added_values.items():
+                file_content += f'\n{prop} {value};'
+
+            with open(self.selected_file_path, 'a') as file:
+                file.write(file_content)
+
+            self.status_label.config(text="Parameters added successfully", foreground="blue")
+
+#__________________
 #
 # TERMINAL APP 
-#______________           
-
+#__________________           
 class TerminalApp:  
     def __init__(self, root):
         self.root = root
