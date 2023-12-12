@@ -17,6 +17,99 @@ from tkinter import Listbox
 from collections import defaultdict  # Import defaultdict | for mesh parameters 
 
 
+class SearchWidget:
+    def __init__(self, root, text_widget):
+        self.text_widget = text_widget
+
+        # Create a search bar
+        search_default_sentence = "Search here!"
+        self.search_entry = tk.Entry(root, width=30)
+        self.search_entry.grid(row=2, column=3, padx=10, pady=(0, 10))
+        self.search_entry.insert(0, search_default_sentence)
+        self.search_entry.configure(background="white", foreground="blue")
+
+        style = ttk.Style()
+        style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
+        self.search_button = tk.Button(root, text="Find", command=self.search_text)
+        self.search_button.grid(row=2, column=4, padx=10, pady=(0, 5))
+
+        self.result_label = tk.Label(root, text="")
+        self.result_label.grid(row=1, column=3, pady=(0, 5))
+        self.result_label.configure(background="white", foreground="black")
+
+        # Bind the <Return> key event to the search function
+        self.search_entry.bind("<Return>", lambda event: self.search_text())
+        
+        # Bind the <Up> and <Down> arrow keys
+        root.bind("<Up>", lambda event: self.prev_occurrence())
+        root.bind("<Down>", lambda event: self.next_occurrence())
+
+        # Keep track of search results
+        self.search_results = []
+        self.current_result_index = 0
+
+    def search_text(self):
+        # Get the search term from the entry widget
+        search_term = self.search_entry.get()
+
+        # Clear previous tags
+        self.text_widget.tag_remove("highlight", "1.0", tk.END)
+
+        # Perform the search and highlight occurrences
+        start_pos = "1.0"
+        occurrences = 0
+        self.search_results = []  # Clear previous search results
+
+        while True:
+            start_pos = self.text_widget.search(search_term, start_pos, stopindex=tk.END, nocase=True, exact=True)
+            if not start_pos:
+                break
+            end_pos = f"{start_pos}+{len(search_term)}c"
+            self.text_widget.tag_add("highlight", start_pos, end_pos)
+            self.search_results.append((start_pos, end_pos))
+            occurrences += 1
+            start_pos = end_pos
+
+        # Apply the highlighting tag
+        self.text_widget.tag_config("highlight", background="yellow", foreground="black")
+
+        # Update result label
+        self.result_label.config(text=f"{occurrences} occurrences found!", background="white", foreground="blue")
+        self.current_result_index = 0
+
+    def next_occurrence(self):
+        if self.search_results:
+            # Move to the next occurrence
+            self.current_result_index = (self.current_result_index + 1) % len(self.search_results)
+            start_pos, end_pos = self.search_results[self.current_result_index]
+
+            # Highlight the current occurrence
+            self.text_widget.tag_remove("highlight", "1.0", tk.END)
+            self.text_widget.tag_add("highlight", start_pos, end_pos)
+            self.text_widget.tag_config("highlight", background="yellow", foreground="black")
+
+            # Scroll to the line of the current occurrence
+            line_number = int(start_pos.split(".")[0])
+            self.text_widget.yview_moveto((line_number - 1) / self.get_total_lines())
+
+    def prev_occurrence(self):
+        if self.search_results:
+            # Move to the previous occurrence
+            self.current_result_index = (self.current_result_index - 1) % len(self.search_results)
+            start_pos, end_pos = self.search_results[self.current_result_index]
+
+            # Highlight the current occurrence
+            self.text_widget.tag_remove("highlight", "1.0", tk.END)
+            self.text_widget.tag_add("highlight", start_pos, end_pos)
+            self.text_widget.tag_config("highlight", background="yellow", foreground="black")
+
+            # Scroll to the line of the current occurrence
+            line_number = int(start_pos.split(".")[0])
+            self.text_widget.yview_moveto((line_number - 1) / self.get_total_lines())
+
+    def get_total_lines(self):
+        return int(self.text_widget.index(tk.END).split(".")[0])
+
 
 class ReplacePropertiesPopup:
     def __init__(self, parent, thermo_type_params, mixture_params, old_values_thermo_type, old_values_mixture):
@@ -214,9 +307,10 @@ class TerminalApp:
 
         # Create an entry field for entering the command with a default sentence
         default_sentence =  "top" # Or "htop"
-        self.entry = ttk.Entry(self.root, width=20)
-        self.entry.grid(row=8, column=1, pady=1, columnspan=2, padx=10, sticky="ew")
+        self.entry = ttk.Entry(self.root, width=10)
+        self.entry.grid(row=8, column=2, pady=1, padx=10, sticky="ew")
         self.entry.insert(0, default_sentence) 
+        self.entry.configure(foreground="green", background="black")
 
 
         # Create a button to stop the command execution
@@ -234,26 +328,38 @@ class TerminalApp:
         self.add_tooltip(self.magic_box_button, "Magicbox! click to see what's inside :)")
         
         #----------Text Widget with Scrollbar-----------       
-        checkMesh_button = ttk.Button(self.root, text="Load Mesh Quality", command=self.load_meshChecked)
-        checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(1, 0), padx=10)
-        #checkMesh_button.grid(row=2, column=1, pady=1, padx=10, sticky="ew")
+        checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
+        #checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(1, 0), padx=10)
+        checkMesh_button.grid(row=2, column=1, pady=1, padx=10, sticky="ew")
         checkMesh_button['width'] = 18  # Adjust the width as needed
         
-        checkMesh_button = ttk.Button(self.root, text="Load Log File", command=self.load_log_file)
-        checkMesh_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
-        #checkMesh_button.grid(row=2, column=2, pady=1, padx=10, sticky="ew")
-        checkMesh_button['width'] = 18  # Adjust the width as needed\
+        checkMesh_button = ttk.Button(self.root, text="Load log file", command=self.load_log_file)
+        #checkMesh_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
+        checkMesh_button.grid(row=2, column=2, pady=1, padx=1, sticky="ew")
+        checkMesh_button['width'] = 9  # Adjust the width as needed\
         
-        self.text_box = tk.Text(self.root, wrap="none", height=20, width=80)  # Adjust the width as needed
-        self.text_box.grid(row=3, column=1, columnspan=2, padx=10, pady=1, sticky=tk.W, rowspan=5)
+        #self.text_box = tk.Text(self.root, wrap="none", height=20, width=110)  # Adjust the width as needed
+        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=25, width=110)  # Adjust the width as needed
+        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky=tk.W, rowspan=5)
+        self.text_box.configure(foreground="white", background="black")
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=3, column=1, columnspan=2, pady=1, sticky='nse', rowspan=5)
+        self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=5)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
+        
+        sample_text = """
+        This is a sample text widget.
+        You can search for words in this text.
+        Just type a word in the search bar and press 'Enter'.
+        """
+        self.text_box.insert(tk.END, sample_text)
+        
+        # Add the search widget to the main app
+        self.search_widget = SearchWidget(root, self.text_box)
         #----------Text Widget with Scrollbar-----------
         
         # Create a progress bar with the custom style
-        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-        self.progress_bar_canvas.grid(row=9, column=1, padx=50, pady=1)
+        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
+        self.progress_bar_canvas.grid(row=9, column=2, padx=50, pady=1)
         self.progress_bar_canvas_flag=True
 
         # Initialize variables for simulation thread
@@ -438,7 +544,7 @@ class TerminalApp:
 
     def add_bgImage(self):
         self.splash_bgImage_label = tk.Label(self.root)
-        self.splash_bgImage_label.grid(row=0, column=3, pady=10, padx=10, sticky="ew", rowspan=15)
+        self.splash_bgImage_label.grid(row=0, column=5, pady=10, padx=10, sticky="ew", rowspan=15)
         self.splash_bgImage_label.configure(background="white")
         self.show_next_image()
 
@@ -448,7 +554,8 @@ class TerminalApp:
 
         # Load and display the next image in the list
         splash_bgImage = Image.open(image_path)
-        splash_bgImage = splash_bgImage.resize((1300, 870))
+        splash_bgImage = splash_bgImage.resize((1350, 1000))
+        #splash_bgImage = splash_bgImage.resize((1300, 870))
         splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
         self.splash_bgImage_label.configure(image=splash_bgImage)
         self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
@@ -752,24 +859,50 @@ class TerminalApp:
                         mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"]  # Add other parameters as needed
                         values = self.ask_mesh_parameters(mesh_params)
 
-                        # Generate the meshing command based on user input
+# ------------------ In case you want to view meshing process in a separate terminal -------------------------
+###                        # Generate the meshing command based on user input
+###                        command = [f"./{os.path.basename(cartMesh_script)}"]
+###                        for param, value in values.items():
+###                            if value:
+###                                command.extend([param, value])
+
+###                        # Create a new terminal window and execute the command
+###                        self.terminal_process = subprocess.Popen(
+###                            f"gnome-terminal -- bash -c 'cd {self.geometry_dest_path}; {' '.join(command)}; exec bash'",
+###                            shell=True,
+###                            stdout=subprocess.PIPE,
+###                            stderr=subprocess.PIPE,
+###                            text=True,
+###                            preexec_fn=os.setsid,  # Create a new process group
+###                        )
+
+###                        # Monitor the terminal process and display the output
+###                        self.monitor_terminal()
+# ------------------ In case you want to view meshing process in a separate terminal -------------------------
+                        
+                        # Use Popen to capture real-time output
                         command = [f"./{os.path.basename(cartMesh_script)}"]
-                        for param, value in values.items():
-                            if value:
-                                command.extend([param, value])
+                        process = subprocess.Popen(command, cwd=self.geometry_dest_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 
-                        # Create a new terminal window and execute the command
-                        self.terminal_process = subprocess.Popen(
-                            f"gnome-terminal -- bash -c 'cd {self.geometry_dest_path}; {' '.join(command)}; exec bash'",
-                            shell=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            text=True,
-                            preexec_fn=os.setsid,  # Create a new process group
-                        )
+                        # Continuously read and insert output into the Text widget
+                        while True:
+                            line = process.stdout.readline()
+                            if not line:
+                                break
+                            self.text_box.insert("end", line)
+                            self.text_box.see("end")  # Scroll to the end to show real-time updates
+                            self.text_box.update_idletasks()  # Update the widget
+                           
+                        # Wait for the process to complete
+                        process.communicate()
 
-                        # Monitor the terminal process and display the output
-                        self.monitor_terminal()
+                        # Check the return code and display appropriate messages
+                        if process.returncode == 0:
+                            tk.messagebox.showinfo("Mesh is generated", "Mesh constructed successfully.")
+                        else:
+                            tk.messagebox.showerror("Meshing Error", "There was an error during meshing. Check the console output.")
+                    
+                    
 
                     except subprocess.CalledProcessError as e:
                         tk.messagebox.showerror("Error", f"Error running AllmeshCartesian script: {e.stderr}")
