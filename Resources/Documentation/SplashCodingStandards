@@ -1,0 +1,20 @@
+#---------------
+For Class Files:
+Use CamelCase:
+#---------------
+Capitalize the first letter of each word.
+Example: MyClassFile.py
+Reflect the Class Name:
+
+-> If your class is named SearchWidget, the file can be named SearchWidget.py.
+
+#-------------------
+For Function Files:
+Use Snake Case:
+#-------------------
+
+Use all lowercase letters with underscores to separate words.
+Example: my_function_file.py
+Reflect the Functionality:
+
+-> If your file contains utility functions related to file operations, you might name it file_utils.py.
