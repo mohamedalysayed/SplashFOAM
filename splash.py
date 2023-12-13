@@ -18,6 +18,8 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
 from ReplaceProperties import ReplacePropertiesPopup
+from ReplaceMeshParameters import ReplaceMeshParameters
+
 
 #______________
 #
@@ -202,8 +204,13 @@ class TerminalApp:
         # ... (other initialization code)
         self.selected_file_path = None
         self.selected_file_content = None
+        self.mesh_dict_file_path = None
+        self.selected_mesh_file_content = None
         self.geometry_dest_path = None
         self.control_dict_path = None 
+        
+        # Mesh parameters 
+        self.mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"] 
         
         self.header = """/*--------------------------------*- C++ -*----------------------------------*\\
   =========                 |
@@ -481,12 +488,10 @@ class TerminalApp:
         else:
             tk.messagebox.showerror("Error", "No file selected for import")
         # -------------- importing the geometry --------------------------------------------------------------------    
+
  
+# -------------------------------- MESH CREATION ------------------------------
 
-    # -------------------------------- MESH CREATION ------------------------------
-
-    # Start the journey of mesh creation :)
-   
     def create_mesh(self):
         # Check if geometry is loaded
         if not self.geometry_loaded:
@@ -499,187 +504,88 @@ class TerminalApp:
         if mesh_type is not None:
             # Execute the meshing command based on the selected mesh type
             if mesh_type == "Cartesian":
-                # Execute Cartesian mesh command
-                # Running "AllmeshCartesian" script here
-                cartMesh_script = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
-                if os.path.exists(cartMesh_script):
-                    chmod_command = ["chmod", "+x", cartMesh_script]
-                    subprocess.run(chmod_command, check=True)
 
-                    try:
-                        # Activating the progress bar "again" - to be on the safe side
-                        self.progress_bar_canvas_flag = True
-                        self.start_progress_bar()
+                # Read the content of the "meshDict" file
+                self.mesh_dict_file_path = os.path.join(self.geometry_dest_path, "system", "meshDict")
 
-                        # Create a popup to get mesh parameters from the user
-                        mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"]  # Add other parameters as needed
-                        values = self.ask_mesh_parameters(mesh_params)
+                try:
+                    with open(self.mesh_dict_file_path, "r") as mesh_dict_file:
+                        file_content = mesh_dict_file.read()
+                        self.selected_mesh_file_content = file_content
 
-# ------------------ In case you want to view meshing process in a separate terminal -------------------------
-###                        # Generate the meshing command based on user input
-###                        command = [f"./{os.path.basename(cartMesh_script)}"]
-###                        for param, value in values.items():
-###                            if value:
-###                                command.extend([param, value])
+                    old_values_mesh = {param: match.group(1) for param in self.mesh_params
+                                       for match in re.finditer(f'{param}\s+(\S+)(;|;//.*)', file_content)}
 
-###                        # Create a new terminal window and execute the command
-###                        self.terminal_process = subprocess.Popen(
-###                            f"gnome-terminal -- bash -c 'cd {self.geometry_dest_path}; {' '.join(command)}; exec bash'",
-###                            shell=True,
-###                            stdout=subprocess.PIPE,
-###                            stderr=subprocess.PIPE,
-###                            text=True,
-###                            preexec_fn=os.setsid,  # Create a new process group
-###                        )
+                    # Open a popup to replace mesh parameters
+                    self.open_replace_mesh_parameters_popup(old_values_mesh)
 
-###                        # Monitor the terminal process and display the output
-###                        self.monitor_terminal()
-# ------------------ In case you want to view meshing process in a separate terminal -------------------------
-                        
-                        # Use Popen to capture real-time output
-                        command = [f"./{os.path.basename(cartMesh_script)}"]
-                        process = subprocess.Popen(command, cwd=self.geometry_dest_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
-
-                        # Continuously read and insert output into the Text widget
-                        while True:
-                            line = process.stdout.readline()
-                            if not line:
-                                break
-                            self.text_box.insert("end", line)
-                            self.text_box.see("end")  # Scroll to the end to show real-time updates
-                            self.text_box.update_idletasks()  # Update the widget
-                           
-                        # Wait for the process to complete
-                        process.communicate()
-
-                        # Check the return code and display appropriate messages
-                        if process.returncode == 0:
-                            tk.messagebox.showinfo("Mesh is generated", "Mesh constructed successfully.")
-                        else:
-                            tk.messagebox.showerror("Meshing Error", "There was an error during meshing. Check the console output.")
+                except FileNotFoundError:
+                    tk.messagebox.showerror("Error", f"File not found - {self.mesh_dict_file_path}")
+                except Exception as e:
+                    tk.messagebox.showerror("Error", f"Error reading mesh parameters: {e}")
+                   
                     
-                    
-
-                    except subprocess.CalledProcessError as e:
-                        tk.messagebox.showerror("Error", f"Error running AllmeshCartesian script: {e.stderr}")
-                    finally:
-                        self.progress_bar_canvas_flag = False
-                else:
-                    tk.messagebox.showerror("Error", "AllmeshCartesian script not found!")
-
             elif mesh_type == "Polyhedral":
                 # Execute Polyhedral mesh command
                 pass  # Replace with the actual command
             elif mesh_type == "Tetrahedral":
                 # Execute Tetrahedral mesh command
                 pass  # Replace with the actual command
+                
+                
 
-# _____________________________________Craft your own mesh______________________________________________________
+    def open_replace_mesh_parameters_popup(self, old_values_mesh):
+        if old_values_mesh:
+            # Open a popup to replace mesh parameters
+            ReplaceMeshParameters(self, self.mesh_params, old_values_mesh)
+        else:
+            tk.messagebox.showerror("Error", "No mesh parameters found in the 'meshDict' file!")
 
-    def ask_mesh_parameters(self, mesh_params):
-        # Read existing values from the AllmeshCartesian script
-        existing_values = self.read_mesh_parameters_from_script()
 
-        # Create a popup to ask the user for mesh parameters
-        popup = tk.Toplevel(self.root)
-        popup.geometry("250x450")
-        popup.title("Mesh Parameters")
+    def start_meshing(self):
+        # Execute Cartesian mesh command
+        # Running "AllmeshCartesian" script here
+        cartMesh_script = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
+        if os.path.exists(cartMesh_script):
+            chmod_command = ["chmod", "+x", cartMesh_script]
+            subprocess.run(chmod_command, check=True)
 
-        param_entries = {}
+            try:
+                # Activating the progress bar "again" - to be on the safe side
+                self.progress_bar_canvas_flag = True
+                self.start_progress_bar()
 
-        def display_help(param):
-            # Get the help text from the dictionary or use a default message
-            help_text = self.PARAMETER_HELP.get(param, f"{param}:\nProvide a brief description or range of values.")
-            messagebox.showinfo("Help", help_text)
+                # Use Popen to capture real-time output
+                command = [f"./{os.path.basename(cartMesh_script)}"]
+                process = subprocess.Popen(command, cwd=self.geometry_dest_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 
-        # Populate the popup with parameter entry fields, their old values, and help buttons
-        for param in mesh_params:
-            frame = ttk.Frame(popup)
-            frame.pack(fill=tk.X)
+                # Continuously read and insert output into the Text widget
+                while True:
+                    line = process.stdout.readline()
+                    if not line:
+                        break
+                    self.text_box.insert("end", line)
+                    self.text_box.see("end")  # Scroll to the end to show real-time updates
+                    self.text_box.update_idletasks()  # Update the widget
 
-            ttk.Label(frame, text=param).pack()
-            #ttk.Label(frame, text=param).pack(side=tk.LEFT padx=(0, 10))
+                # Wait for the process to complete
+                process.communicate()
+
+                # Check the return code and display appropriate messages
+                if process.returncode == 0:
+                    tk.messagebox.showinfo("Mesh is generated", "Mesh constructed successfully.")
+                else:
+                    tk.messagebox.showerror("Meshing Error", "There was an error during meshing. Check the console output.")
+
+            except subprocess.CalledProcessError as e:
+                tk.messagebox.showerror("Error", f"Error running AllmeshCartesian script: {e.stderr}")
+            finally:
+                self.progress_bar_canvas_flag = False
+        else:
+            tk.messagebox.showerror("Error", "AllmeshCartesian script not found!")
             
-            # Add a help button
-            style = ttk.Style()
-            style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black", justify="right")
-            help_button = ttk.Button(frame, text="?", command=lambda param=param: display_help(param), width=1)
-            #help_button.configure(text="?", foreground="blue")
-            help_button.pack(side=tk.RIGHT)
-            #help_button.pack(side=tk.LEFT) 
             
-            entry_var = tk.StringVar()
-            entry_var.set(existing_values.get(param, ""))  # Set the default value from the script
-            entry = ttk.Entry(frame, textvariable=entry_var)
-            #entry.pack(side=tk.LEFT)
-            entry.pack()   
-
-            param_entries[param] = entry
-
-        def update_mesh_parameters():
-            # Get the new values from the entry fields
-            new_values = {param: entry.get() for param, entry in param_entries.items()}
-
-            # Close the popup
-            popup.destroy()
-
-            if new_values:
-                # TODO: Apply the new values to the AllmeshCartesian script
-                # You need to modify this part based on the structure of your script
-                self.update_mesh_parameters_in_script(new_values)
-
-                # Start the meshing process [FLAG!!]
-                self.start_meshing()
-
-        # Add an "Update" button to apply the new values
-        ttk.Button(popup, text="Start Meshing!", command=update_mesh_parameters).pack() # update mesh parameters then start meshing.
-
-        # Wait for the popup to be closed
-        self.root.wait_window(popup)
-
-        # Return the new values or an empty dictionary if the popup was closed without clicking "Update"
-        return new_values if "new_values" in locals() else {}
-
-    # ------ rest of fully functioning mesher   
-    def read_mesh_parameters_from_script(self):
-        # TODO: Implement this method to read existing values from the AllmeshCartesian script
-        # You need to modify this part based on the structure of your script
-        existing_values = {}
-        
-        # Full path to AllmeshCartesian script
-        script_file_path = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
-        
-        try:
-            with open(script_file_path, "r") as script_file:
-                for line in script_file:
-                    if "-set" in line:
-                        parts = line.split()
-                        if len(parts) == 4:
-                            param = parts[3]
-                            value = parts[4]
-                            existing_values[param] = value
-        except FileNotFoundError:
-            print(f"Error: File not found - {script_file_path}")
-        return existing_values
-       
-    def update_mesh_parameters_in_script(self, new_values):
-        # TODO: Implement this method to update the AllmeshCartesian script with new parameter values
-        # You need to modify this part based on the structure of your script
-        script_file_path = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
-
-        with open(script_file_path, "r") as script_file:
-            lines = script_file.readlines()
-
-        for i, line in enumerate(lines):
-            for param, value in new_values.items():
-                if f"-entry {param} -set" in line:
-                    lines[i] = f'foamDictionary system/meshDict -entry {param} -set {value}\n'
-                    break
-
-        with open(script_file_path, "w") as script_file:
-            script_file.writelines(lines)
-            
-# ______Craft your own mesh with teh desired type _______
+    # ______Craft your own mesh with teh desired type _______
 
     def ask_mesh_type(self):
         # Create a popup to ask the user for mesh type
@@ -699,6 +605,184 @@ class TerminalApp:
 
         # Return the selected mesh type
         return self.mesh_type_var.get()
+
+
+
+###    # Start the journey of mesh creation :)
+###   
+###    def create_mesh(self):
+###        # Check if geometry is loaded
+###        if not self.geometry_loaded:
+###            messagebox.showinfo("Geometry Not Loaded", "Please load a geometry before creating the mesh.")
+###            return
+
+###        # Ask the user for mesh type using clickable buttons
+###        mesh_type = self.ask_mesh_type()
+
+###        if mesh_type is not None:
+###            # Execute the meshing command based on the selected mesh type
+###            if mesh_type == "Cartesian":
+###          
+            
+###                # Execute Cartesian mesh command
+###                # Running "AllmeshCartesian" script here
+###                cartMesh_script = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
+###                if os.path.exists(cartMesh_script):
+###                    chmod_command = ["chmod", "+x", cartMesh_script]
+###                    subprocess.run(chmod_command, check=True)
+
+###                    try:
+###                        # Activating the progress bar "again" - to be on the safe side
+###                        self.progress_bar_canvas_flag = True
+###                        self.start_progress_bar()
+
+###                        # Create a popup to get mesh parameters from the user
+###                        mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"]  # Add other parameters as needed
+###                        values = self.ask_mesh_parameters(mesh_params)
+
+###                        
+###                        # Use Popen to capture real-time output
+###                        command = [f"./{os.path.basename(cartMesh_script)}"]
+###                        process = subprocess.Popen(command, cwd=self.geometry_dest_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+
+###                        # Continuously read and insert output into the Text widget
+###                        while True:
+###                            line = process.stdout.readline()
+###                            if not line:
+###                                break
+###                            self.text_box.insert("end", line)
+###                            self.text_box.see("end")  # Scroll to the end to show real-time updates
+###                            self.text_box.update_idletasks()  # Update the widget
+###                           
+###                        # Wait for the process to complete
+###                        process.communicate()
+
+###                        # Check the return code and display appropriate messages
+###                        if process.returncode == 0:
+###                            tk.messagebox.showinfo("Mesh is generated", "Mesh constructed successfully.")
+###                        else:
+###                            tk.messagebox.showerror("Meshing Error", "There was an error during meshing. Check the console output.")
+###                    
+###                    except subprocess.CalledProcessError as e:
+###                        tk.messagebox.showerror("Error", f"Error running AllmeshCartesian script: {e.stderr}")
+###                    finally:
+###                        self.progress_bar_canvas_flag = False
+###                else:
+###                    tk.messagebox.showerror("Error", "AllmeshCartesian script not found!")
+
+###            elif mesh_type == "Polyhedral":
+###                # Execute Polyhedral mesh command
+###                pass  # Replace with the actual command
+###            elif mesh_type == "Tetrahedral":
+###                # Execute Tetrahedral mesh command
+###                pass  # Replace with the actual command
+
+#### _____________________________________Craft your own mesh______________________________________________________
+
+###    def ask_mesh_parameters(self, mesh_params):
+###        # Read existing values from the AllmeshCartesian script
+###        existing_values = self.read_mesh_parameters_from_script()
+
+###        # Create a popup to ask the user for mesh parameters
+###        popup = tk.Toplevel(self.root)
+###        popup.geometry("250x450")
+###        popup.title("Mesh Parameters")
+
+###        param_entries = {}
+
+###        def display_help(param):
+###            # Get the help text from the dictionary or use a default message
+###            help_text = self.PARAMETER_HELP.get(param, f"{param}:\nProvide a brief description or range of values.")
+###            messagebox.showinfo("Help", help_text)
+
+###        # Populate the popup with parameter entry fields, their old values, and help buttons
+###        for param in mesh_params:
+###            frame = ttk.Frame(popup)
+###            frame.pack(fill=tk.X)
+
+###            ttk.Label(frame, text=param).pack()
+###            #ttk.Label(frame, text=param).pack(side=tk.LEFT padx=(0, 10))
+###            
+###            # Add a help button
+###            style = ttk.Style()
+###            style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black", justify="right")
+###            help_button = ttk.Button(frame, text="?", command=lambda param=param: display_help(param), width=1)
+###            #help_button.configure(text="?", foreground="blue")
+###            help_button.pack(side=tk.RIGHT)
+###            #help_button.pack(side=tk.LEFT) 
+###            
+###            entry_var = tk.StringVar()
+###            entry_var.set(existing_values.get(param, ""))  # Set the default value from the script
+###            entry = ttk.Entry(frame, textvariable=entry_var)
+###            #entry.pack(side=tk.LEFT)
+###            entry.pack()   
+
+###            param_entries[param] = entry
+
+###        def update_mesh_parameters():
+###            # Get the new values from the entry fields
+###            new_values = {param: entry.get() for param, entry in param_entries.items()}
+
+###            # Close the popup
+###            popup.destroy()
+
+###            if new_values:
+###                # TODO: Apply the new values to the AllmeshCartesian script
+###                # You need to modify this part based on the structure of your script
+###                self.update_mesh_parameters_in_script(new_values)
+
+###                # Start the meshing process [FLAG!!]
+###                self.start_meshing()
+
+###        # Add an "Update" button to apply the new values
+###        ttk.Button(popup, text="Start Meshing!", command=update_mesh_parameters).pack() # update mesh parameters then start meshing.
+
+###        # Wait for the popup to be closed
+###        self.root.wait_window(popup)
+
+###        # Return the new values or an empty dictionary if the popup was closed without clicking "Update"
+###        return new_values if "new_values" in locals() else {}
+
+###    # ------ rest of fully functioning mesher   
+###    def read_mesh_parameters_from_script(self):
+###        # TODO: Implement this method to read existing values from the AllmeshCartesian script
+###        # You need to modify this part based on the structure of your script
+###        existing_values = {}
+###        
+###        # Full path to AllmeshCartesian script
+###        script_file_path = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
+###        
+###        try:
+###            with open(script_file_path, "r") as script_file:
+###                for line in script_file:
+###                    if "-set" in line:
+###                        parts = line.split()
+###                        if len(parts) == 4:
+###                            param = parts[3]
+###                            value = parts[4]
+###                            existing_values[param] = value
+###        except FileNotFoundError:
+###            print(f"Error: File not found - {script_file_path}")
+###        return existing_values
+###       
+###    def update_mesh_parameters_in_script(self, new_values):
+###        # TODO: Implement this method to update the AllmeshCartesian script with new parameter values
+###        # You need to modify this part based on the structure of your script
+###        script_file_path = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
+
+###        with open(script_file_path, "r") as script_file:
+###            lines = script_file.readlines()
+
+###        for i, line in enumerate(lines):
+###            for param, value in new_values.items():
+###                if f"-entry {param} -set" in line:
+###                    lines[i] = f'foamDictionary system/meshDict -entry {param} -set {value}\n'
+###                    break
+
+###        with open(script_file_path, "w") as script_file:
+###            script_file.writelines(lines)
+###            
+
         
 # -------------------------------- MESH CREATION ------------------------------            
             
