@@ -113,7 +113,7 @@ class TerminalApp:
         # Create an entry field for entering the command with a default sentence
         default_sentence =  "top" # Or "htop"
         self.entry = ttk.Entry(self.root, width=10)
-        self.entry.grid(row=8, column=2, pady=1, padx=10, sticky="ew")
+        self.entry.grid(row=11, column=2, pady=1, padx=10, sticky="ew")
         self.entry.insert(0, default_sentence) 
         self.entry.configure(foreground="green", background="black")
 
@@ -141,14 +141,14 @@ class TerminalApp:
         checkMesh_button = ttk.Button(self.root, text="Load log file", command=self.load_log_file)
         #checkMesh_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
         checkMesh_button.grid(row=2, column=2, pady=1, padx=1, sticky="ew")
-        checkMesh_button['width'] = 9  # Adjust the width as needed\
+        checkMesh_button['width'] = 9  # Adjust the width as needed
         
         #self.text_box = tk.Text(self.root, wrap="none", height=20, width=110)  # Adjust the width as needed
-        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=25, width=110)  # Adjust the width as needed
-        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky=tk.W, rowspan=5)
+        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=40, width=110)  # Adjust the width as needed
+        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky=tk.W, rowspan=8)
         self.text_box.configure(foreground="white", background="black")
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=5)
+        self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
         
         sample_text = """
@@ -156,7 +156,31 @@ class TerminalApp:
         You can search for words in this text.
         Just type a word in the search bar and press 'Enter'.
         """
-        self.text_box.insert(tk.END, sample_text)
+        splash_welcome_msg = """
+_____________________________________________________
+__        __   _                            _        
+\ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
+ \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
+  \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
+   \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
+                                                     
+ ____        _           _                           
+/ ___| _ __ | | __ _ ___| |__                        
+\___ \| '_ \| |/ _` / __| '_ \                       
+ ___) | |_) | | (_| \__ \ | | |                      
+|____/| .__/|_|\__,_|___/_| |_|                      
+      |_|                                            
+  ___                   _____ ___    _    __  __     
+ / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
+| | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
+| |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
+ \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
+      |_|
+_____________________________________________________      
+      Your gate to efficient CFD production! 
+"""
+        self.text_box.insert(tk.END, splash_welcome_msg)
+        #self.text_box.insert(tk.END, sample_text)
         
         # Add the search widget to the main app
         self.search_widget = SearchWidget(root, self.text_box)
@@ -164,7 +188,7 @@ class TerminalApp:
         
         # Create a progress bar with the custom style
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-        self.progress_bar_canvas.grid(row=9, column=2, padx=50, pady=1)
+        self.progress_bar_canvas.grid(row=12, column=2, padx=50, pady=1)
         self.progress_bar_canvas_flag=True
 
         # Initialize variables for simulation thread
