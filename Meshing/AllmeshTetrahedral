@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# Run from this directory
+cd "${0%/*}" || exit 1
+
+#of2306
+. /usr/lib/openfoam/openfoam2306/etc/bashrc
+
+# Source tutorial run functions
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+
+#### Define a spinner to entertain the user while the mesh is being created
+###spinner() {
+###  local pid=$1
+###  local delay=0.1
+###  local spinstr='|/-\'
+###  while ps -p $pid > /dev/null; do
+###    local temp=${spinstr#?}
+###    printf " [%c]  " "$spinstr"
+###    local spinstr=$temp${spinstr%"$temp"}
+###    sleep $delay
+###    printf "\b\b\b\b\b\b"
+###  done
+###  printf "    \b\b\b\b"
+###}
+
+# Removing old mesh
+rm -f log.tetrahedralMesh 
+rm -f log.checkMesh 
+rm -f log.foamToVTK
+rm -f log.paraFoam
+rm -rf constant/polyMesh 
+rm -rf VTK
+
+# Update the user with the status - spinner goes after 
+echo
+echo "==========================================================="
+echo "Mesh is being crafted, please hang on... " & 
+echo
+# build the mesh in tetrahedral mode 
+tetMesh > log.tetrahedralMesh & 
+###spinner $! 
+
+echo "Mesh is successfully generated! Now creating the vtk files for you..." &
+echo
+# Wait a second before executing the next line 
+
+# Extract ClockTime value from log.tetrahedralMesh
+clock_time=$(grep "ClockTime =" log.tetrahedralMesh | awk '{print $7}' | tr -d '[:alpha:]')
+sleep_time=$((clock_time + 1))
+
+#sleep 4 # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
+sleep $sleep_time # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
+
+# Saving the mesh in VTK format (for CAD viewers)
+runApplication foamToVTK 
+sleep 1 
+runApplication paraFoam   
+
+echo "Checking mesh quality..." &
+echo
+runApplication checkMesh 
+echo "==========================================================="
+#------------------------------------------------------------------------------
