@@ -35,6 +35,9 @@ class TerminalApp:
         # Display a welcome message
         self.show_welcome_message()
         
+        # Variable to track visibility state of the action bar
+        self.show_first_column = True  
+
         #  Source OpenFOAM Libraries
         #self.source_openfoam_libraries()
         
@@ -50,7 +53,7 @@ class TerminalApp:
         self.image_paths = ["Resources/Images/airplaneEngine.jpg", "Resources/Images/racing-car.jpg", "Resources/Images/bubbles.jpg"]
         self.time_delay = 2500  # Setting the time delay in milliseconds
         self.add_bgImage()
-        self.start_slideshow()
+        ###self.start_slideshow()
         #________________Sliding images_________________
         
         # A dictionary to define a help message for each mesh parameter 
@@ -68,7 +71,9 @@ class TerminalApp:
         #style.configure("TButton", width=15, height=10, relief="solid", background="#ffffe0", foreground="black") # thinner buttons 
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
         self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.import_button, "Click to import the geometry to be simulated")        
+        self.add_tooltip(self.import_button, "Click to import the geometry to be simulated")     
+        # Allow the button to expand horizontally with the window
+        #root.columnconfigure(0, weight=1)   
         
         # Create a button to open a directory dialog
         self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
@@ -76,8 +81,9 @@ class TerminalApp:
         self.add_tooltip(self.browse_button, "Click to change the physical properties of your fluid")
         self.geometry_loaded = False
         
-        # Create a mesh type variable
+        # Create a mesh type variable (set it so "Cartesian" as a default)
         self.mesh_type_var = tk.StringVar(value="Cartesian")
+        self.mesh_type = None
         
         # Create a button to create the mesh
         self.create_mesh_button = ttk.Button(self.root, text="Create Mesh", command=self.create_mesh)
@@ -85,9 +91,9 @@ class TerminalApp:
         self.add_tooltip(self.create_mesh_button, "Click to start building your mesh")
         
         # Create a button to initialize the case directory
-        self.initialize_case_button = ttk.Button(self.root, text="Initialize Case", command=self.initialize_case)
-        self.initialize_case_button.grid(row=3, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.initialize_case_button, "Click to choose the running directory of your case")
+        self.load_case_button = ttk.Button(self.root, text="Load Case", command=self.load_case)
+        self.load_case_button.grid(row=3, column=0, pady=1, padx=10, sticky="ew")
+        self.add_tooltip(self.load_case_button, "Click to choose the running directory of your case")
         
         # Create a button to run simulation
         self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
@@ -111,11 +117,11 @@ class TerminalApp:
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
         # Create an entry field for entering the command with a default sentence
-        default_sentence =  "top" # Or "htop"
+        default_sentence =  "Type your command here!" # Or "htop"
         self.entry = ttk.Entry(self.root, width=10)
         self.entry.grid(row=11, column=2, pady=1, padx=10, sticky="ew")
         self.entry.insert(0, default_sentence) 
-        self.entry.configure(foreground="green", background="black")
+        self.entry.configure(foreground="blue", background="black")
 
 
         # Create a button to stop the command execution
@@ -132,6 +138,24 @@ class TerminalApp:
         self.magic_box_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.magic_box_button, "Magicbox! click to see what's inside :)")
         
+        
+        # Create a check button to hide/show parts of the program
+        # Create a custom style
+        style = ttk.Style()
+        style.configure("Custom.TCheckbutton", foreground="black", background="white")
+
+        # Create a Checkbutton using the custom style
+        toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Results Panel", command=self.toggle_visibility, style="Custom.TCheckbutton")
+        toggle_visibility_button.grid(row=12, column=1, pady=1, padx=7, sticky="ew")
+
+
+
+  
+        # Create a progress bar with the custom style
+        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
+        self.progress_bar_canvas.grid(row=12, column=2, padx=50, pady=1)
+        self.progress_bar_canvas_flag=True
+        
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
         #checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(1, 0), padx=10)
@@ -144,9 +168,10 @@ class TerminalApp:
         checkMesh_button['width'] = 9  # Adjust the width as needed
         
         #self.text_box = tk.Text(self.root, wrap="none", height=20, width=110)  # Adjust the width as needed
-        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=40, width=110)  # Adjust the width as needed
-        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky=tk.W, rowspan=8)
-        self.text_box.configure(foreground="white", background="black")
+        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)  # Adjust the width as needed
+        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
+        #self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky=tk.W, rowspan=8)
+        self.text_box.configure(foreground="lightblue", background="black")
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
         self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
@@ -157,27 +182,29 @@ class TerminalApp:
         Just type a word in the search bar and press 'Enter'.
         """
         splash_welcome_msg = """
-_____________________________________________________
-__        __   _                            _        
-\ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
- \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
-  \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
-   \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
-                                                     
- ____        _           _                           
-/ ___| _ __ | | __ _ ___| |__                        
-\___ \| '_ \| |/ _` / __| '_ \                       
- ___) | |_) | | (_| \__ \ | | |                      
-|____/| .__/|_|\__,_|___/_| |_|                      
-      |_|                                            
-  ___                   _____ ___    _    __  __     
- / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
-| | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
-| |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
- \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
-      |_|
-_____________________________________________________      
-      Your gate to efficient CFD production! 
+                            _____________________________________________________
+                            __        __   _                            _        
+                            \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
+                             \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
+                              \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
+                               \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
+                                                                                 
+                                     ____        _           _                           
+                                    / ___| _ __ | | __ _ ___| |__                        
+                                    \___ \| '_ \| |/ _` / __| '_ \                       
+                                     ___) | |_) | | (_| \__ \ | | |                      
+                                    |____/| .__/|_|\__,_|___/_| |_|                      
+                                          |_|                                            
+                              ___                   _____ ___    _    __  __     
+                             / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
+                            | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
+                            | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
+                             \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
+                                  |_|
+                            _____________________________________________________ 
+                                 
+                                   Your gate to efficient CFD production! 
+                            _____________________________________________________
 """
         self.text_box.insert(tk.END, splash_welcome_msg)
         #self.text_box.insert(tk.END, sample_text)
@@ -186,11 +213,18 @@ _____________________________________________________
         self.search_widget = SearchWidget(root, self.text_box)
         #----------Text Widget with Scrollbar-----------
         
-        # Create a progress bar with the custom style
-        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-        self.progress_bar_canvas.grid(row=12, column=2, padx=50, pady=1)
-        self.progress_bar_canvas_flag=True
+        # Configure row and column weights to allow resizing 
+        no_global_columns = 5
+        no_global_rows = 13
+        
+        # Adjust the row range according to the exsisting number
+        for i in range(no_global_rows):  # Assuming you have 13 rows
+            self.root.rowconfigure(i, weight=1)
 
+        # Adjust the column range according to the exsisting number
+        for i in range(no_global_columns):
+            self.root.columnconfigure(i, weight=1)
+        
         # Initialize variables for simulation thread
         self.simulation_thread = None
         self.simulation_running = False
@@ -209,7 +243,7 @@ _____________________________________________________
         self.selected_fuel = tk.StringVar()
 
         # Set a default value for the dropdown
-        default_value = "Methanol"
+        default_value = "Available fuel options"
         self.selected_fuel.set(default_value)
 
         # Create a dropdown menu for fuel selection
@@ -232,6 +266,9 @@ _____________________________________________________
         self.selected_mesh_file_content = None
         self.geometry_dest_path = None
         self.control_dict_path = None 
+        self.separateMeshLogFile = False
+        self.caseMeshLogFile = False
+        self.solverLogFile = False 
         
         # Mesh parameters 
         self.mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"] 
@@ -246,6 +283,49 @@ _____________________________________________________
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
         self.mixture_params = ["molWeight", "rho", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
 
+
+    # -------------- Main logos --------------------------    
+    def add_logos(self):
+
+        # Load and display openfoam logo
+        self.logo_openfoam = Image.open("Resources/Logos/openfoam_logo.png")  
+        self.logo_openfoam = self.logo_openfoam.resize((140, 40))
+        self.logo_openfoam = ImageTk.PhotoImage(self.logo_openfoam)
+        self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
+        self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
+        self.OF_label.configure(background="white")
+        
+        # Load and display SMLT logo
+        self.logo_simulitica = Image.open("Resources/Logos/simulitica_logo.png") 
+        self.logo_simulitica = self.logo_simulitica.resize((140, 70))
+        self.logo_simulitica = ImageTk.PhotoImage(self.logo_simulitica)
+        self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
+        self.simLabel.grid(row=11, column=0, pady=10, padx=10, sticky="ew")
+        self.simLabel.configure(background="white")
+
+        # Create a label for copyright text
+        self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
+        self.copyright_label.grid(row=12, column=0, pady=10, padx=10, sticky="ew")
+        self.copyright_label.configure(background="white", font="bold")
+    # -------------- Main logos -------------------------- 
+    
+    # Toggle function for action bar visibility
+    def toggle_visibility(self):
+        self.show_first_column = not self.show_first_column
+
+    # Toggle the visibility of buttons in the first column
+        if self.show_first_column:
+            #self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="ew")
+            #self.browse_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
+            self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=8)
+            # ... (toggle other buttons)
+        else:
+            #self.import_button.grid_remove()
+            #self.browse_button.grid_remove()
+            self.splash_bgImage_label.grid_remove()
+            # ... (toggle other buttons)
+    
+    
     def run_terminal_command(self, command):
         # Your existing method for running terminal commands goes here
         pass
@@ -362,70 +442,47 @@ _____________________________________________________
      
      # -------------- Splash background image(s) --------------------------  
        
-###    def add_bgImage(self):
-
-###        # Load and display openfoam logo
-###        self.splash_bgImage = Image.open("Resources/Images/racing-car.jpg")  
-###        self.splash_bgImage = self.splash_bgImage.resize((1300, 870))
-###        ##self.splash_bgImage = Image.open("Resources/Images/bubbles.jpg")  
-###        ##self.splash_bgImage = self.splash_bgImage.resize((1300, 850))
-###        #self.splash_bgImage = Image.open("Resources/Images/airplaneEngine.jpg")  
-###        #self.splash_bgImage = self.splash_bgImage.resize((1300, 950))
-###        self.splash_bgImage = ImageTk.PhotoImage(self.splash_bgImage)
-###        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-###        self.splash_bgImage_label.grid(row=0, column=3, pady=10, padx=10, sticky="ew", rowspan=15)
-###        self.splash_bgImage_label.configure(background="white")  
-
     def add_bgImage(self):
-        self.splash_bgImage_label = tk.Label(self.root)
-        self.splash_bgImage_label.grid(row=0, column=5, pady=10, padx=10, sticky="ew", rowspan=15)
-        self.splash_bgImage_label.configure(background="white")
-        self.show_next_image()
-
-    def show_next_image(self):
-        image_path = self.image_paths[self.current_image_index]
-        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
-
-        # Load and display the next image in the list
-        splash_bgImage = Image.open(image_path)
-        splash_bgImage = splash_bgImage.resize((1350, 1000))
-        #splash_bgImage = splash_bgImage.resize((1300, 870))
-        splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
-        self.splash_bgImage_label.configure(image=splash_bgImage)
-        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
-
-        # Schedule the next image after the total time delay
-        self.root.after(self.time_delay, self.show_next_image)
-
-    def start_slideshow(self):
-        # Start the slideshow after the pre-specified delay
-        self.root.after(self.time_delay, self.show_next_image)
-        # -------------- Splash background image(s) -------------------------- 
-    
-    # -------------- Main logos --------------------------    
-    def add_logos(self):
 
         # Load and display openfoam logo
-        self.logo_openfoam = Image.open("Resources/Logos/openfoam_logo.png")  
-        self.logo_openfoam = self.logo_openfoam.resize((140, 40))
-        self.logo_openfoam = ImageTk.PhotoImage(self.logo_openfoam)
-        self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
-        self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
-        self.OF_label.configure(background="white")
-        
-        # Load and display SMLT logo
-        self.logo_simulitica = Image.open("Resources/Logos/simulitica_logo.png") 
-        self.logo_simulitica = self.logo_simulitica.resize((140, 70))
-        self.logo_simulitica = ImageTk.PhotoImage(self.logo_simulitica)
-        self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
-        self.simLabel.grid(row=11, column=0, pady=10, padx=10, sticky="ew")
-        self.simLabel.configure(background="white")
+        self.splash_bgImage = Image.open("Resources/Images/racing-car.jpg")  
+        self.splash_bgImage = self.splash_bgImage.resize((800, 600))
+        ##self.splash_bgImage = Image.open("Resources/Images/bubbles.jpg")  
+        ##self.splash_bgImage = self.splash_bgImage.resize((1300, 850))
+        #self.splash_bgImage = Image.open("Resources/Images/airplaneEngine.jpg")  
+        #self.splash_bgImage = self.splash_bgImage.resize((1300, 950))
+        self.splash_bgImage = ImageTk.PhotoImage(self.splash_bgImage)
+        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
+        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=13)
+        self.splash_bgImage_label.configure(background="white")  
 
-        # Create a label for copyright text
-        self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
-        self.copyright_label.grid(row=12, column=0, pady=10, padx=10, sticky="ew")
-        self.copyright_label.configure(background="white", font="bold")
-   # -------------- Main logos --------------------------        
+###    def add_bgImage(self):
+###        self.splash_bgImage_label = tk.Label(self.root)
+###        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=8)
+###        self.splash_bgImage_label.configure(background="white")
+###        self.show_next_image()
+
+###    def show_next_image(self):
+###        image_path = self.image_paths[self.current_image_index]
+###        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
+
+###        # Load and display the next image in the list
+###        splash_bgImage = Image.open(image_path)
+###        splash_bgImage = splash_bgImage.resize((800, 600))
+###        #splash_bgImage = splash_bgImage.resize((1350, 1000))
+###        splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
+###        self.splash_bgImage_label.configure(image=splash_bgImage)
+###        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
+
+###        # Schedule the next image after the total time delay
+###        self.root.after(self.time_delay, self.show_next_image)
+
+###    def start_slideshow(self):
+###        # Start the slideshow after the pre-specified delay
+###        self.root.after(self.time_delay, self.show_next_image)
+        # -------------- Splash background image(s) -------------------------- 
+    
+     
         
         
     # -------------- importing the geometry --------------------------------------------------------------------    
@@ -523,11 +580,9 @@ _____________________________________________________
             return
 
         # Ask the user for mesh type using clickable buttons
-        mesh_type = self.ask_mesh_type()
+        self.mesh_type = self.ask_mesh_type()
 
-        if mesh_type is not None:
-            # Execute the meshing command based on the selected mesh type
-            if mesh_type == "Cartesian":
+        if self.mesh_type is not None:
 
                 # Read the content of the "meshDict" file
                 self.mesh_dict_file_path = os.path.join(self.geometry_dest_path, "system", "meshDict")
@@ -547,17 +602,7 @@ _____________________________________________________
                     tk.messagebox.showerror("Error", f"File not found - {self.mesh_dict_file_path}")
                 except Exception as e:
                     tk.messagebox.showerror("Error", f"Error reading mesh parameters: {e}")
-                   
-                    
-            elif mesh_type == "Polyhedral":
-                # Execute Polyhedral mesh command
-                pass  # Replace with the actual command
-            elif mesh_type == "Tetrahedral":
-                # Execute Tetrahedral mesh command
-                pass  # Replace with the actual command
-                
-                
-
+                             
     def open_replace_mesh_parameters_popup(self, old_values_mesh):
         if old_values_mesh:
             # Open a popup to replace mesh parameters
@@ -567,9 +612,23 @@ _____________________________________________________
 
 
     def start_meshing(self):
-        # Execute Cartesian mesh command
-        # Running "AllmeshCartesian" script here
-        cartMesh_script = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
+    
+        # Choosing the right script based on the selected mesh type
+        if self.mesh_type == "Cartesian":
+            script_name = "AllmeshCartesian"
+        elif self.mesh_type == "Polyhedral":
+            script_name = "AllmeshPolyhedral"
+        elif self.mesh_type == "Tetrahedral":
+            script_name = "AllmeshTetrahedral"
+        else:
+            tk.messagebox.showerror("Error", f"Unsupported mesh type: {self.mesh_type_var}")
+            return
+
+        # Create the full path to the meshing script
+        cartMesh_script = os.path.join(self.geometry_dest_path, script_name)
+
+
+        # Running mesh script 
         if os.path.exists(cartMesh_script):
             chmod_command = ["chmod", "+x", cartMesh_script]
             subprocess.run(chmod_command, check=True)
@@ -578,7 +637,10 @@ _____________________________________________________
                 # Activating the progress bar "again" - to be on the safe side
                 self.progress_bar_canvas_flag = True
                 self.start_progress_bar()
-
+                
+                # Clear previous content from the text box
+                self.text_box.delete(1.0, "end")  
+                
                 # Use Popen to capture real-time output
                 command = [f"./{os.path.basename(cartMesh_script)}"]
                 process = subprocess.Popen(command, cwd=self.geometry_dest_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
@@ -587,17 +649,24 @@ _____________________________________________________
                 while True:
                     line = process.stdout.readline()
                     if not line:
-                        break
+                        break    
                     self.text_box.insert("end", line)
                     self.text_box.see("end")  # Scroll to the end to show real-time updates
                     self.text_box.update_idletasks()  # Update the widget
 
                 # Wait for the process to complete
                 process.communicate()
+                
+                # Enable the load_meshChecked function
+                self.separateMeshLogFile = True 
+                
+                # Update the status label 
+                self.status_label.config(text="Meshing process is finished!", foreground="green")
 
                 # Check the return code and display appropriate messages
                 if process.returncode == 0:
-                    tk.messagebox.showinfo("Mesh is generated", "Mesh constructed successfully.")
+                    #pass
+                    tk.messagebox.showinfo("Mesh is ready", "Mesh is generated successfully!") # DEBUGGING
                 else:
                     tk.messagebox.showerror("Meshing Error", "There was an error during meshing. Check the console output.")
 
@@ -629,196 +698,18 @@ _____________________________________________________
 
         # Return the selected mesh type
         return self.mesh_type_var.get()
-
-
-
-###    # Start the journey of mesh creation :)
-###   
-###    def create_mesh(self):
-###        # Check if geometry is loaded
-###        if not self.geometry_loaded:
-###            messagebox.showinfo("Geometry Not Loaded", "Please load a geometry before creating the mesh.")
-###            return
-
-###        # Ask the user for mesh type using clickable buttons
-###        mesh_type = self.ask_mesh_type()
-
-###        if mesh_type is not None:
-###            # Execute the meshing command based on the selected mesh type
-###            if mesh_type == "Cartesian":
-###          
-            
-###                # Execute Cartesian mesh command
-###                # Running "AllmeshCartesian" script here
-###                cartMesh_script = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
-###                if os.path.exists(cartMesh_script):
-###                    chmod_command = ["chmod", "+x", cartMesh_script]
-###                    subprocess.run(chmod_command, check=True)
-
-###                    try:
-###                        # Activating the progress bar "again" - to be on the safe side
-###                        self.progress_bar_canvas_flag = True
-###                        self.start_progress_bar()
-
-###                        # Create a popup to get mesh parameters from the user
-###                        mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"]  # Add other parameters as needed
-###                        values = self.ask_mesh_parameters(mesh_params)
-
-###                        
-###                        # Use Popen to capture real-time output
-###                        command = [f"./{os.path.basename(cartMesh_script)}"]
-###                        process = subprocess.Popen(command, cwd=self.geometry_dest_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
-
-###                        # Continuously read and insert output into the Text widget
-###                        while True:
-###                            line = process.stdout.readline()
-###                            if not line:
-###                                break
-###                            self.text_box.insert("end", line)
-###                            self.text_box.see("end")  # Scroll to the end to show real-time updates
-###                            self.text_box.update_idletasks()  # Update the widget
-###                           
-###                        # Wait for the process to complete
-###                        process.communicate()
-
-###                        # Check the return code and display appropriate messages
-###                        if process.returncode == 0:
-###                            tk.messagebox.showinfo("Mesh is generated", "Mesh constructed successfully.")
-###                        else:
-###                            tk.messagebox.showerror("Meshing Error", "There was an error during meshing. Check the console output.")
-###                    
-###                    except subprocess.CalledProcessError as e:
-###                        tk.messagebox.showerror("Error", f"Error running AllmeshCartesian script: {e.stderr}")
-###                    finally:
-###                        self.progress_bar_canvas_flag = False
-###                else:
-###                    tk.messagebox.showerror("Error", "AllmeshCartesian script not found!")
-
-###            elif mesh_type == "Polyhedral":
-###                # Execute Polyhedral mesh command
-###                pass  # Replace with the actual command
-###            elif mesh_type == "Tetrahedral":
-###                # Execute Tetrahedral mesh command
-###                pass  # Replace with the actual command
-
-#### _____________________________________Craft your own mesh______________________________________________________
-
-###    def ask_mesh_parameters(self, mesh_params):
-###        # Read existing values from the AllmeshCartesian script
-###        existing_values = self.read_mesh_parameters_from_script()
-
-###        # Create a popup to ask the user for mesh parameters
-###        popup = tk.Toplevel(self.root)
-###        popup.geometry("250x450")
-###        popup.title("Mesh Parameters")
-
-###        param_entries = {}
-
-###        def display_help(param):
-###            # Get the help text from the dictionary or use a default message
-###            help_text = self.PARAMETER_HELP.get(param, f"{param}:\nProvide a brief description or range of values.")
-###            messagebox.showinfo("Help", help_text)
-
-###        # Populate the popup with parameter entry fields, their old values, and help buttons
-###        for param in mesh_params:
-###            frame = ttk.Frame(popup)
-###            frame.pack(fill=tk.X)
-
-###            ttk.Label(frame, text=param).pack()
-###            #ttk.Label(frame, text=param).pack(side=tk.LEFT padx=(0, 10))
-###            
-###            # Add a help button
-###            style = ttk.Style()
-###            style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black", justify="right")
-###            help_button = ttk.Button(frame, text="?", command=lambda param=param: display_help(param), width=1)
-###            #help_button.configure(text="?", foreground="blue")
-###            help_button.pack(side=tk.RIGHT)
-###            #help_button.pack(side=tk.LEFT) 
-###            
-###            entry_var = tk.StringVar()
-###            entry_var.set(existing_values.get(param, ""))  # Set the default value from the script
-###            entry = ttk.Entry(frame, textvariable=entry_var)
-###            #entry.pack(side=tk.LEFT)
-###            entry.pack()   
-
-###            param_entries[param] = entry
-
-###        def update_mesh_parameters():
-###            # Get the new values from the entry fields
-###            new_values = {param: entry.get() for param, entry in param_entries.items()}
-
-###            # Close the popup
-###            popup.destroy()
-
-###            if new_values:
-###                # TODO: Apply the new values to the AllmeshCartesian script
-###                # You need to modify this part based on the structure of your script
-###                self.update_mesh_parameters_in_script(new_values)
-
-###                # Start the meshing process [FLAG!!]
-###                self.start_meshing()
-
-###        # Add an "Update" button to apply the new values
-###        ttk.Button(popup, text="Start Meshing!", command=update_mesh_parameters).pack() # update mesh parameters then start meshing.
-
-###        # Wait for the popup to be closed
-###        self.root.wait_window(popup)
-
-###        # Return the new values or an empty dictionary if the popup was closed without clicking "Update"
-###        return new_values if "new_values" in locals() else {}
-
-###    # ------ rest of fully functioning mesher   
-###    def read_mesh_parameters_from_script(self):
-###        # TODO: Implement this method to read existing values from the AllmeshCartesian script
-###        # You need to modify this part based on the structure of your script
-###        existing_values = {}
-###        
-###        # Full path to AllmeshCartesian script
-###        script_file_path = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
-###        
-###        try:
-###            with open(script_file_path, "r") as script_file:
-###                for line in script_file:
-###                    if "-set" in line:
-###                        parts = line.split()
-###                        if len(parts) == 4:
-###                            param = parts[3]
-###                            value = parts[4]
-###                            existing_values[param] = value
-###        except FileNotFoundError:
-###            print(f"Error: File not found - {script_file_path}")
-###        return existing_values
-###       
-###    def update_mesh_parameters_in_script(self, new_values):
-###        # TODO: Implement this method to update the AllmeshCartesian script with new parameter values
-###        # You need to modify this part based on the structure of your script
-###        script_file_path = os.path.join(self.geometry_dest_path, "AllmeshCartesian")
-
-###        with open(script_file_path, "r") as script_file:
-###            lines = script_file.readlines()
-
-###        for i, line in enumerate(lines):
-###            for param, value in new_values.items():
-###                if f"-entry {param} -set" in line:
-###                    lines[i] = f'foamDictionary system/meshDict -entry {param} -set {value}\n'
-###                    break
-
-###        with open(script_file_path, "w") as script_file:
-###            script_file.writelines(lines)
-###            
-
         
 # -------------------------------- MESH CREATION ------------------------------            
             
     # --------------------- running the simulation ---------------------------
-    def initialize_case(self):
+    def load_case(self):
         selected_directory = filedialog.askdirectory()
         if selected_directory:
             self.selected_file_path = selected_directory
             self.status_label.config(text=f"Case directory identified: {selected_directory}", foreground="blue")
             self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
         else:
-            self.status_label.config(text="No directory selected.", foreground="red")
+            self.status_label.config(text="No case directory selected.", foreground="red")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
 
 
@@ -850,6 +741,9 @@ _____________________________________________________
                 
                 # Use Popen to capture real-time output
                 process = subprocess.Popen(["./Allrun"], cwd=self.selected_file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+                
+                # Clear previous content from the text box
+                self.text_box.delete(1.0, "end")
 
                 # Continuously read and insert output into the Text widget
                 while True:
@@ -862,12 +756,19 @@ _____________________________________________________
                    
                 # Wait for the process to complete
                 process.communicate()
+                
+                # Enable the load_meshChecked function (to allow checking the mesh stats; also while sim is running)
+                self.caseMeshLogFile = True
+                
+                # Enable the load_log_file function (even if the simulation was not terminated gracefully!)
+                self.solverLogFile = True 
 
                 # Check the return code and display appropriate messages
                 if process.returncode == 0:
                     tk.messagebox.showinfo("Simulation Finished", "Simulation completed successfully.")
                 else:
-                    tk.messagebox.showerror("Simulation Error", "There was an error during simulation. Check the console output.")
+                    pass # FLAG! must check what openfoam "returns" in case of a successful operation
+                    #tk.messagebox.showerror("Simulation Error", "There was an error during simulation. Check the console output.")
             except subprocess.CalledProcessError as e:
                 tk.messagebox.showerror("Error", f"Error running Allrun script: {e.stderr}")
             finally:
@@ -914,24 +815,6 @@ _____________________________________________________
     
     def replace_write_now_with_end_time(self, control_dict_path):
         subprocess.run(["sed", "-i", 's/writeNow/endTime/g', control_dict_path], check=True)
-        
-    def load_log_file(self):
-            # Specify the path to the "log" file
-            log_file_path = os.path.join(self.selected_file_path, "log")
-
-            # Check if the file exists
-            if os.path.exists(log_file_path):
-                # Read the content of the file
-                with open(log_file_path, "r") as file:
-                    content = file.read()
-
-                # Insert the content into the Text widget
-                self.text_box.delete(1.0, "end")  # Clear previous content
-                self.text_box.insert("end", content)
-            else:
-                # If the file doesn't exist, display a message in the Text widget
-                self.text_box.delete(1.0, "end")  # Clear previous content
-                self.text_box.insert("end", "log file not found.") 
                 
     def start_progress_bar(self):
         self.root.after(100, self.update_progress)
@@ -961,33 +844,84 @@ _____________________________________________________
 #______________________________________________________________________
 # FLAG: essentially intended to be dedicated for checkMesh script****
     def load_meshChecked(self):
+###        if not self.separateMeshLogFile:
+###            pass
+###            # messagebox.showinfo("Mesh Not Created Separately!", "Please check, maybe it's created through the case.") #DEBUGGING
+###        elif not self.caseMeshLogFile:
+###            messagebox.showinfo("No Mesh Found!", "Please make sure a mesh is generated first then load its log file.")
+###            return
+            
+        # Check if the file exists
+        if self.geometry_dest_path and os.path.exists(self.geometry_dest_path):  # If mesh was created stand alone 
             # Specify the path to the "AllmeshCartesian" file
-            allmesh_cartesian_path = os.path.join(self.geometry_dest_path, "meshChecked")
+            allmesh_cartesian_path1 = os.path.join(self.geometry_dest_path, "log.checkMesh")  # Meshing dir.
+
+            # Read the content of the file
+            with open(allmesh_cartesian_path1, "r") as file:
+                content = file.read()
+
+            # Insert the content into the Text widget
+            self.text_box.delete(1.0, "end")  # Clear previous content
+            self.text_box.insert("end", content)
+        elif self.selected_file_path and os.path.exists(self.selected_file_path):  # If mesh was created stand alone 
+            # Specify the path to the "Allrun" file
+            allmesh_cartesian_path2 = os.path.join(self.selected_file_path, "log.checkMesh")  # Case dir.
+
+            # Read the content of the file
+            with open(allmesh_cartesian_path2, "r") as file:
+                content = file.read()
+
+            # Insert the content into the Text widget
+            self.text_box.delete(1.0, "end")  # Clear previous content
+            self.text_box.insert("end", content)
+        else:
+            # If the file doesn't exist, display a message in the Text widget
+            self.text_box.delete(1.0, "end")  # Clear previous content
+            self.text_box.insert("end", "log.checkMesh file not found.")
+            messagebox.showinfo("No Mesh Log-File Found!", "Please make sure a mesh is generated first then load its log file.")
+#__________________________________________________________________           
+    def load_log_file(self):
+         
+###        if not self.solverLogFile:
+###            messagebox.showinfo("No solver run!", "No solver log file was found. Please make sure your simulation is run first.")
+###            return
+
+        solver_names = ["simpleFoam", "pimpleFoam", "icoFoam", "compressibleInterFoam", "foamRun"]  # Add more solver names...
+
+        # Check each solver log file
+        for solver_name in solver_names:
+            log_file_path = os.path.join(self.selected_file_path, f"log.{solver_name}")
 
             # Check if the file exists
-            if os.path.exists(allmesh_cartesian_path):
+            if os.path.exists(log_file_path):
                 # Read the content of the file
-                with open(allmesh_cartesian_path, "r") as file:
+                with open(log_file_path, "r") as file:
                     content = file.read()
 
                 # Insert the content into the Text widget
                 self.text_box.delete(1.0, "end")  # Clear previous content
                 self.text_box.insert("end", content)
-            else:
-                # If the file doesn't exist, display a message in the Text widget
-                self.text_box.delete(1.0, "end")  # Clear previous content
-                self.text_box.insert("end", "meshChecked file not found.")
-#______________________________________________________________________           
+
+                # Break the loop once a log file is found
+                break
+        else:
+            # If none of the log files exist, display a message in the Text widget
+            self.text_box.delete(1.0, "end")  # Clear previous content
+            self.text_box.insert("end", "No log file found.")
+            
+            
              
 # -------------------------------- Plot results ------------------------------  
     # Function to plot results using xmgrace
     def plot_results_xmgrace(self):
+    
+        xmgrace_sample_file = os.path.join("Resources", "Sample_Results", "stresses.agr")
         try:
             # Check if xmgrace is installed
             subprocess.run(["xmgrace", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             
             # Run xmgrace in the same terminal window
-            subprocess.run(["xmgrace"])
+            subprocess.run(["xmgrace", xmgrace_sample_file])
         except subprocess.CalledProcessError:
             tk.messagebox.showerror("Error", "xmgrace is not installed or not in the system's PATH.")
 # -------------------------------- Plot results ------------------------------  
@@ -1061,17 +995,18 @@ _____________________________________________________
             del self.tooltip
             
     def magic_box(self): # Fixing the issue of updating process with the modification in controlDict | FLAG!
+    
+        if not self.solverLogFile:
+            messagebox.showinfo("No solver run!", "No simulation was run to help you with :/")
+            return
+            
         # Manually touch the controlDict file
         control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
         try:
             subprocess.run(["touch", control_dict_path], check=True)
         except subprocess.CalledProcessError as e:
             tk.messagebox.showerror("Error", f"Error touching controlDict: {e.stderr}")
-            
-     
-
-        
-        
+   
 if __name__ == "__main__":
     root = tk.Tk()
     app = TerminalApp(root)

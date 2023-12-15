@@ -1,0 +1,24 @@
+/// -*- C++ -*-
+coordinateTransform
+{
+    type    fieldCoordinateSystemTransform;
+    libs    (fieldFunctionObjects);
+    log     true;
+    fields  ( U );
+
+    writeControl writeTime;
+
+    coordinateSystem
+    {
+        type    cylindrical;
+        origin  (0 0 0);
+        rotation
+        {
+            type cylindrical;
+            axis (1 0 0);  //< local Z
+        }
+    }
+}
+
+
+// ************************************************************************* //

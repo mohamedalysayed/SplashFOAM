@@ -7,7 +7,7 @@ class SearchWidget:
         self.text_widget = text_widget
 
         # Create a search bar
-        search_default_sentence = "Search here!"
+        search_default_sentence = "Search inside the log file"
         self.search_entry = tk.Entry(root, width=30)
         self.search_entry.grid(row=2, column=3, padx=10, pady=(0, 10))
         self.search_entry.insert(0, search_default_sentence)
