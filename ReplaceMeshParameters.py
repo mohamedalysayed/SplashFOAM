@@ -79,7 +79,7 @@ class ReplaceMeshParameters:
             with open(self.parent.mesh_dict_file_path, 'w') as file:
                 file.write(file_content)
 
-            self.parent.status_label.config(text="Values replaced successfully", foreground="green")
+            self.parent.status_label.config(text="Mesh parameters' values are updated successfully!", foreground="green")
             
 #            #_______________________________________________________________________________________
             # Show a confirmation popup after ReplaceMeshParameters finishes

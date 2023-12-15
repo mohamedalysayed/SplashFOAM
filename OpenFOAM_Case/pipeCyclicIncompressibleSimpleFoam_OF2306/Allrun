@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Run from this directory
+cd "${0%/*}" || exit 1
+
+# of2306
+. /usr/lib/openfoam/openfoam2306/etc/bashrc
+
+# Source tutorial run functions
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+#------------------------------------------------------------------------------
+
+canCompile || exit 0    # Dynamic code
+
+restore0Dir
+
+runApplication blockMesh
+
+runApplication topoSet
+
+runApplication refineHexMesh c0 -overwrite
+
+runApplication checkMesh 
+
+runApplication decomposePar -cellDist
+
+runParallel $(getApplication) 
+ 
+#foamMonitor -l postProcessing/residuals/0/solverInfo.dat
+
+runApplication reconstructPar latestTime
+
+runApplication paraFoam
+#------------------------------------------------------------------------------

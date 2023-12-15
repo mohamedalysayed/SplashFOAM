@@ -1,0 +1,34 @@
+// -*- C++ -*-
+// Calculate momentum fields
+momentum
+{
+    type    momentum;
+    libs    (fieldFunctionObjects);
+    log     true;
+    useNamePrefix   true;
+
+    executeInterval 10;
+    writeControl    writeTime;
+
+    // writeToFile     true;
+
+    writeMomentum   true;
+    writePosition   true;
+    writeVelocity   true;
+
+    // Cells to select (all/cellSet/cellZone)
+    regionType  all;
+    // name     c0;
+
+    cylindrical true;
+
+    origin  (0 0 0);
+    rotation
+    {
+        type cylindrical;
+        axis (1 0 0);   //< local Z
+    }
+}
+
+
+// ************************************************************************* //

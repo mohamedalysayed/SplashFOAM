@@ -1,0 +1,117 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+mergeType points;   // Wedge geometry - Merge points instead of topology
+
+scale   1;
+
+//- Half angle of wedge in degrees
+halfAngle 45.0;
+
+//- Radius of pipe [m]
+radius  0.5;
+
+y               #eval{ $radius*sin(degToRad($halfAngle)) };
+z               #eval{ $radius*cos(degToRad($halfAngle)) };
+minY            #eval{ -1*$y };
+minZ            #eval{ -1*$z };
+
+vertices
+(
+    (0  0 0)        //0
+    (10 0 0)        //1
+    (10 0 0)        //2
+    (0  0 0)        //3
+
+    (0  $minY $z)   //4
+    (10 $minY $z)   //5
+    (10 $y $z)      //6
+    (0  $y $z)      //7
+
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) (50 5 5) simpleGrading (1 1 1)
+);
+
+edges
+(
+    arc 4 7 origin (0 0 0)
+    arc 5 6 origin (10 0 0)
+);
+
+boundary
+(
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+        );
+    }
+
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (1 2 6 5)
+        );
+    }
+
+    side1
+    {
+        type cyclicAMI;
+        neighbourPatch side2;
+        faces
+        (
+            (0 1 5 4)
+        );
+
+        transform rotational;
+        rotationAxis (1 0 0);
+        rotationCentre (0 0 0);
+    }
+
+    side2
+    {
+        type cyclicAMI;
+        neighbourPatch side1;
+        faces
+        (
+            (7 6 2 3)
+        );
+
+        transform rotational;
+        rotationAxis (1 0 0);
+        rotationCentre (0 0 0);
+    }
+
+    walls
+    {
+        type wall;
+        faces
+        (
+            (4 5 6 7)
+            (3 2 1 0)
+        );
+    }
+);
+
+
+// ************************************************************************* //

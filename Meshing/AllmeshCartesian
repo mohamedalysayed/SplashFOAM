@@ -3,81 +3,62 @@
 # Run from this directory
 cd "${0%/*}" || exit 1
 
-# Source tutorial run functions
-#. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
-
-# Define a spinner to entertain the user while the mesh is being created
-spinner() {
-  local pid=$1
-  local delay=0.1
-  local spinstr='|/-\'
-  while ps -p $pid > /dev/null; do
-    local temp=${spinstr#?}
-    printf " [%c]  " "$spinstr"
-    local spinstr=$temp${spinstr%"$temp"}
-    sleep $delay
-    printf "\b\b\b\b\b\b"
-  done
-  printf "    \b\b\b\b"
-}
-
-#source ~/.bashrc 
 #of2306
 . /usr/lib/openfoam/openfoam2306/etc/bashrc
 
+# Source tutorial run functions
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+
+#### Define a spinner to entertain the user while the mesh is being created
+###spinner() {
+###  local pid=$1
+###  local delay=0.1
+###  local spinstr='|/-\'
+###  while ps -p $pid > /dev/null; do
+###    local temp=${spinstr#?}
+###    printf " [%c]  " "$spinstr"
+###    local spinstr=$temp${spinstr%"$temp"}
+###    sleep $delay
+###    printf "\b\b\b\b\b\b"
+###  done
+###  printf "    \b\b\b\b"
+###}
+
 # Removing old mesh
-rm -rf log.cartesianMesh 
+rm -f log.cartesianMesh 
+rm -f log.checkMesh 
+rm -f log.foamToVTK
+rm -f log.paraFoam
 rm -rf constant/polyMesh 
 rm -rf VTK
 
 # Update the user with the status - spinner goes after 
-echo "Mesh is being crafted..." & 
-
-# Modify mesh parameters 
-#foamDictionary system/meshDict -entry minCellSize -set 0.0002
-#foamDictionary system/meshDict -entry maxCellSize -set 0.0004
-#foamDictionary system/meshDict -entry boundaryCellSize -set 0.0003
-#foamDictionary system/meshDict -entry nLayers -set 
-#foamDictionary system/meshDict -entry thicknessRatio -set 
-#foamDictionary system/meshDict -entry maxFirstLayerThickness -set 
-
+echo
+echo "==========================================================="
+echo "Mesh is being crafted, please hang on... " & 
+echo
 # build the mesh in cartesian mode 
 cartesianMesh > log.cartesianMesh & 
-#cartesianMesh # -> once you change to this, the user will have instantaneos info, however, NO stored info :/ 
-spinner $!
-# tail -10f log.cartesianMesh # race condition [not a good idea!] 
+###spinner $! 
 
 echo "Mesh is successfully generated! Now creating the vtk files for you..." &
+echo
 # Wait a second before executing the next line 
 
 # Extract ClockTime value from log.cartesianMesh
-#clock_time=$(grep "ClockTime =" log.cartesianMesh | awk '{print $NF}' | tr -d '[:alpha:]')
 clock_time=$(grep "ClockTime =" log.cartesianMesh | awk '{print $7}' | tr -d '[:alpha:]')
 sleep_time=$((clock_time + 1))
-
-#echo "sleep_time_calculated = "& 
-#echo $sleep_time 
 
 #sleep 4 # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
 sleep $sleep_time # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
 
-echo "Saving the mesh in VTK format..." &
 # Saving the mesh in VTK format (for CAD viewers)
-foamToVTK > log.foamToVTK-Cartesian &
-spinner $!
+runApplication foamToVTK 
+sleep 1 
+runApplication paraFoam   
 
 echo "Checking mesh quality..." &
-checkMesh > meshChecked & 
-spinner $!
-
-
-echo "Opening mesh vtk file(s) in paraview..." &
-sleep 1 # wait a second then open the vtk file in paraview 
-
-paraview VTK/Meshing_0/internal.vtu & 
-#spinner $!
-
-#runApplication blockMesh
-#runApplication extrudeMesh
-
+echo
+runApplication checkMesh 
+echo "==========================================================="
 #------------------------------------------------------------------------------

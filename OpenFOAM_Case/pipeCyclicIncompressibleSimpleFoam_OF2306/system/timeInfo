@@ -1,0 +1,15 @@
+// -*- C++ -*-
+// Record execution/clock time
+time
+{
+    type    timeInfo;
+    libs    (utilityFunctionObjects);
+    log     true;
+
+    // writeToFile     true;
+
+    perTimeStep     true;
+}
+
+
+// ************************************************************************* //
