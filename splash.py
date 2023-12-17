@@ -19,6 +19,7 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
 from ReplaceProperties import ReplacePropertiesPopup
 from ReplaceMeshParameters import ReplaceMeshParameters
+from ReplaceControlDictParameters import ReplaceControlDictParameters
 
 
 #______________
@@ -95,25 +96,30 @@ class TerminalApp:
         self.load_case_button.grid(row=3, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.load_case_button, "Click to choose the running directory of your case")
         
+        # Create a button to stop the command execution
+        self.stop_button = ttk.Button(self.root, text="Initialize Sim", command=self.initialize_simulation)
+        self.stop_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
+        self.add_tooltip(self.stop_button, "Click to stop terminal command")
+        
         # Create a button to run simulation
-        self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
-        self.run_simulation_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
+        self.run_simulation_button = ttk.Button(self.root, text="Run Sim", command=self.run_simulation)
+        self.run_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.run_simulation_button, "Click to start your simulation")
         
         # Stop Simulation Button
-        self.stop_simulation_button = ttk.Button(self.root, text="Stop Simulation", command=self.stop_simulation)
-        self.stop_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
+        self.stop_simulation_button = ttk.Button(self.root, text="Stop Sim", command=self.stop_simulation)
+        self.stop_simulation_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.stop_simulation_button, "Click to terminate your simulation")
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
         # Create a button to plot results using xmgrace
         self.plot_results_xmgrace_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results_xmgrace)
-        self.plot_results_xmgrace_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
+        self.plot_results_xmgrace_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
 
-         # Create a button to execute the command
+        # Create a button to execute the command
         self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
-        self.execute_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
+        self.execute_button.grid(row=11, column=1, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
         # Create an entry field for entering the command with a default sentence
@@ -124,10 +130,7 @@ class TerminalApp:
         self.entry.configure(foreground="blue", background="black")
 
 
-        # Create a button to stop the command execution
-        self.stop_button = ttk.Button(self.root, text="Stop Command", command=self.stop_command, state=tk.DISABLED)
-        self.stop_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.stop_button, "Click to stop terminal command")
+
 
         # Create a ttk.Style to configure the progress bar
         self.style = ttk.Style()
@@ -263,7 +266,9 @@ class TerminalApp:
         self.selected_file_path = None
         self.selected_file_content = None
         self.mesh_dict_file_path = None
+        self.control_dict_file_path = None
         self.selected_mesh_file_content = None
+        self.selected_control_file_content = None
         self.geometry_dest_path = None
         self.control_dict_path = None 
         self.separateMeshLogFile = False
@@ -272,6 +277,7 @@ class TerminalApp:
         
         # Mesh parameters 
         self.mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"] 
+        self.control_dict_params = ["startTime", "endTime", "deltaT", "writeInterval", "purgeWrite", "maxCo"]
         
         self.header = """/*--------------------------------*- C++ -*----------------------------------*\\
   =========                 |
@@ -572,7 +578,6 @@ class TerminalApp:
 
  
 # -------------------------------- MESH CREATION ------------------------------
-
     def create_mesh(self):
         # Check if geometry is loaded
         if not self.geometry_loaded:
@@ -701,7 +706,7 @@ class TerminalApp:
         
 # -------------------------------- MESH CREATION ------------------------------            
             
-    # --------------------- running the simulation ---------------------------
+# --------------------- running the simulation ---------------------------------------
     def load_case(self):
         selected_directory = filedialog.askdirectory()
         if selected_directory:
@@ -711,7 +716,77 @@ class TerminalApp:
         else:
             self.status_label.config(text="No case directory selected.", foreground="red")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
+            
+                
+    def initialize_simulation(self):
+        allclean_script = os.path.join(self.selected_file_path, "Allclean")
+        if os.path.exists(allclean_script):
+            chmod_command = ["chmod", "+x", allclean_script]
+            subprocess.run(chmod_command, check=True)
 
+            try:
+                self.start_progress_bar()
+                
+                # Use Popen to capture real-time output
+                process = subprocess.Popen(["./Allclean"], cwd=self.selected_file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+                
+                # Clear previous content from the text box
+                self.text_box.delete(1.0, "end")
+
+                # Continuously read and insert output into the Text widget
+                while True:
+                    line = process.stdout.readline()
+                    if not line:
+                        break
+                    self.text_box.insert("end", line)
+                    self.text_box.see("end")  # Scroll to the end to show real-time updates
+                    self.text_box.update_idletasks()  # Update the widget
+                   
+                # Wait for the process to complete
+                process.communicate()
+
+                # Check the return code and display appropriate messages
+                if process.returncode == 0:
+                    tk.messagebox.showinfo("Simulation Initialized", "Simulation directory has been reset to default!")
+                    
+                else:
+                    pass # FLAG! must check what openfoam "returns" in case of a successful operation
+                    #tk.messagebox.showerror("Simulation Error", "There was an error during simulation. Check the console output.")
+            except subprocess.CalledProcessError as e:
+                tk.messagebox.showerror("Error", f"Error running Allclean script: {e.stderr}")
+            finally:
+                self.stop_progress_bar()
+        else:
+            tk.messagebox.showerror("Error", "Allclean script not found!")
+                  
+            
+    def update_control_dict_parameters(self):
+        # Read the content of the "controlDict" file
+        self.control_dict_file_path = os.path.join(self.selected_file_path, "system", "controlDict")
+
+        try:
+            with open(self.control_dict_file_path, "r") as control_dict_file:
+                file_content = control_dict_file.read()
+                self.selected_control_file_content = file_content
+                existing_values_control_dict = {
+                    param: match.group(1) for param in self.control_dict_params
+                    for match in re.finditer(f'{param}\\s+([^;]+)(;|;//.*)', file_content)
+                }
+
+            # Open a popup to replace controlDict parameters
+            self.open_replace_control_dict_parameters_popup(existing_values_control_dict)
+
+        except FileNotFoundError:
+            tk.messagebox.showerror("Error", f"File not found - {self.control_dict_file_path}")
+        except Exception as e:
+            tk.messagebox.showerror("Error", f"Error reading controlDict parameters: {e}")
+            
+    def open_replace_control_dict_parameters_popup(self, existing_values):
+        if existing_values:
+            # Open a popup to replace controlDict parameters
+            ReplaceControlDictParameters(self, self.control_dict_params, existing_values)
+        else:
+            tk.messagebox.showerror("Error", "No controlDict parameters found in the 'controlDict' file!")
 
     def run_simulation(self):
         if self.selected_file_path is None:
@@ -719,7 +794,8 @@ class TerminalApp:
             return
 
         if not self.simulation_running:
-            self.simulation_thread = threading.Thread(target=self.run_openfoam_simulation)
+            #self.simulation_thread = threading.Thread(target=self.run_openfoam_simulation)
+            self.simulation_thread = threading.Thread(target=self.update_control_dict_parameters)
             self.simulation_thread.start()
             self.simulation_running = True
             self.stop_simulation_button["state"] = tk.NORMAL
@@ -766,6 +842,9 @@ class TerminalApp:
                 # Check the return code and display appropriate messages
                 if process.returncode == 0:
                     tk.messagebox.showinfo("Simulation Finished", "Simulation completed successfully.")
+                    
+                    # Giving the user the possibility to re-run the simulation
+                    self.simulation_running = False
                 else:
                     pass # FLAG! must check what openfoam "returns" in case of a successful operation
                     #tk.messagebox.showerror("Simulation Error", "There was an error during simulation. Check the console output.")
@@ -777,10 +856,11 @@ class TerminalApp:
         else:
             tk.messagebox.showerror("Error", "Allrun script not found!")
             
-        # Now, update the modification timestamp of the controlDict file
+        # Now, update the modification timestamp of the controlDict file | FLAG, maybe not needed anymore! 
         subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
         time.sleep(0.1)  # Add a 100ms delay if needed
         
+# --------------------- running the simulation ---------------------------------------
         
     def stop_simulation(self): # FLAG! at the moment, the controlDict file needs to be open and saved and closed, for the function to work :/
         if not self.simulation_running:
