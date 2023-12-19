@@ -13,9 +13,10 @@ class SearchWidget:
         self.search_entry.insert(0, search_default_sentence)
         self.search_entry.configure(background="white", foreground="blue")
 
-        style = ttk.Style()
-        style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
+        #style = ttk.Style()
+        #style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
         self.search_button = tk.Button(root, text="Find", command=self.search_text)
+        self.search_button.configure(relief="flat", background="lightblue", foreground="black", font=(12))
         self.search_button.grid(row=2, column=4, padx=10, pady=(0, 5))
 
         self.result_label = tk.Label(root, text="")

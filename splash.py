@@ -6,14 +6,19 @@ import time
 import shutil # For file copying
 import threading # Import threading for running simulation in a separate thread
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, simpledialog
-from tkinter.simpledialog import askstring
+from tkinter import ttk, filedialog, font, messagebox, simpledialog, colorchooser
+#from tkinter.simpledialog import askstring
+import tkinter.simpledialog 
 from PIL import Image, ImageTk
 import subprocess
 from tkinter import scrolledtext
 import matplotlib.pyplot as plt
 from tkinter import Listbox
 from collections import defaultdict # Import defaultdict | for mesh parameters 
+from tkinter.colorchooser import askcolor
+from tkinter.font import Font
+
+
 
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
@@ -35,6 +40,9 @@ class TerminalApp:
         
         # Display a welcome message
         self.show_welcome_message()
+        
+        # Display the main text box widget
+        self.setup_ui()
         
         # Variable to track visibility state of the action bar
         self.show_first_column = True  
@@ -170,50 +178,51 @@ class TerminalApp:
         checkMesh_button.grid(row=2, column=2, pady=1, padx=1, sticky="ew")
         checkMesh_button['width'] = 9  # Adjust the width as needed
         
-        #self.text_box = tk.Text(self.root, wrap="none", height=20, width=110)  # Adjust the width as needed
-        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)  # Adjust the width as needed
-        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
-        #self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky=tk.W, rowspan=8)
-        self.text_box.configure(foreground="lightblue", background="black")
-        self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
-        self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
-        
-        sample_text = """
-        This is a sample text widget.
-        You can search for words in this text.
-        Just type a word in the search bar and press 'Enter'.
-        """
-        splash_welcome_msg = """
-                            _____________________________________________________
-                            __        __   _                            _        
-                            \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
-                             \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
-                              \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
-                               \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
-                                                                                 
-                                     ____        _           _                           
-                                    / ___| _ __ | | __ _ ___| |__                        
-                                    \___ \| '_ \| |/ _` / __| '_ \                       
-                                     ___) | |_) | | (_| \__ \ | | |                      
-                                    |____/| .__/|_|\__,_|___/_| |_|                      
-                                          |_|                                            
-                              ___                   _____ ___    _    __  __     
-                             / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
-                            | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
-                            | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
-                             \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
-                                  |_|
-                            _____________________________________________________ 
-                                 
-                                   Your gate to efficient CFD production! 
-                            _____________________________________________________
-"""
-        self.text_box.insert(tk.END, splash_welcome_msg)
-        #self.text_box.insert(tk.END, sample_text)
-        
+####        #self.text_box = tk.Text(self.root, wrap="none", height=20, width=110)  # Adjust the width as needed
+####        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)  # Adjust the width as needed
+####        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
+####        #self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky=tk.W, rowspan=8)
+####        self.text_box.configure(foreground="lightblue", background="black")
+####        self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
+####        self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
+####        self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
+####        
+####        sample_text = """
+####        This is a sample text widget.
+####        You can search for words in this text.
+####        Just type a word in the search bar and press 'Enter'.
+####        """
+####        splash_welcome_msg = """
+####                            _____________________________________________________
+####                            __        __   _                            _        
+####                            \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
+####                             \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
+####                              \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
+####                               \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
+####                                                                                 
+####                                     ____        _           _                           
+####                                    / ___| _ __ | | __ _ ___| |__                        
+####                                    \___ \| '_ \| |/ _` / __| '_ \                       
+####                                     ___) | |_) | | (_| \__ \ | | |                      
+####                                    |____/| .__/|_|\__,_|___/_| |_|                      
+####                                          |_|                                            
+####                              ___                   _____ ___    _    __  __     
+####                             / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
+####                            | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
+####                            | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
+####                             \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
+####                                  |_|
+####                            _____________________________________________________ 
+####                                 
+####                                   Your gate to efficient CFD production! 
+####                            _____________________________________________________
+####"""
+####        self.text_box.insert(tk.END, splash_welcome_msg)
+####        #self.text_box.insert(tk.END, sample_text)
+####        
         # Add the search widget to the main app
         self.search_widget = SearchWidget(root, self.text_box)
+
         #----------Text Widget with Scrollbar-----------
         
         # Configure row and column weights to allow resizing 
@@ -509,6 +518,9 @@ class TerminalApp:
             # Create the Meshing folder if it doesn't exist
             if not os.path.exists(meshing_folder):
                 os.makedirs(meshing_folder)
+                
+            # Initiate the text_box with a simple CAD representation! 
+            self.generate_cad_visual()
 
             # Copy and rename the geometry file
             geometry_filename = f"CAD.{file_path.split('.')[-1].lower()}"
@@ -525,7 +537,7 @@ class TerminalApp:
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
             popup.title("Choose CAD Viewer")
-            popup.geometry("400x400")
+            popup.geometry("400x420")
 
             def open_freecad():
                 subprocess.run(["freecad", geometry_dest, "&"], check=True)
@@ -544,7 +556,7 @@ class TerminalApp:
             def open_paraview():
                 subprocess.run(["paraview", geometry_dest], check=True)
                 popup.destroy()
-
+                
             # Load logos
             freecad_logo = Image.open(freecad_logo_path).resize((160, 50), Image.ANTIALIAS)
             gmsh_logo = Image.open(gmsh_logo_path).resize((80, 70), Image.ANTIALIAS)
@@ -555,9 +567,9 @@ class TerminalApp:
             paraview_logo = ImageTk.PhotoImage(paraview_logo)
 
             # Create buttons with logos for the CAD viewers
-            style = ttk.Style()
+            ####style = ttk.Style()
             #style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black", borderwidth=1)
-            style.configure("TButton", padding=10, relief="solid", background="white", foreground="black", borderwidth=1) 
+            ###style.configure("TButton", padding=10, relief="solid", background="white", foreground="black", borderwidth=1) 
             freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
             freecad_button.image = freecad_logo
             freecad_button.pack(side=tk.TOP, padx=30, pady=10)
@@ -631,6 +643,9 @@ class TerminalApp:
 
         # Create the full path to the meshing script
         cartMesh_script = os.path.join(self.geometry_dest_path, script_name)
+        
+        # Initiate the text_box with a nice mesh representation! 
+        self.generate_mesh_visual()
 
 
         # Running mesh script 
@@ -644,7 +659,7 @@ class TerminalApp:
                 self.start_progress_bar()
                 
                 # Clear previous content from the text box
-                self.text_box.delete(1.0, "end")  
+                ##self.text_box.delete(1.0, "end")  
                 
                 # Use Popen to capture real-time output
                 command = [f"./{os.path.basename(cartMesh_script)}"]
@@ -703,6 +718,95 @@ class TerminalApp:
 
         # Return the selected mesh type
         return self.mesh_type_var.get()
+        
+    # Decoration function for meshing process    
+    def generate_mesh_visual(self):
+        mesh_representation = self.create_mesh_visual()
+        self.text_box.delete(1.0, tk.END)  # Clear existing content
+        self.text_box.insert(tk.END, mesh_representation)
+
+    def create_mesh_visual(self):
+        mesh = ""
+        mesh += "+---+---+---+\n"
+        mesh += f"| 1 | 2 | 3 |\n"
+        mesh += "+---+---+---+\n"
+        mesh += f"| 4 | 5 | 6 |\n"
+        mesh += "+---+---+---+\n"
+        mesh += f"| 7 | 8 | 9 |\n"
+        mesh += "+---+---+---+\n"
+        
+         # Add the decorative pattern below the mesh
+        pattern = """ 
+ ____        _           _       __  __           _               
+/ ___| _ __ | | __ _ ___| |__   |  \/  | ___  ___| |__   ___ _ __ 
+\___ \| '_ \| |/ _` / __| '_ \  | |\/| |/ _ \/ __| '_ \ / _ \ '__|
+ ___) | |_) | | (_| \__ \ | | | | |  | |  __/\__ \ | | |  __/ |   
+|____/| .__/|_|\__,_|___/_| |_| |_|  |_|\___||___/_| |_|\___|_|   
+      |_|                                                         
+__________________________________________________________________
+"""
+
+        return pattern + mesh
+        
+    # Decoration function for CAD import  
+    def generate_cad_visual(self):
+        cad_representation = self.create_cad_visual()
+        self.text_box.delete(1.0, tk.END)  # Clear existing content
+        self.text_box.insert(tk.END, cad_representation)
+
+    def create_cad_visual(self):
+        cad = ""
+        cad += "+-----------+\n"
+        cad += f"|           |\n"
+        cad += "+           +\n"
+        cad += f"|           |\n"
+        cad += "+           +\n"
+        cad += f"|           |\n"
+        cad += "+-----------+\n"
+        
+         # Add the decorative pattern below the mesh
+        pattern = """ 
+        
+ ____        _           _        ____    _    ____  
+/ ___| _ __ | | __ _ ___| |__    / ___|  / \  |  _ \ 
+\___ \| '_ \| |/ _` / __| '_ \  | |     / _ \ | | | |
+ ___) | |_) | | (_| \__ \ | | | | |___ / ___ \| |_| |
+|____/| .__/|_|\__,_|___/_| |_|  \____/_/   \_\____/ 
+      |_|                                                                          
+_____________________________________________________
+"""
+
+        return pattern + cad
+        
+    # Decoration function for CAD import  
+    def generate_run_visual(self):
+        cad_representation = self.create_run_visual()
+        self.text_box.delete(1.0, tk.END)  # Clear existing content
+        self.text_box.insert(tk.END, cad_representation)
+
+    def create_run_visual(self):
+        run = ""
+        run += "+-----------+\n"
+        run += f"|           |\n"
+        run += "+           +\n"
+        run += f"|           |\n"
+        run += "+           +\n"
+        run += f"|           |\n"
+        run += "+-----------+\n"
+        
+         # Add the decorative pattern below the mesh
+        pattern = """ 
+        
+ ____        _           _       ____  _   _ _   _ 
+/ ___| _ __ | | __ _ ___| |__   |  _ \| | | | \ | |
+\___ \| '_ \| |/ _` / __| '_ \  | |_) | | | |  \| |
+ ___) | |_) | | (_| \__ \ | | | |  _ <| |_| | |\  |
+|____/| .__/|_|\__,_|___/_| |_| |_| \_\\____/|_| \_|
+      |_|                                            
+_____________________________________________________
+"""
+
+        return pattern + run
         
 # -------------------------------- MESH CREATION ------------------------------            
             
@@ -778,6 +882,7 @@ class TerminalApp:
 
         except FileNotFoundError:
             tk.messagebox.showerror("Error", f"File not found - {self.control_dict_file_path}")
+            self.simulation_running = False # Let the user try again 
         except Exception as e:
             tk.messagebox.showerror("Error", f"Error reading controlDict parameters: {e}")
             
@@ -815,11 +920,14 @@ class TerminalApp:
                 control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
                 self.replace_write_now_with_end_time(control_dict_path)
                 
+                # Initiate the text_box with a nice mesh representation! 
+                self.generate_run_visual()
+
                 # Use Popen to capture real-time output
                 process = subprocess.Popen(["./Allrun"], cwd=self.selected_file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
                 
                 # Clear previous content from the text box
-                self.text_box.delete(1.0, "end")
+                ###self.text_box.delete(1.0, "end")
 
                 # Continuously read and insert output into the Text widget
                 while True:
@@ -1086,6 +1194,75 @@ class TerminalApp:
             subprocess.run(["touch", control_dict_path], check=True)
         except subprocess.CalledProcessError as e:
             tk.messagebox.showerror("Error", f"Error touching controlDict: {e.stderr}")
+
+                  
+    def setup_ui(self):
+        # Create the Text widget
+        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)
+        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
+        self.text_box.configure(foreground="lightblue", background="black")
+
+        splash_welcome_msg = """
+                                _____________________________________________________
+                                __        __   _                            _        
+                                \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
+                                 \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
+                                  \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
+                                   \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
+                                                                                     
+                                         ____        _           _                           
+                                        / ___| _ __ | | __ _ ___| |__                        
+                                        \___ \| '_ \| |/ _` / __| '_ \                       
+                                         ___) | |_) | | (_| \__ \ | | |                      
+                                        |____/| .__/|_|\__,_|___/_| |_|                      
+                                              |_|                                            
+                                  ___                   _____ ___    _    __  __     
+                                 / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
+                                | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
+                                | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
+                                 \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
+                                      |_|
+                                _____________________________________________________ 
+                                     
+                                       Your gate to efficient CFD production! 
+                                _____________________________________________________
+    """
+        self.text_box.insert(tk.END, splash_welcome_msg)
+
+        # Create a vertical scrollbar for the Text widget
+        self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
+        self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
+        self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
+
+        # Add buttons to the self.text_box
+        font_button = ttk.Button(self.root, text="Font", command=self.change_font)
+        ##font_button.place(relx=0.98, rely=0, anchor="ne")  # Use place to position over the top-right corner
+        #font_button.grid(row=3, column=4, padx=1)
+        font_button.grid(row=3, column=4, padx=10, pady=(0, 1))
+
+        color_button = ttk.Button(self.root, text="Color", command=self.change_color)
+        #color_button.place(relx=0.93, rely=0, anchor="ne")  # Adjust relx for proper spacing
+        #color_button.grid(row=4, column=4, padx=1)
+        color_button.grid(row=4, column=4, padx=10, pady=(0, 1))
+
+    def change_font(self):
+        current_font = self.text_box.cget("font")
+        new_font = tkinter.simpledialog.askstring("Font", "Enter font (e.g., Arial 12 bold)", initialvalue=current_font)
+
+        if new_font:
+            self.text_box.configure(font=new_font)
+
+    def change_color(self):
+        # Ask for text color
+        text_color = colorchooser.askcolor(color=self.text_box.cget("foreground"))[1]
+        if text_color:
+            self.text_box.configure(foreground=text_color)
+
+        # Ask for background color
+        bg_color = colorchooser.askcolor(color=self.text_box.cget("background"))[1]
+        if bg_color:
+            self.text_box.configure(background=bg_color)
+  
    
 if __name__ == "__main__":
     root = tk.Tk()

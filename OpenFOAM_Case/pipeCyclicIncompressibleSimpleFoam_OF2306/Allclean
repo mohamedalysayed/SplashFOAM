@@ -1,5 +1,9 @@
 #!/bin/sh
 cd "${0%/*}" || exit                                # Run from this directory
+
+# of2306
+. /usr/lib/openfoam/openfoam2306/etc/bashrc
+
 . ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions      # Tutorial clean functions
 #------------------------------------------------------------------------------
 
