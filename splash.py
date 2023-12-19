@@ -7,7 +7,6 @@ import shutil # For file copying
 import threading # Import threading for running simulation in a separate thread
 import tkinter as tk
 from tkinter import ttk, filedialog, font, messagebox, simpledialog, colorchooser
-#from tkinter.simpledialog import askstring
 import tkinter.simpledialog 
 from PIL import Image, ImageTk
 import subprocess
@@ -59,10 +58,10 @@ class TerminalApp:
         #________________Sliding images_________________
         self.current_image_index = 0
         #self.image_paths = ["Resources/Images/racing-car.jpg", "Resources/Images/airplaneEngine.jpg", "Resources/Images/ship5.jpg", "Images/bubbles.jpg"]
-        self.image_paths = ["Resources/Images/airplaneEngine.jpg", "Resources/Images/racing-car.jpg", "Resources/Images/bubbles.jpg"]
+        self.image_paths = ["Resources/Images/airplaneEngine.jpg", "Resources/Images/racing-car.jpg", "Resources/Images/bubbles.jpg", "Resources/Images/watermeloni.jpeg"]
         self.time_delay = 2500  # Setting the time delay in milliseconds
         self.add_bgImage()
-        ###self.start_slideshow()
+        self.start_slideshow()
         #________________Sliding images_________________
         
         # A dictionary to define a help message for each mesh parameter 
@@ -457,44 +456,59 @@ class TerminalApp:
      
      # -------------- Splash background image(s) --------------------------  
        
+##    def add_bgImage(self):
+
+##        # Load and display openfoam logo
+##        self.splash_bgImage = Image.open("Resources/Images/racing-car.jpg")  
+##        self.splash_bgImage = self.splash_bgImage.resize((800, 600))
+##        ##self.splash_bgImage = Image.open("Resources/Images/bubbles.jpg")  
+##        ##self.splash_bgImage = self.splash_bgImage.resize((1300, 850))
+##        #self.splash_bgImage = Image.open("Resources/Images/airplaneEngine.jpg")  
+##        #self.splash_bgImage = self.splash_bgImage.resize((1300, 950))
+##        self.splash_bgImage = ImageTk.PhotoImage(self.splash_bgImage)
+##        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
+##        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=13)
+##        self.splash_bgImage_label.configure(background="white")  
+
+#        # Load and display openfoam logo
+#        self.splash_bgImage1 = Image.open("Resources/Images/racing-car.jpg")  
+#        self.splash_bgImage1 = self.splash_bgImage1.resize((800, 600))
+#        self.splash_bgImage1 = ImageTk.PhotoImage(self.splash_bgImage1)
+#        self.splash_bgImage1_label = tk.Label(self.root, image=self.splash_bgImage1)
+#        self.splash_bgImage1_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=6)
+#        self.splash_bgImage1_label.configure(background="white")
+#        
+#        self.splash_bgImage2 = Image.open("Resources/Images/watermeloni.jpeg")  
+#        self.splash_bgImage2 = self.splash_bgImage2.resize((800, 600))
+#        self.splash_bgImage2 = ImageTk.PhotoImage(self.splash_bgImage2)
+#        self.splash_bgImage2_label = tk.Label(self.root, image=self.splash_bgImage2)
+#        self.splash_bgImage2_label.grid(row=6, column=5, pady=1, padx=10, sticky="ew", rowspan=6)
+#        self.splash_bgImage2_label.configure(background="white")
+
     def add_bgImage(self):
+        self.splash_bgImage_label = tk.Label(self.root)
+        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=14)
+        self.splash_bgImage_label.configure(background="white")
+        self.show_next_image()
 
-        # Load and display openfoam logo
-        self.splash_bgImage = Image.open("Resources/Images/racing-car.jpg")  
-        self.splash_bgImage = self.splash_bgImage.resize((800, 600))
-        ##self.splash_bgImage = Image.open("Resources/Images/bubbles.jpg")  
-        ##self.splash_bgImage = self.splash_bgImage.resize((1300, 850))
-        #self.splash_bgImage = Image.open("Resources/Images/airplaneEngine.jpg")  
-        #self.splash_bgImage = self.splash_bgImage.resize((1300, 950))
-        self.splash_bgImage = ImageTk.PhotoImage(self.splash_bgImage)
-        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=13)
-        self.splash_bgImage_label.configure(background="white")  
+    def show_next_image(self):
+        image_path = self.image_paths[self.current_image_index]
+        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
 
-###    def add_bgImage(self):
-###        self.splash_bgImage_label = tk.Label(self.root)
-###        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=8)
-###        self.splash_bgImage_label.configure(background="white")
-###        self.show_next_image()
+        # Load and display the next image in the list
+        splash_bgImage = Image.open(image_path)
+        splash_bgImage = splash_bgImage.resize((800, 600))
+        #splash_bgImage = splash_bgImage.resize((1350, 1000))
+        splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
+        self.splash_bgImage_label.configure(image=splash_bgImage)
+        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
 
-###    def show_next_image(self):
-###        image_path = self.image_paths[self.current_image_index]
-###        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
+        # Schedule the next image after the total time delay
+        self.root.after(self.time_delay, self.show_next_image)
 
-###        # Load and display the next image in the list
-###        splash_bgImage = Image.open(image_path)
-###        splash_bgImage = splash_bgImage.resize((800, 600))
-###        #splash_bgImage = splash_bgImage.resize((1350, 1000))
-###        splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
-###        self.splash_bgImage_label.configure(image=splash_bgImage)
-###        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
-
-###        # Schedule the next image after the total time delay
-###        self.root.after(self.time_delay, self.show_next_image)
-
-###    def start_slideshow(self):
-###        # Start the slideshow after the pre-specified delay
-###        self.root.after(self.time_delay, self.show_next_image)
+    def start_slideshow(self):
+        # Start the slideshow after the pre-specified delay
+        self.root.after(self.time_delay, self.show_next_image)
         # -------------- Splash background image(s) -------------------------- 
     
      
@@ -1238,12 +1252,13 @@ _____________________________________________________
         font_button = ttk.Button(self.root, text="Font", command=self.change_font)
         ##font_button.place(relx=0.98, rely=0, anchor="ne")  # Use place to position over the top-right corner
         #font_button.grid(row=3, column=4, padx=1)
-        font_button.grid(row=3, column=4, padx=10, pady=(0, 1))
+        font_button.grid(row=9, column=4, padx=10, pady=(0, 5))
+        
 
         color_button = ttk.Button(self.root, text="Color", command=self.change_color)
         #color_button.place(relx=0.93, rely=0, anchor="ne")  # Adjust relx for proper spacing
         #color_button.grid(row=4, column=4, padx=1)
-        color_button.grid(row=4, column=4, padx=10, pady=(0, 1))
+        color_button.grid(row=10, column=4, padx=10, pady=(0, 5))
 
     def change_font(self):
         current_font = self.text_box.cget("font")
@@ -1263,6 +1278,8 @@ _____________________________________________________
         if bg_color:
             self.text_box.configure(background=bg_color)
   
+   
+   
    
 if __name__ == "__main__":
     root = tk.Tk()
