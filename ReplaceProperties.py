@@ -87,7 +87,7 @@ class ReplacePropertiesPopup:
             with open(self.parent.selected_file_path, 'w') as file:
                 file.write(file_content)
 
-            self.parent.status_label.config(text="Values replaced successfully", foreground="green")
+            self.parent.status_label.config(text="Values replaced successfully")
             tk.messagebox.showinfo("Update", "Mixture block updated successfully.")
             self.popup.destroy()
         else:
@@ -108,7 +108,7 @@ class ReplacePropertiesPopup:
             with open(self.selected_file_path, 'a') as file:
                 file.write(file_content)
 
-            self.status_label.config(text="Parameters added successfully", foreground="blue")
+            self.status_label.config(text="Parameters added successfully")
 
 
 if __name__ == "__main__":

@@ -1,11 +1,10 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2306                                  |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  10
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 FoamFile
 {
     version         2;
@@ -17,16 +16,16 @@ FoamFile
 
 surfaceFile     "CAD.stl";
 
-minCellSize     0.0002;
+minCellSize 0.0002;
 
-maxCellSize     0.0004;
+maxCellSize 0.0004;
 
 boundaryCellSize 0.0003;
 
 boundaryLayers
 {
-    nLayers         5;
-    thicknessRatio  1.1;
+    nLayers 5;
+    thicknessRatio 1.1;
     maxFirstLayerThickness 0.5;
 }
 
