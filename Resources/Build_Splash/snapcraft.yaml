@@ -1,0 +1,31 @@
+name: splash
+version: '1.0'
+summary: Your application summary
+description: Your application description
+base: core18
+grade: stable
+confinement: strict
+
+apps:
+  splash:
+    command: bin/splash
+
+parts:
+  splash:
+    plugin: dump
+    source: dist/
+    organize:
+      'splash': bin/splash
+
+# First: create the executable for splash 
+# pyinstaller --onefile --add-data "Resources:Resources" --add-data "Meshing:Meshing" --add-data "OpenFOAM_Case:OpenFOAM_Case" --name splash splash.py
+
+# Second: run "snapcraft" [sudo snap install snapcraft --classic] in case it was not installed
+
+# Third: install and test the snap package >> sudo snap install --dangerous splash_1.0_amd64.snap
+
+# Fourth: Push to snap store (optional)
+#snapcraft login
+#snapcraft push splash_1.0_amd64.snap
+
+# NOTE: The setup.py file is called inherently by snap. 
