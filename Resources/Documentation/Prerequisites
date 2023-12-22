@@ -9,10 +9,8 @@ pip install PyQt5
 pip install PySide2
 sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev
 sudo apt-get install build-essential
-pip install -U wxPython
 pip install numpy-stl
 pip install GTK
-pip install openai 
 pip install Pillow==9.5.0
 
 KEYS
