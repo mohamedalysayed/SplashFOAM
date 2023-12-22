@@ -17,14 +17,11 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 from tkinter.colorchooser import askcolor
 from tkinter.font import Font
 
-
-
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
 from ReplaceProperties import ReplacePropertiesPopup
 from ReplaceMeshParameters import ReplaceMeshParameters
 from ReplaceControlDictParameters import ReplaceControlDictParameters
-
 
 #______________
 #
@@ -53,15 +50,24 @@ class TerminalApp:
         self.add_logos()
   
         # Add a background image
-        #self.add_bgImage()
+        self.add_bgImage()
         
         #________________Sliding images_________________
-        self.current_image_index = 0
-        #self.image_paths = ["Resources/Images/racing-car.jpg", "Resources/Images/airplaneEngine.jpg", "Resources/Images/ship5.jpg", "Images/bubbles.jpg"]
-        self.image_paths = ["Resources/Images/airplaneEngine.jpg", "Resources/Images/racing-car.jpg", "Resources/Images/bubbles.jpg", "Resources/Images/watermeloni.jpeg"]
-        self.time_delay = 2500  # Setting the time delay in milliseconds
-        self.add_bgImage()
-        self.start_slideshow()
+###        # Sliding images
+###        self.current_image_index = 0
+###        self.image_paths = [
+###            #"Resources/Images/airplaneEngine.jpg",
+###            "Resources/Images/airplaneEngine.png",
+###            #"Resources/Images/racing-car.jpg",
+###            "Resources/Images/racing-car.png",
+###            #"Resources/Images/bubbles.jpg",
+###            "Resources/Images/bubbles.png",
+###            #"Resources/Images/watermeloni.jpeg"
+###            "Resources/Images/watermeloni.png"
+###        ]
+###        self.time_delay = 2500  # Setting the time delay in milliseconds
+###        self.add_bgImage()
+###        self.start_slideshow()
         #________________Sliding images_________________
         
         # A dictionary to define a help message for each mesh parameter 
@@ -104,9 +110,9 @@ class TerminalApp:
         self.add_tooltip(self.load_case_button, "Click to choose the running directory of your case")
         
         # Create a button to stop the command execution
-        self.stop_button = ttk.Button(self.root, text="Initialize Sim", command=self.initialize_simulation)
-        self.stop_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.stop_button, "Click to stop terminal command")
+        self.initialize_simulation_button = ttk.Button(self.root, text="Initialize Sim", command=self.initialize_simulation)
+        self.initialize_simulation_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
+        self.add_tooltip(self.initialize_simulation_button, "Click to stop terminal command")
         
         # Create a button to run simulation
         self.run_simulation_button = ttk.Button(self.root, text="Run Sim", command=self.run_simulation)
@@ -130,14 +136,11 @@ class TerminalApp:
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
         # Create an entry field for entering the command with a default sentence
-        default_sentence =  "Type your command here!" # Or "htop"
+        default_sentence =  "top" # Or "htop"
         self.entry = ttk.Entry(self.root, width=10)
         self.entry.grid(row=11, column=2, pady=1, padx=10, sticky="ew")
         self.entry.insert(0, default_sentence) 
         self.entry.configure(foreground="blue", background="black")
-
-
-
 
         # Create a ttk.Style to configure the progress bar
         self.style = ttk.Style()
@@ -147,8 +150,7 @@ class TerminalApp:
         self.magic_box_button = ttk.Button(self.root, text="Magic box!", command=self.magic_box)
         self.magic_box_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.magic_box_button, "Magicbox! click to see what's inside :)")
-        
-        
+
         # Create a check button to hide/show parts of the program
         # Create a custom style
         style = ttk.Style()
@@ -158,9 +160,6 @@ class TerminalApp:
         toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Results Panel", command=self.toggle_visibility, style="Custom.TCheckbutton")
         toggle_visibility_button.grid(row=12, column=1, pady=1, padx=7, sticky="ew")
 
-
-
-  
         # Create a progress bar with the custom style
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
         self.progress_bar_canvas.grid(row=12, column=2, padx=50, pady=1)
@@ -177,48 +176,6 @@ class TerminalApp:
         checkMesh_button.grid(row=2, column=2, pady=1, padx=1, sticky="ew")
         checkMesh_button['width'] = 9  # Adjust the width as needed
         
-####        #self.text_box = tk.Text(self.root, wrap="none", height=20, width=110)  # Adjust the width as needed
-####        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)  # Adjust the width as needed
-####        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
-####        #self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky=tk.W, rowspan=8)
-####        self.text_box.configure(foreground="lightblue", background="black")
-####        self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-####        self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
-####        self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
-####        
-####        sample_text = """
-####        This is a sample text widget.
-####        You can search for words in this text.
-####        Just type a word in the search bar and press 'Enter'.
-####        """
-####        splash_welcome_msg = """
-####                            _____________________________________________________
-####                            __        __   _                            _        
-####                            \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
-####                             \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
-####                              \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
-####                               \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
-####                                                                                 
-####                                     ____        _           _                           
-####                                    / ___| _ __ | | __ _ ___| |__                        
-####                                    \___ \| '_ \| |/ _` / __| '_ \                       
-####                                     ___) | |_) | | (_| \__ \ | | |                      
-####                                    |____/| .__/|_|\__,_|___/_| |_|                      
-####                                          |_|                                            
-####                              ___                   _____ ___    _    __  __     
-####                             / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
-####                            | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
-####                            | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
-####                             \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
-####                                  |_|
-####                            _____________________________________________________ 
-####                                 
-####                                   Your gate to efficient CFD production! 
-####                            _____________________________________________________
-####"""
-####        self.text_box.insert(tk.END, splash_welcome_msg)
-####        #self.text_box.insert(tk.END, sample_text)
-####        
         # Add the search widget to the main app
         self.search_widget = SearchWidget(root, self.text_box)
 
@@ -265,10 +222,11 @@ class TerminalApp:
         self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
        
         # Create a label for status messages
-        self.status_label = ttk.Label(self.root, text="", foreground="blue")
+        self.status_label = ttk.Label(self.root, text="")
         default_status = "This field will show the status of your work!"
         self.status_label.grid(row=0, column=1, columnspan=3, pady=1, padx=10, sticky="w")
-        self.status_label.config(text=default_status)
+        ###self.status_label.config(text=default_status)
+        self.status_label.config(text=default_status, font=("TkDefaultFont", 9, "bold"), foreground="lightblue", background="black")
 
         # ... (other initialization code)
         self.selected_file_path = None
@@ -301,18 +259,40 @@ class TerminalApp:
     # -------------- Main logos --------------------------    
     def add_logos(self):
 
-        # Load and display openfoam logo
-        self.logo_openfoam = Image.open("Resources/Logos/openfoam_logo.png")  
-        self.logo_openfoam = self.logo_openfoam.resize((140, 40))
-        self.logo_openfoam = ImageTk.PhotoImage(self.logo_openfoam)
+###        # Load and display openfoam logo
+###        self.logo_openfoam = Image.open("Resources/Logos/openfoam_logo.png")  
+###        self.logo_openfoam = self.logo_openfoam.resize((140, 40))
+###        self.logo_openfoam = ImageTk.PhotoImage(self.logo_openfoam)
+###        self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
+###        self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
+###        self.OF_label.configure(background="white")
+###        
+###        # Load and display SMLT logo
+###        self.logo_simulitica = Image.open("Resources/Logos/simulitica_logo.png") 
+###        self.logo_simulitica = self.logo_simulitica.resize((140, 70))
+###        self.logo_simulitica = ImageTk.PhotoImage(self.logo_simulitica)
+###        self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
+###        self.simLabel.grid(row=11, column=0, pady=10, padx=10, sticky="ew")
+###        self.simLabel.configure(background="white")
+
+###        # Create a label for copyright text
+###        self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
+###        self.copyright_label.grid(row=12, column=0, pady=10, padx=10, sticky="ew")
+###        self.copyright_label.configure(background="white", font="bold")
+
+        # Create PhotoImage objects directly from image files
+        self.logo_openfoam = tk.PhotoImage(file="Resources/Logos/openfoam_logo.png")
+        self.logo_simulitica = tk.PhotoImage(file="Resources/Logos/simulitica_logo.png")
+
+        # Resize images if needed
+        self.logo_openfoam = self.logo_openfoam.subsample(2, 2)  # Adjust the subsample as needed
+        self.logo_simulitica = self.logo_simulitica.subsample(5, 5)  # Adjust the subsample as needed
+
+        # Create Labels with the images
         self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
         self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
         self.OF_label.configure(background="white")
-        
-        # Load and display SMLT logo
-        self.logo_simulitica = Image.open("Resources/Logos/simulitica_logo.png") 
-        self.logo_simulitica = self.logo_simulitica.resize((140, 70))
-        self.logo_simulitica = ImageTk.PhotoImage(self.logo_simulitica)
+
         self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
         self.simLabel.grid(row=11, column=0, pady=10, padx=10, sticky="ew")
         self.simLabel.configure(background="white")
@@ -321,6 +301,7 @@ class TerminalApp:
         self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
         self.copyright_label.grid(row=12, column=0, pady=10, padx=10, sticky="ew")
         self.copyright_label.configure(background="white", font="bold")
+        
     # -------------- Main logos -------------------------- 
     
     # Toggle function for action bar visibility
@@ -349,12 +330,12 @@ class TerminalApp:
 
         if selected_file and os.path.basename(selected_file).startswith("physicalProperties"):
             self.selected_file_path = selected_file
-            self.status_label.config(text=f"Selected file: {selected_file}", foreground="blue")
+            self.status_label.config(text=f"Selected file: {selected_file}")
 
             # Update the current fuel status label
             current_fuel = self.detect_current_fuel()
             if current_fuel:
-                self.status_label.config(text=f"Current fuel: {current_fuel}", foreground="blue")
+                self.status_label.config(text=f"Current fuel: {current_fuel}")
 
                 # Check if the detected current fuel matches any of the available fuels
                 # If it does, set it as the selected fuel in the dropdown
@@ -401,7 +382,7 @@ class TerminalApp:
         if selected_fuel and selected_fuel != "Fuel Options":
             current_fuel = self.detect_current_fuel()
             if current_fuel:
-                self.status_label.config(text=f"Current fuel: {current_fuel}", foreground="blue")
+                self.status_label.config(text=f"Current fuel: {current_fuel}")
                 self.replace_fuel(selected_fuel, current_fuel)
 
     def replace_fuel(self, selected_fuel, current_fuel):
@@ -428,7 +409,7 @@ class TerminalApp:
             pass
             
         # Update the status label
-        self.status_label.config(text=f"Fuel replaced. Selected fuel: {selected_fuel}", foreground="blue")
+        self.status_label.config(text=f"Fuel replaced. Selected fuel: {selected_fuel}")
         # -----------------------------------------------------------------------------------------------------<
 
             
@@ -438,77 +419,104 @@ class TerminalApp:
                           "This is your interactive OpenFOAM simulation tool.\n"\
                           "Start by importing geometry and configuring your case."
 
-        # You can choose to display the welcome message in a label or a messagebox
-        # Label Example:
+        # Create a Label to display the welcome message
         welcome_label = ttk.Label(self.root, text=welcome_message, font=("TkDefaultFont", 12), background="lightblue")
         welcome_label.grid(row=0, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
 
-        # OR
-        #self.root.after(3000, welcome_label.destroy)
-        
-        # Messagebox Example:
-        whatnot = "Once you hit OK, you will never see life the same way again!"
-        messagebox.showinfo("Welcome", whatnot)
-        welcome_label.destroy()
-        
+        # Create a PhotoImage object and set it to the Label
+        welcome_image = tk.PhotoImage(file="Resources/Images/watermeloni.png")
+        welcome_image = welcome_image.subsample(8, 8)
+        welcome_label.config(image=welcome_image, compound="top")
 
+        # Update the main loop to display the image for 2 seconds
+        self.root.update()
+        time.sleep(2)  # Sleep for 2 seconds
+        welcome_label.destroy()  # Destroy the Label to collapse the popup
+        
     # -------------- Welcome Message -------------------------- 
      
      # -------------- Splash background image(s) --------------------------  
        
-##    def add_bgImage(self):
+###    def add_bgImage(self):
 
-##        # Load and display openfoam logo
-##        self.splash_bgImage = Image.open("Resources/Images/racing-car.jpg")  
-##        self.splash_bgImage = self.splash_bgImage.resize((800, 600))
-##        ##self.splash_bgImage = Image.open("Resources/Images/bubbles.jpg")  
-##        ##self.splash_bgImage = self.splash_bgImage.resize((1300, 850))
-##        #self.splash_bgImage = Image.open("Resources/Images/airplaneEngine.jpg")  
-##        #self.splash_bgImage = self.splash_bgImage.resize((1300, 950))
-##        self.splash_bgImage = ImageTk.PhotoImage(self.splash_bgImage)
-##        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-##        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=13)
-##        self.splash_bgImage_label.configure(background="white")  
+###        # Load and display openfoam logo
+###        self.splash_bgImage = Image.open("Resources/Images/racing-car.jpg")  
+###        self.splash_bgImage = self.splash_bgImage.resize((800, 600))
+###        ##self.splash_bgImage = Image.open("Resources/Images/bubbles.jpg")  
+###        ##self.splash_bgImage = self.splash_bgImage.resize((1300, 850))
+###        #self.splash_bgImage = Image.open("Resources/Images/airplaneEngine.jpg")  
+###        #self.splash_bgImage = self.splash_bgImage.resize((1300, 950))
+###        self.splash_bgImage = ImageTk.PhotoImage(self.splash_bgImage)
+###        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
+###        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=13)
+###        self.splash_bgImage_label.configure(background="white")  
 
-#        # Load and display openfoam logo
-#        self.splash_bgImage1 = Image.open("Resources/Images/racing-car.jpg")  
-#        self.splash_bgImage1 = self.splash_bgImage1.resize((800, 600))
-#        self.splash_bgImage1 = ImageTk.PhotoImage(self.splash_bgImage1)
-#        self.splash_bgImage1_label = tk.Label(self.root, image=self.splash_bgImage1)
-#        self.splash_bgImage1_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=6)
-#        self.splash_bgImage1_label.configure(background="white")
-#        
-#        self.splash_bgImage2 = Image.open("Resources/Images/watermeloni.jpeg")  
-#        self.splash_bgImage2 = self.splash_bgImage2.resize((800, 600))
-#        self.splash_bgImage2 = ImageTk.PhotoImage(self.splash_bgImage2)
-#        self.splash_bgImage2_label = tk.Label(self.root, image=self.splash_bgImage2)
-#        self.splash_bgImage2_label.grid(row=6, column=5, pady=1, padx=10, sticky="ew", rowspan=6)
-#        self.splash_bgImage2_label.configure(background="white")
-
+    # Static bg image (png directly loaded with tk.PhotoImage)
     def add_bgImage(self):
-        self.splash_bgImage_label = tk.Label(self.root)
-        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=14)
+        # Specify the image path
+        image_path = "Resources/Images/racing-car.png"
+
+        # Create a tk.PhotoImage object directly from the file
+        self.splash_bgImage = tk.PhotoImage(file=image_path)
+
+        # Resize the image if needed
+        #self.splash_bgImage = self.splash_bgImage.zoom(2)  # Adjust the zoom factor as needed
+        self.splash_bgImage = self.splash_bgImage.subsample(5, 5)  # Adjust the subsample as needed
+
+        # Create a label to display the image
+        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
+        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=13)
         self.splash_bgImage_label.configure(background="white")
-        self.show_next_image()
 
-    def show_next_image(self):
-        image_path = self.image_paths[self.current_image_index]
-        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
+        # Dynamic bg jpg images (uses PIL - NOT good when packaging)
+####    def add_bgImage(self):
+####        self.splash_bgImage_label = tk.Label(self.root)
+####        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=14)
+####        self.splash_bgImage_label.configure(background="white")
+####        self.show_next_image()
 
-        # Load and display the next image in the list
-        splash_bgImage = Image.open(image_path)
-        splash_bgImage = splash_bgImage.resize((800, 600))
-        #splash_bgImage = splash_bgImage.resize((1350, 1000))
-        splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
-        self.splash_bgImage_label.configure(image=splash_bgImage)
-        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
+####    def show_next_image(self):
+####        image_path = self.image_paths[self.current_image_index]
+####        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
 
-        # Schedule the next image after the total time delay
-        self.root.after(self.time_delay, self.show_next_image)
+####        # Load and display the next image in the list
+####        splash_bgImage = Image.open(image_path)
+####        splash_bgImage = splash_bgImage.resize((800, 600))
+####        splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
+####        self.splash_bgImage_label.configure(image=splash_bgImage)
+####        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
 
-    def start_slideshow(self):
-        # Start the slideshow after the pre-specified delay
-        self.root.after(self.time_delay, self.show_next_image)
+####        # Schedule the next image after the total time delay
+####        self.root.after(self.time_delay, self.show_next_image)
+
+####    def start_slideshow(self):
+####        # Start the slideshow after the pre-specified delay
+####        self.root.after(self.time_delay, self.show_next_image)
+
+      # Dynamic bg png images (directly loaded with tk.PhotoImage)
+##    def add_bgImage(self):
+##        self.splash_bgImage_label = tk.Label(self.root)
+##        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=14)
+##        self.splash_bgImage_label.configure(background="white")
+##        self.show_next_image()
+
+##    def show_next_image(self):
+##        image_path = self.image_paths[self.current_image_index]
+##        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
+
+##        # Load and display the next image in the list
+##        splash_bgImage = tk.PhotoImage(file=image_path)
+##        self.splash_bgImage_label.configure(image=splash_bgImage)
+##        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
+
+##        # Schedule the next image after the total time delay
+##        self.root.after(self.time_delay, self.show_next_image)
+
+##    def start_slideshow(self):
+##        # Start the slideshow after the pre-specified delay
+##        self.root.after(self.time_delay, self.show_next_image)
+
+
         # -------------- Splash background image(s) -------------------------- 
     
      
@@ -525,7 +533,7 @@ class TerminalApp:
         if file_path:
             self.selected_file_path = file_path
             meshing_folder = os.path.join(os.path.dirname(self.selected_file_path), "Meshing")
-            self.status_label.config(text="The geometry file is successfully imported!", foreground="blue")
+            self.status_label.config(text="The geometry file is successfully imported!")
             # To enable meshing to start
             self.geometry_loaded = True
 
@@ -548,10 +556,11 @@ class TerminalApp:
             gmsh_logo_path = os.path.join("Resources", "Logos", "gmsh_logo.png")
             paraview_logo_path = os.path.join("Resources", "Logos", "paraview_logo.png")
 
+
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
             popup.title("Choose CAD Viewer")
-            popup.geometry("400x420")
+            popup.geometry("400x550")
 
             def open_freecad():
                 subprocess.run(["freecad", geometry_dest, "&"], check=True)
@@ -571,14 +580,21 @@ class TerminalApp:
                 subprocess.run(["paraview", geometry_dest], check=True)
                 popup.destroy()
                 
-            # Load logos
-            freecad_logo = Image.open(freecad_logo_path).resize((160, 50), Image.ANTIALIAS)
-            gmsh_logo = Image.open(gmsh_logo_path).resize((80, 70), Image.ANTIALIAS)
-            paraview_logo = Image.open(paraview_logo_path).resize((200, 40), Image.ANTIALIAS)
+            # Load logos (jpg)
+###            freecad_logo = Image.open(freecad_logo_path).resize((160, 50), Image.ANTIALIAS)
+###            gmsh_logo = Image.open(gmsh_logo_path).resize((80, 70), Image.ANTIALIAS)
+###            paraview_logo = Image.open(paraview_logo_path).resize((200, 40), Image.ANTIALIAS)
 
-            freecad_logo = ImageTk.PhotoImage(freecad_logo)
-            gmsh_logo = ImageTk.PhotoImage(gmsh_logo)
-            paraview_logo = ImageTk.PhotoImage(paraview_logo)
+###            freecad_logo = ImageTk.PhotoImage(freecad_logo)
+###            gmsh_logo = ImageTk.PhotoImage(gmsh_logo)
+###            paraview_logo = ImageTk.PhotoImage(paraview_logo)
+            
+            freecad_logo = tk.PhotoImage(file=freecad_logo_path)
+            freecad_logo = freecad_logo.subsample(4, 4)
+            gmsh_logo = tk.PhotoImage(file=gmsh_logo_path)
+            gmsh_logo = gmsh_logo.subsample(9, 9)
+            paraview_logo = tk.PhotoImage(file=paraview_logo_path)
+            paraview_logo = paraview_logo.subsample(9, 9)
 
             # Create buttons with logos for the CAD viewers
             ####style = ttk.Style()
@@ -695,7 +711,7 @@ class TerminalApp:
                 self.separateMeshLogFile = True 
                 
                 # Update the status label 
-                self.status_label.config(text="Meshing process is finished!", foreground="green")
+                self.status_label.config(text="Meshing process is finished!")
 
                 # Check the return code and display appropriate messages
                 if process.returncode == 0:
@@ -829,8 +845,9 @@ _____________________________________________________
         selected_directory = filedialog.askdirectory()
         if selected_directory:
             self.selected_file_path = selected_directory
-            self.status_label.config(text=f"Case directory identified: {selected_directory}", foreground="blue")
+            self.status_label.config(text=f"Case directory identified: {selected_directory}")
             self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
+            self.initialize_simulation_button["state"] = tk.NORMAL # Enable the "Initialize Simulation" button
         else:
             self.status_label.config(text="No case directory selected.", foreground="red")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
@@ -1046,13 +1063,7 @@ _____________________________________________________
 #______________________________________________________________________
 # FLAG: essentially intended to be dedicated for checkMesh script****
     def load_meshChecked(self):
-###        if not self.separateMeshLogFile:
-###            pass
-###            # messagebox.showinfo("Mesh Not Created Separately!", "Please check, maybe it's created through the case.") #DEBUGGING
-###        elif not self.caseMeshLogFile:
-###            messagebox.showinfo("No Mesh Found!", "Please make sure a mesh is generated first then load its log file.")
-###            return
-            
+   
         # Check if the file exists
         if self.geometry_dest_path and os.path.exists(self.geometry_dest_path):  # If mesh was created stand alone 
             # Specify the path to the "AllmeshCartesian" file
@@ -1083,11 +1094,8 @@ _____________________________________________________
             messagebox.showinfo("No Mesh Log-File Found!", "Please make sure a mesh is generated first then load its log file.")
 #__________________________________________________________________           
     def load_log_file(self):
-         
-###        if not self.solverLogFile:
-###            messagebox.showinfo("No solver run!", "No solver log file was found. Please make sure your simulation is run first.")
-###            return
 
+        # List of identifiable "solver" names 
         solver_names = ["simpleFoam", "pimpleFoam", "icoFoam", "compressibleInterFoam", "foamRun"]  # Add more solver names...
 
         # Check each solver log file
@@ -1166,7 +1174,7 @@ _____________________________________________________
                 # The terminal process has completed
                 self.execute_button.config(state=tk.NORMAL)
                 self.stop_button.config(state=tk.DISABLED)
-                self.status_label.config(text="Command executed successfully", foreground="blue")
+                self.status_label.config(text="Command executed successfully")
                 #self.status_label.delete(0, END)
 # ================================================================
     def stop_command(self):
