@@ -1,0 +1,10 @@
+# Non-python Splash Dependencies
+# ______________________________
+
+OpenFOAM v11
+OpenFOAM v2306 
+Paraview
+FreeCAD
+Gmsh 
+Blender 
+VTK (optional)
