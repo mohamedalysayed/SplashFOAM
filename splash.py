@@ -34,6 +34,11 @@ class TerminalApp:
         self.root.config(background="white") # black
         self.root.title("Splash - OpenFOAM")
         
+        # Set the window icon using a PhotoImage
+        icon_path = "Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
+        icon_image = tk.PhotoImage(file=icon_path)
+        self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
+        
         # Display a welcome message
         self.show_welcome_message()
         
@@ -135,7 +140,7 @@ class TerminalApp:
         self.execute_button.grid(row=11, column=1, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
-        # Create an entry field for entering the command with a default sentence
+        # Create an entry field for entering the commands by user
         default_sentence =  "top" # Or "htop"
         self.entry = ttk.Entry(self.root, width=10)
         self.entry.grid(row=11, column=2, pady=1, padx=10, sticky="ew")
@@ -223,9 +228,9 @@ class TerminalApp:
        
         # Create a label for status messages
         self.status_label = ttk.Label(self.root, text="")
-        default_status = "This field will show the status of your work!"
+        #default_status = "This field will show the status of your work!" # Start by importing geometry and configuring your case
+        default_status = "Start by importing geometry and configuring your case!"
         self.status_label.grid(row=0, column=1, columnspan=3, pady=1, padx=10, sticky="w")
-        ###self.status_label.config(text=default_status)
         self.status_label.config(text=default_status, font=("TkDefaultFont", 9, "bold"), foreground="lightblue", background="black")
 
         # ... (other initialization code)
@@ -415,22 +420,31 @@ class TerminalApp:
             
     # -------------- Welcome Message --------------------------    
     def show_welcome_message(self):
-        welcome_message = "Welcome to Splash OpenFOAM!\n\n"\
-                          "This is your interactive OpenFOAM simulation tool.\n"\
-                          "Start by importing geometry and configuring your case."
+        welcome_message = (
+        "Welcome to Splash OpenFOAM!\n\n"
+        "Your interactive OpenFOAM simulation tool.\n"
+        "_____________________________________________________________________________\n"
+        "\n"
+        "Copyright (C) Simulitica Ltd. - All Rights Reserved\n"
+        "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
+        "Proprietary and confidential\n"
+        "Written by Mohamed SAYED (m.sayed@simulitica.com), November 2023.\n"
+        "_____________________________________________________________________________\n"
+        )
 
         # Create a Label to display the welcome message
-        welcome_label = ttk.Label(self.root, text=welcome_message, font=("TkDefaultFont", 12), background="lightblue")
+        welcome_label = ttk.Label(self.root, text=welcome_message, font=("TkDefaultFont", 12), background="white")
         welcome_label.grid(row=0, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
 
         # Create a PhotoImage object and set it to the Label
-        welcome_image = tk.PhotoImage(file="Resources/Images/watermeloni.png")
-        welcome_image = welcome_image.subsample(8, 8)
+        ##welcome_image = tk.PhotoImage(file="Resources/Images/watermeloni.png")
+        welcome_image = tk.PhotoImage(file="Resources/Images/racing-car.png")
+        welcome_image = welcome_image.subsample(4, 4)
         welcome_label.config(image=welcome_image, compound="top")
 
         # Update the main loop to display the image for 2 seconds
         self.root.update()
-        time.sleep(2)  # Sleep for 2 seconds
+        time.sleep(4)  # Sleep for 2 seconds
         welcome_label.destroy()  # Destroy the Label to collapse the popup
         
     # -------------- Welcome Message -------------------------- 
@@ -1250,6 +1264,8 @@ _____________________________________________________
                                 _____________________________________________________
     """
         self.text_box.insert(tk.END, splash_welcome_msg)
+        # Make the Text widget read-only
+        self.text_box.configure(state="disabled")
 
         # Create a vertical scrollbar for the Text widget
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
