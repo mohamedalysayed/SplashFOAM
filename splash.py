@@ -22,6 +22,7 @@ from SearchWidget import SearchWidget  # Import the SearchWidget class from the 
 from ReplaceProperties import ReplacePropertiesPopup
 from ReplaceMeshParameters import ReplaceMeshParameters
 from ReplaceControlDictParameters import ReplaceControlDictParameters
+from ReplaceSimulationSetupParameters import ReplaceSimulationSetupParameters
 
 #______________
 #
@@ -109,30 +110,35 @@ class TerminalApp:
         self.create_mesh_button.grid(row=2, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.create_mesh_button, "Click to start building your mesh")
         
-        # Create a button to initialize the case directory
+        # Create a button to load the case directory
         self.load_case_button = ttk.Button(self.root, text="Load Case", command=self.load_case)
         self.load_case_button.grid(row=3, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.load_case_button, "Click to choose the running directory of your case")
         
-        # Create a button to stop the command execution
+        # Create a button to initialize the command execution
         self.initialize_simulation_button = ttk.Button(self.root, text="Initialize Sim", command=self.initialize_simulation)
         self.initialize_simulation_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.initialize_simulation_button, "Click to stop terminal command")
+        self.add_tooltip(self.initialize_simulation_button, "Click to initialize/reset your simulation")
+        
+        # Create a button to configure the simulation settings before run
+        self.configure_simulation_button = ttk.Button(self.root, text="Configure Sim", command=self.open_simulation_setup_popup)
+        self.configure_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
+        self.add_tooltip(self.configure_simulation_button, "Click to configure your simulation")
         
         # Create a button to run simulation
         self.run_simulation_button = ttk.Button(self.root, text="Run Sim", command=self.run_simulation)
-        self.run_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
+        self.run_simulation_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.run_simulation_button, "Click to start your simulation")
         
         # Stop Simulation Button
         self.stop_simulation_button = ttk.Button(self.root, text="Stop Sim", command=self.stop_simulation)
-        self.stop_simulation_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
+        self.stop_simulation_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.stop_simulation_button, "Click to terminate your simulation")
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
         # Create a button to plot results using xmgrace
         self.plot_results_xmgrace_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results_xmgrace)
-        self.plot_results_xmgrace_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
+        self.plot_results_xmgrace_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
 
         # Create a button to execute the command
@@ -444,7 +450,7 @@ class TerminalApp:
 
         # Update the main loop to display the image for 2 seconds
         self.root.update()
-        time.sleep(4)  # Sleep for 2 seconds
+        time.sleep(0.5)  # Sleep for 2 seconds
         welcome_label.destroy()  # Destroy the Label to collapse the popup
         
     # -------------- Welcome Message -------------------------- 
@@ -868,6 +874,11 @@ _____________________________________________________
             
                 
     def initialize_simulation(self):
+    
+        if self.selected_file_path is None:
+            tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
+            return
+            
         allclean_script = os.path.join(self.selected_file_path, "Allclean")
         if os.path.exists(allclean_script):
             chmod_command = ["chmod", "+x", allclean_script]
@@ -908,7 +919,63 @@ _____________________________________________________
         else:
             tk.messagebox.showerror("Error", "Allclean script not found!")
                   
+                  
+    #+++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++           
+    # Define this method to read existing parameter values
+    def read_simulation_setup_existing_values(self, directory, file_name, param_list):
+        file_path = os.path.join(self.selected_file_path, directory, file_name)
+        try:
+            with open(file_path, "r") as file:
+                file_content = file.read()
+                existing_values = {
+                    param: match.group(1) for param in param_list
+                    for match in re.finditer(f'{param}\\s+([^;]+)(;|;//.*)', file_content)
+                }
+            return existing_values
+        except FileNotFoundError:
+            tk.messagebox.showerror("Error", f"File not found - {file_path}")
+            self.simulation_running = False  # Let the user try again
+            return {}
+        except Exception as e:
+            tk.messagebox.showerror("Error", f"Error reading {directory} parameters: {e}")
+            return {}
+
+    # Modify open_simulation_setup_popup
+    def open_simulation_setup_popup(self):
+    
+        if self.selected_file_path is None:
+            tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
+            return
             
+        # Specify the list of parameters for each file
+        constant_params = {
+            "transportProperties": ["transportModel", "nu"],
+            "turbulenceProperties": ["simulationType", "RASModel", "printCoeffs"]
+            # more files can be added in a similar fashion
+        }
+        system_params = {
+            #"fvSchemes": ["param7", "param8", "param9"],
+            "fvSolution": ["nOuterCorrectors", "nCorrectors", "nNonOrthogonalCorrectors"]
+        }
+
+        # Read existing values for constant parameters
+        existing_values_constant = {}
+        for file_name, param_list in constant_params.items():
+            existing_values_constant.update(self.read_simulation_setup_existing_values("constant", file_name, param_list))
+
+        # Read existing values for system parameters
+        existing_values_system = {}
+        for file_name, param_list in system_params.items():
+            existing_values_system.update(self.read_simulation_setup_existing_values("system", file_name, param_list))
+
+        # Combine existing values for both constant and system parameters
+        existing_values = {**existing_values_constant, **existing_values_system}
+
+        # Open a popup to replace simulation setup parameters
+        ReplaceSimulationSetupParameters(self, constant_params, system_params, existing_values)
+    #+++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++           
+    
+    
     def update_control_dict_parameters(self):
         # Read the content of the "controlDict" file
         self.control_dict_file_path = os.path.join(self.selected_file_path, "system", "controlDict")
@@ -940,7 +1007,7 @@ _____________________________________________________
 
     def run_simulation(self):
         if self.selected_file_path is None:
-            tk.messagebox.showerror("Error", "Please initialize the case directory before running the simulation.")
+            tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
             return
 
         if not self.simulation_running:
@@ -1076,7 +1143,7 @@ _____________________________________________________
 
 #______________________________________________________________________
 # FLAG: essentially intended to be dedicated for checkMesh script****
-    def load_meshChecked(self):
+    def load_meshChecked(self): # Important, implement an error handling mechanism where the it spits useful info in case no mesh was created yet!
    
         # Check if the file exists
         if self.geometry_dest_path and os.path.exists(self.geometry_dest_path):  # If mesh was created stand alone 
