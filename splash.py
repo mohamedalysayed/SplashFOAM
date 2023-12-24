@@ -427,13 +427,13 @@ class TerminalApp:
         "\n"
         "Copyright (C) Simulitica Ltd. - All Rights Reserved\n"
         "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
-        "Proprietary and confidential\n"
         "Written by Mohamed SAYED (m.sayed@simulitica.com), November 2023.\n"
-        "_____________________________________________________________________________\n"
+        "Proprietary and confidential!\n"
+        "_____________________________________________________________________________"
         )
 
         # Create a Label to display the welcome message
-        welcome_label = ttk.Label(self.root, text=welcome_message, font=("TkDefaultFont", 12), background="white")
+        welcome_label = ttk.Label(self.root, text=welcome_message, font=("TkDefaultFont", 12), background="white", justify='center', relief='sol', borderwidth=2)
         welcome_label.grid(row=0, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
 
         # Create a PhotoImage object and set it to the Label
