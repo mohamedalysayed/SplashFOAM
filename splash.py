@@ -305,12 +305,12 @@ class TerminalApp:
         self.OF_label.configure(background="white")
 
         self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
-        self.simLabel.grid(row=11, column=0, pady=10, padx=10, sticky="ew")
+        self.simLabel.grid(row=11, column=0, pady=1, padx=10, sticky="ew")
         self.simLabel.configure(background="white")
 
         # Create a label for copyright text
         self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
-        self.copyright_label.grid(row=12, column=0, pady=10, padx=10, sticky="ew")
+        self.copyright_label.grid(row=12, column=0, pady=1, padx=10, sticky="ew")
         self.copyright_label.configure(background="white", font="bold")
         
     # -------------- Main logos -------------------------- 
@@ -538,10 +538,7 @@ class TerminalApp:
 
 
         # -------------- Splash background image(s) -------------------------- 
-    
-     
-        
-        
+            
     # -------------- importing the geometry --------------------------------------------------------------------    
     def import_geometry(self):
         file_path = filedialog.askopenfilename(
@@ -622,15 +619,15 @@ class TerminalApp:
             ###style.configure("TButton", padding=10, relief="solid", background="white", foreground="black", borderwidth=1) 
             freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
             freecad_button.image = freecad_logo
-            freecad_button.pack(side=tk.TOP, padx=30, pady=10)
+            freecad_button.pack(side=tk.TOP, padx=30, pady=1)
 
             gmsh_button = ttk.Button(popup, text="Open in Gmsh", command=open_gmsh, image=gmsh_logo, compound="top")
             gmsh_button.image = gmsh_logo
-            gmsh_button.pack(side=tk.TOP, padx=20, pady=10)
+            gmsh_button.pack(side=tk.TOP, padx=20, pady=1)
 
             paraview_button = ttk.Button(popup, text="Open in ParaView", command=open_paraview, image=paraview_logo, compound="top")
             paraview_button.image = paraview_logo
-            paraview_button.pack(side=tk.TOP, padx=30, pady=10)
+            paraview_button.pack(side=tk.TOP, padx=30, pady=1)
 
             popup.mainloop()
     
@@ -1301,7 +1298,7 @@ _____________________________________________________
                   
     def setup_ui(self):
         # Create the Text widget
-        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)
+        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
         self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
         self.text_box.configure(foreground="lightblue", background="black")
 
@@ -1343,13 +1340,13 @@ _____________________________________________________
         font_button = ttk.Button(self.root, text="Font", command=self.change_font)
         ##font_button.place(relx=0.98, rely=0, anchor="ne")  # Use place to position over the top-right corner
         #font_button.grid(row=3, column=4, padx=1)
-        font_button.grid(row=9, column=4, padx=10, pady=(0, 5))
+        font_button.grid(row=9, column=4, padx=15, pady=(0, 1))
         
 
         color_button = ttk.Button(self.root, text="Color", command=self.change_color)
         #color_button.place(relx=0.93, rely=0, anchor="ne")  # Adjust relx for proper spacing
         #color_button.grid(row=4, column=4, padx=1)
-        color_button.grid(row=10, column=4, padx=10, pady=(0, 5))
+        color_button.grid(row=10, column=4, padx=10, pady=(0, 1))
 
     def change_font(self):
         current_font = self.text_box.cget("font")
