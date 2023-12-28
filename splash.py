@@ -116,22 +116,22 @@ class TerminalApp:
         self.add_tooltip(self.load_case_button, "Click to choose the running directory of your case")
         
         # Create a button to initialize the command execution
-        self.initialize_simulation_button = ttk.Button(self.root, text="Initialize Sim", command=self.initialize_simulation)
+        self.initialize_simulation_button = ttk.Button(self.root, text="Initialize Simulation", command=self.initialize_simulation)
         self.initialize_simulation_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.initialize_simulation_button, "Click to initialize/reset your simulation")
         
         # Create a button to configure the simulation settings before run
-        self.configure_simulation_button = ttk.Button(self.root, text="Configure Sim", command=self.open_simulation_setup_popup)
+        self.configure_simulation_button = ttk.Button(self.root, text="Configure Simulation", command=self.open_simulation_setup_popup)
         self.configure_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.configure_simulation_button, "Click to configure your simulation")
         
         # Create a button to run simulation
-        self.run_simulation_button = ttk.Button(self.root, text="Run Sim", command=self.run_simulation)
+        self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
         self.run_simulation_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.run_simulation_button, "Click to start your simulation")
         
         # Stop Simulation Button
-        self.stop_simulation_button = ttk.Button(self.root, text="Stop Sim", command=self.stop_simulation)
+        self.stop_simulation_button = ttk.Button(self.root, text="Stop Simulation", command=self.stop_simulation)
         self.stop_simulation_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.stop_simulation_button, "Click to terminate your simulation")
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
@@ -186,6 +186,24 @@ class TerminalApp:
         #checkMesh_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
         checkMesh_button.grid(row=2, column=2, pady=1, padx=1, sticky="ew")
         checkMesh_button['width'] = 9  # Adjust the width as needed
+
+        # _____________________________Profile Theme_____________________________________
+        theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme)
+        theme_button.grid(row=3, column=4, padx=10, pady=5)
+
+        self.reset_var = tk.BooleanVar()
+        
+
+        reset_checkbutton_style = ttk.Style()
+        reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="cyan", background="black")
+        reset_checkbutton = ttk.Checkbutton(self.root, text="Reset theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
+        reset_checkbutton.grid(row=4, column=4, padx=10, pady=1)
+
+        # Store initial theme values
+        self.initial_font = self.text_box.cget("font")
+        self.initial_foreground = self.text_box.cget("foreground")
+        self.initial_background = self.text_box.cget("background")
+        # _____________________________Profile Theme_____________________________________
         
         # Add the search widget to the main app
         self.search_widget = SearchWidget(root, self.text_box)
@@ -783,7 +801,7 @@ class TerminalApp:
         mesh += "+---+---+---+\n"
         
          # Add the decorative pattern below the mesh
-        pattern = """ 
+        pattern = """
  ____        _           _       __  __           _               
 / ___| _ __ | | __ _ ___| |__   |  \/  | ___  ___| |__   ___ _ __ 
 \___ \| '_ \| |/ _` / __| '_ \  | |\/| |/ _ \/ __| '_ \ / _ \ '__|
@@ -791,7 +809,7 @@ class TerminalApp:
 |____/| .__/|_|\__,_|___/_| |_| |_|  |_|\___||___/_| |_|\___|_|   
       |_|                                                         
 __________________________________________________________________
-"""
+\n"""
 
         return pattern + mesh
         
@@ -813,7 +831,6 @@ __________________________________________________________________
         
          # Add the decorative pattern below the mesh
         pattern = """ 
-        
  ____        _           _        ____    _    ____  
 / ___| _ __ | | __ _ ___| |__    / ___|  / \  |  _ \ 
 \___ \| '_ \| |/ _` / __| '_ \  | |     / _ \ | | | |
@@ -821,7 +838,7 @@ __________________________________________________________________
 |____/| .__/|_|\__,_|___/_| |_|  \____/_/   \_\____/ 
       |_|                                                                          
 _____________________________________________________
-"""
+\n"""
 
         return pattern + cad
         
@@ -842,8 +859,7 @@ _____________________________________________________
         run += "+-----------+\n"
         
          # Add the decorative pattern below the mesh
-        pattern = """ 
-        
+        pattern = """   
  ____        _           _       ____  _   _ _   _ 
 / ___| _ __ | | __ _ ___| |__   |  _ \| | | | \ | |
 \___ \| '_ \| |/ _` / __| '_ \  | |_) | | | |  \| |
@@ -851,7 +867,7 @@ _____________________________________________________
 |____/| .__/|_|\__,_|___/_| |_| |_| \_\\____/|_| \_|
       |_|                                            
 _____________________________________________________
-"""
+\n"""
 
         return pattern + run
         
@@ -947,6 +963,7 @@ _____________________________________________________
         # Specify the list of parameters for each file
         constant_params = {
             "transportProperties": ["transportModel", "nu"],
+            "thermophysicalProperties": ["molWeight", "Cp", "Hf", "mu", "Pr"],
             "turbulenceProperties": ["simulationType", "RASModel", "printCoeffs"]
             # more files can be added in a similar fashion
         }
@@ -970,6 +987,48 @@ _____________________________________________________
 
         # Open a popup to replace simulation setup parameters
         ReplaceSimulationSetupParameters(self, constant_params, system_params, existing_values)
+
+###    # Modify open_simulation_setup_popup
+###    def open_simulation_setup_popup(self):
+###        
+###        if self.selected_file_path is None:
+###            tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
+###            return
+###                
+###        # Specify the list of parameters for each file
+###        constant_params = {
+###            "transportProperties": ["transportModel", "nu"],
+###            "thermophysicalProperties": ["molWeight", "Cp", "Hf", "mu", "Pr"],
+###            "turbulenceProperties": ["simulationType", "RASModel", "printCoeffs"]
+###            # more files can be added in a similar fashion
+###        }
+###        system_params = {
+###            #"fvSchemes": ["param7", "param8", "param9"],
+###            "fvSolution": ["nOuterCorrectors", "nCorrectors", "nNonOrthogonalCorrectors"]
+###        }
+
+###        # Read existing values for constant parameters
+###        existing_values_constant = {}
+###        for file_name, param_list in constant_params.items():
+###            file_path = os.path.join(self.selected_file_path, "constant", file_name)
+###            if os.path.exists(file_path):
+###                existing_values_constant.update(self.read_simulation_setup_existing_values("constant", file_name, param_list))
+
+###        # Read existing values for system parameters
+###        existing_values_system = {}
+###        for file_name, param_list in system_params.items():
+###            file_path = os.path.join(self.selected_file_path, "system", file_name)
+###            if os.path.exists(file_path):
+###                existing_values_system.update(self.read_simulation_setup_existing_values("system", file_name, param_list))
+
+###        # Combine existing values for both constant and system parameters
+###        existing_values = {**existing_values_constant, **existing_values_system}
+
+###        # Open a popup to replace simulation setup parameters
+###        ReplaceSimulationSetupParameters(self, constant_params, system_params, existing_values)
+
+# ++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++
+
     #+++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++           
     
     
@@ -1088,12 +1147,7 @@ _____________________________________________________
         if os.path.exists(control_dict_path):
             try:
                 subprocess.run(["sed", "-i", '0,/endTime/s//writeNow/', control_dict_path], check=True)
-                #time.sleep(0.1)  # Add a 100ms delay
-                #subprocess.run(["ex", "-sc", 'wq', control_dict_path], check=True)
-                print(control_dict_path)
-                #subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
-                #subprocess.run(["sync"], check=True)  # Flush file system buffers to disk
-                #time.sleep(0.1)  # Add a 100ms delay
+                print(control_dict_path) # FLAG! DEBUGGING        
                 tk.messagebox.showinfo("Stop Simulation", "Simulation stopped successfully.")
             except subprocess.CalledProcessError as e:
                 tk.messagebox.showerror("Error", f"Error stopping simulation: {e.stderr}")
@@ -1174,7 +1228,7 @@ _____________________________________________________
     def load_log_file(self):
 
         # List of identifiable "solver" names 
-        solver_names = ["simpleFoam", "pimpleFoam", "icoFoam", "compressibleInterFoam", "foamRun"]  # Add more solver names...
+        solver_names = ["simpleFoam", "pimpleFoam", "icoFoam", "sonicFoam", "compressibleInterFoam", "foamRun"]  # Add more solver names...
 
         # Check each solver log file
         for solver_name in solver_names:
@@ -1196,8 +1250,6 @@ _____________________________________________________
             # If none of the log files exist, display a message in the Text widget
             self.text_box.delete(1.0, "end")  # Clear previous content
             self.text_box.insert("end", "No log file found.")
-            
-            
              
 # -------------------------------- Plot results ------------------------------  
     # Function to plot results using xmgrace
@@ -1228,9 +1280,7 @@ _____________________________________________________
             text=True,
             preexec_fn=os.setsid,  # Create a new process group
         )
-        # Enable the stop button
-        self.stop_button.config(state=tk.NORMAL)
-
+        
         # Disable the execute button
         self.execute_button.config(state=tk.DISABLED)
 
@@ -1251,16 +1301,9 @@ _____________________________________________________
             else:
                 # The terminal process has completed
                 self.execute_button.config(state=tk.NORMAL)
-                self.stop_button.config(state=tk.DISABLED)
                 self.status_label.config(text="Command executed successfully")
                 #self.status_label.delete(0, END)
-# ================================================================
-    def stop_command(self):
-        if self.terminal_process:
-            # Terminate the terminal process and its process group
-            os.killpg(os.getpgid(self.terminal_process.pid), signal.SIGTERM)
-            self.status_label.config(text="Command execution stopped", foreground="red")
-            
+                
 # ===================Tool tip (hover over the button)=============================================
     def add_tooltip(self, widget, text):
         widget.bind("<Enter>", lambda event: self.show_tooltip_right(widget, text))
@@ -1300,62 +1343,77 @@ _____________________________________________________
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
         self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
-        self.text_box.configure(foreground="lightblue", background="black")
+        #self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
+        self.text_box.configure(foreground="#ffff00", background="black", font=("courier", 13, "bold"))
 
         splash_welcome_msg = """
-                                _____________________________________________________
-                                __        __   _                            _        
-                                \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
-                                 \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
-                                  \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
-                                   \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
-                                                                                     
-                                         ____        _           _                           
-                                        / ___| _ __ | | __ _ ___| |__                        
-                                        \___ \| '_ \| |/ _` / __| '_ \                       
-                                         ___) | |_) | | (_| \__ \ | | |                      
-                                        |____/| .__/|_|\__,_|___/_| |_|                      
-                                              |_|                                            
-                                  ___                   _____ ___    _    __  __     
-                                 / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
-                                | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
-                                | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
-                                 \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
-                                      |_|
-                                _____________________________________________________ 
-                                     
-                                       Your gate to efficient CFD production! 
-                                _____________________________________________________
+                        _____________________________________________________
+                        __        __   _                            _        
+                        \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
+                         \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
+                          \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
+                           \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
+                                                                             
+                                 ____        _           _                           
+                                / ___| _ __ | | __ _ ___| |__                        
+                                \___ \| '_ \| |/ _` / __| '_ \                       
+                                 ___) | |_) | | (_| \__ \ | | |                      
+                                |____/| .__/|_|\__,_|___/_| |_|                      
+                                      |_|                                            
+                          ___                   _____ ___    _    __  __     
+                         / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
+                        | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
+                        | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
+                         \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
+                              |_|
+                        _____________________________________________________ 
+                             
+                               Your gate to efficient CFD production! 
+                        _____________________________________________________
     """
         self.text_box.insert(tk.END, splash_welcome_msg)
         # Make the Text widget read-only
-        self.text_box.configure(state="disabled")
+        self.text_box.configure(state="normal")
 
         # Create a vertical scrollbar for the Text widget
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
         self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
 
-        # Add buttons to the self.text_box
-        font_button = ttk.Button(self.root, text="Font", command=self.change_font)
-        ##font_button.place(relx=0.98, rely=0, anchor="ne")  # Use place to position over the top-right corner
-        #font_button.grid(row=3, column=4, padx=1)
-        font_button.grid(row=9, column=4, padx=15, pady=(0, 1))
+###        # Add buttons to the self.text_box
+###        font_button = ttk.Button(self.root, text="Font", command=self.change_font)
+###        font_button.grid(row=3, column=4, padx=10, pady=5) # pady=(0, 1))
+
+###        color_button = ttk.Button(self.root, text="Color", command=self.change_color)
+###        color_button.grid(row=4, column=4, padx=10, pady=5)
+
+###    def change_font(self):
+###        current_font = self.text_box.cget("font")
+###        new_font = tkinter.simpledialog.askstring("Font", "Enter font (e.g., Arial 12 bold)", initialvalue=current_font)
+
+###        if new_font:
+###            self.text_box.configure(font=new_font)
+
+###    def change_color(self):
+###        # Ask for text color
+###        text_color = colorchooser.askcolor(color=self.text_box.cget("foreground"))[1]
+###        if text_color:
+###            self.text_box.configure(foreground=text_color)
+
+###        # Ask for background color
+###        bg_color = colorchooser.askcolor(color=self.text_box.cget("background"))[1]
+###        if bg_color:
+###            self.text_box.configure(background=bg_color)
+
         
 
-        color_button = ttk.Button(self.root, text="Color", command=self.change_color)
-        #color_button.place(relx=0.93, rely=0, anchor="ne")  # Adjust relx for proper spacing
-        #color_button.grid(row=4, column=4, padx=1)
-        color_button.grid(row=10, column=4, padx=10, pady=(0, 1))
-
-    def change_font(self):
+    def change_theme(self):
+        # Ask for font
         current_font = self.text_box.cget("font")
-        new_font = tkinter.simpledialog.askstring("Font", "Enter font (e.g., Arial 12 bold)", initialvalue=current_font)
-
+        new_font = simpledialog.askstring("Font", "Enter font (e.g., Arial 12 bold)", initialvalue=current_font)
         if new_font:
             self.text_box.configure(font=new_font)
 
-    def change_color(self):
         # Ask for text color
         text_color = colorchooser.askcolor(color=self.text_box.cget("foreground"))[1]
         if text_color:
@@ -1365,16 +1423,31 @@ _____________________________________________________
         bg_color = colorchooser.askcolor(color=self.text_box.cget("background"))[1]
         if bg_color:
             self.text_box.configure(background=bg_color)
+
+        # Reset if the Reset checkbox is selected
+        if self.reset_var.get():
+            self.reset_theme()
+
+    def toggle_reset(self):
+        # Toggle between the Reset and user-chosen themes
+        if self.reset_var.get():
+            self.reset_theme()
+        else:
+            self.text_box.configure(font=self.initial_font)
+            self.text_box.configure(foreground=self.initial_foreground)
+            self.text_box.configure(background=self.initial_background)
+
+    def reset_theme(self):
+        # Reset to initial values
+        self.text_box.configure(font=self.initial_font)
+        self.text_box.configure(foreground=self.initial_foreground)
+        self.text_box.configure(background=self.initial_background)
   
-   
-   
    
 if __name__ == "__main__":
     root = tk.Tk()
     app = TerminalApp(root)
     root.mainloop()   
-
-
 
 
 #        # Monitor residuals using foamMonitor

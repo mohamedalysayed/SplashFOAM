@@ -33,8 +33,7 @@ rm -rf constant/polyMesh
 rm -rf VTK
 
 # Update the user with the status - spinner goes after 
-echo
-echo "==========================================================="
+echo "===========================================================>>>"
 echo "Mesh is being crafted, please hang on... " & 
 echo
 # build the mesh in tetrahedral mode 
@@ -42,8 +41,6 @@ tetMesh > log.tetrahedralMesh &
 ###spinner $! 
 
 echo "Mesh is successfully generated! Now creating the vtk files for you..." &
-echo
-# Wait a second before executing the next line 
 
 # Extract ClockTime value from log.tetrahedralMesh
 clock_time=$(grep "ClockTime =" log.tetrahedralMesh | awk '{print $7}' | tr -d '[:alpha:]')
@@ -58,7 +55,8 @@ sleep 1
 runApplication paraFoam   
 
 echo "Checking mesh quality..." &
-echo
 runApplication checkMesh 
-echo "==========================================================="
+echo "Mesh quality checked! Click on 'Load mesh quality' to view the report."
+echo
+echo "===========================================================<<<"
 #------------------------------------------------------------------------------

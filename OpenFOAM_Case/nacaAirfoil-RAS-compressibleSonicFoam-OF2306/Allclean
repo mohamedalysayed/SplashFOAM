@@ -1,0 +1,21 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+
+# of2306
+. /usr/lib/openfoam/openfoam2306/etc/bashrc
+
+. ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions      # Tutorial clean functions
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+cleanCase0
+
+# Don't need these extra files (from star4ToFoam conversion)
+rm -f \
+   constant/cellTable \
+   constant/polyMesh/cellTableId \
+   constant/polyMesh/interfaces  \
+   constant/polyMesh/origCellId  \
+   ;
+
+#------------------------------------------------------------------------------
