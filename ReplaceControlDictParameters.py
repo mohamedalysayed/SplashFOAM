@@ -34,15 +34,17 @@ class ReplaceControlDictParameters:
                 self.new_values[param] = entry_var
                 self.entry_widgets[param] = entry
 
-            # Create an "Update" button that calls the update_control_dict_parameters method
+            # Create an "Update" button that calls the update_convtrol_dict_parameters method
             style = ttk.Style()
-            style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+            style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
             update_button = ttk.Button(self.popup, text="Update", command=self.update_control_dict_parameters)
             update_button.pack(pady=10)
             
             # Create a "Launch" button immediately starts the simulation 
+            ##style = ttk.Style()
+            ##style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
             style = ttk.Style()
-            style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+            style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
             update_button = ttk.Button(self.popup, text="Launch Simulation", command=self.parent.run_openfoam_simulation)
             update_button.pack(pady=10)
 

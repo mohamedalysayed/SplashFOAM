@@ -7,6 +7,7 @@ setup(
     install_requires=[
         'PyQt5',
         'PySide2',
+  	'matplotlib',
         'numpy-stl',
 	'numpy',
         'openai',
