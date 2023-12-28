@@ -468,7 +468,7 @@ class TerminalApp:
 
         # Update the main loop to display the image for 2 seconds
         self.root.update()
-        time.sleep(0.5)  # Sleep for 2 seconds
+        time.sleep(2)  # Sleep for 2 seconds
         welcome_label.destroy()  # Destroy the Label to collapse the popup
         
     # -------------- Welcome Message -------------------------- 
