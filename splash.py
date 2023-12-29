@@ -24,6 +24,9 @@ from ReplaceMeshParameters import ReplaceMeshParameters
 from ReplaceControlDictParameters import ReplaceControlDictParameters
 from ReplaceSimulationSetupParameters import ReplaceSimulationSetupParameters
 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
 #______________
 #
 # TERMINAL APP 
@@ -162,19 +165,50 @@ class TerminalApp:
         self.magic_box_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.magic_box_button, "Magicbox! click to see what's inside :)")
 
-        # Create a check button to hide/show parts of the program
-        # Create a custom style
+        # Create a Checkbutton using the custom style for showing/hiding results section 
         style = ttk.Style()
         style.configure("Custom.TCheckbutton", foreground="black", background="white")
-
-        # Create a Checkbutton using the custom style
         toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Results Panel", command=self.toggle_visibility, style="Custom.TCheckbutton")
-        toggle_visibility_button.grid(row=12, column=1, pady=1, padx=7, sticky="ew")
+        toggle_visibility_button.grid(row=13, column=1, pady=1, padx=7, sticky="w")
+
+        # _____________________________Profile Theme_____________________________________
+        theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme)
+        theme_button.grid(row=3, column=4, padx=10, pady=5)
+
+        self.reset_var = tk.BooleanVar()
+        
+        # Create a Checkbutton for resetting profile theme to default 
+        reset_checkbutton_style = ttk.Style()
+        reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
+        reset_checkbutton = ttk.Checkbutton(self.root, text="Reset theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
+        reset_checkbutton.grid(row=12, column=1, padx=10, pady=1, sticky="w")
+        
+        # Store initial profile theme values
+        self.initial_font = self.text_box.cget("font")
+        self.initial_foreground = self.text_box.cget("foreground")
+        self.initial_background = self.text_box.cget("background")
+        # _____________________________Profile Theme_____________________________________
 
         # Create a progress bar with the custom style
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
         self.progress_bar_canvas.grid(row=12, column=2, padx=50, pady=1)
         self.progress_bar_canvas_flag=True
+        
+        
+        # Add a Canvas for plotting residuals column 5, row 8 (spans 5 rows)
+        self.plot_canvas = FigureCanvasTkAgg(Figure(figsize=(5, 4)))
+        self.plot_canvas.get_tk_widget().grid(row=8, column=5, pady=1, padx=10, sticky="ew", rowspan=5)
+        self.ax = self.plot_canvas.figure.add_subplot(111)
+        self.ax.set_xlabel("Iteration / Time Step")
+        self.ax.set_ylabel("Residuals")
+        self.plot_canvas.draw()
+
+        # Create Checkbutton for monitoring simulation
+        self.monitor_simulation_var = tk.BooleanVar()
+        monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
+        monitor_simulation_checkbutton.grid(row=14, column=1, pady=1, padx=7, sticky="w")
+        
+        
         
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
@@ -186,31 +220,12 @@ class TerminalApp:
         #checkMesh_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
         checkMesh_button.grid(row=2, column=2, pady=1, padx=1, sticky="ew")
         checkMesh_button['width'] = 9  # Adjust the width as needed
-
-        # _____________________________Profile Theme_____________________________________
-        theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme)
-        theme_button.grid(row=3, column=4, padx=10, pady=5)
-
-        self.reset_var = tk.BooleanVar()
-        
-
-        reset_checkbutton_style = ttk.Style()
-        reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="cyan", background="black")
-        reset_checkbutton = ttk.Checkbutton(self.root, text="Reset theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
-        reset_checkbutton.grid(row=4, column=4, padx=10, pady=1)
-
-        # Store initial theme values
-        self.initial_font = self.text_box.cget("font")
-        self.initial_foreground = self.text_box.cget("foreground")
-        self.initial_background = self.text_box.cget("background")
-        # _____________________________Profile Theme_____________________________________
         
         # Add the search widget to the main app
         self.search_widget = SearchWidget(root, self.text_box)
-
         #----------Text Widget with Scrollbar-----------
         
-        # Configure row and column weights to allow resizing 
+        #---------- Config row and column weights to allow resizing------ 
         no_global_columns = 5
         no_global_rows = 13
         
@@ -221,6 +236,7 @@ class TerminalApp:
         # Adjust the column range according to the exsisting number
         for i in range(no_global_columns):
             self.root.columnconfigure(i, weight=1)
+        #---------- Config row and column weights to allow resizing------
         
         # Initialize variables for simulation thread
         self.simulation_thread = None
@@ -503,7 +519,7 @@ class TerminalApp:
 
         # Create a label to display the image
         self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=13)
+        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=8)
         self.splash_bgImage_label.configure(background="white")
 
         # Dynamic bg jpg images (uses PIL - NOT good when packaging)
@@ -632,9 +648,6 @@ class TerminalApp:
             paraview_logo = paraview_logo.subsample(9, 9)
 
             # Create buttons with logos for the CAD viewers
-            ####style = ttk.Style()
-            #style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black", borderwidth=1)
-            ###style.configure("TButton", padding=10, relief="solid", background="white", foreground="black", borderwidth=1) 
             freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
             freecad_button.image = freecad_logo
             freecad_button.pack(side=tk.TOP, padx=30, pady=1)
@@ -881,6 +894,9 @@ _____________________________________________________
             self.status_label.config(text=f"Case directory identified: {selected_directory}")
             self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
             self.initialize_simulation_button["state"] = tk.NORMAL # Enable the "Initialize Simulation" button
+            
+            # Monitor residuals using foamMonitor | FLAG - monitoring residuals starts here 
+            self.monitor_simulation()
         else:
             self.status_label.config(text="No case directory selected.", foreground="red")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
@@ -988,50 +1004,9 @@ _____________________________________________________
         # Open a popup to replace simulation setup parameters
         ReplaceSimulationSetupParameters(self, constant_params, system_params, existing_values)
 
-###    # Modify open_simulation_setup_popup
-###    def open_simulation_setup_popup(self):
-###        
-###        if self.selected_file_path is None:
-###            tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
-###            return
-###                
-###        # Specify the list of parameters for each file
-###        constant_params = {
-###            "transportProperties": ["transportModel", "nu"],
-###            "thermophysicalProperties": ["molWeight", "Cp", "Hf", "mu", "Pr"],
-###            "turbulenceProperties": ["simulationType", "RASModel", "printCoeffs"]
-###            # more files can be added in a similar fashion
-###        }
-###        system_params = {
-###            #"fvSchemes": ["param7", "param8", "param9"],
-###            "fvSolution": ["nOuterCorrectors", "nCorrectors", "nNonOrthogonalCorrectors"]
-###        }
-
-###        # Read existing values for constant parameters
-###        existing_values_constant = {}
-###        for file_name, param_list in constant_params.items():
-###            file_path = os.path.join(self.selected_file_path, "constant", file_name)
-###            if os.path.exists(file_path):
-###                existing_values_constant.update(self.read_simulation_setup_existing_values("constant", file_name, param_list))
-
-###        # Read existing values for system parameters
-###        existing_values_system = {}
-###        for file_name, param_list in system_params.items():
-###            file_path = os.path.join(self.selected_file_path, "system", file_name)
-###            if os.path.exists(file_path):
-###                existing_values_system.update(self.read_simulation_setup_existing_values("system", file_name, param_list))
-
-###        # Combine existing values for both constant and system parameters
-###        existing_values = {**existing_values_constant, **existing_values_system}
-
-###        # Open a popup to replace simulation setup parameters
-###        ReplaceSimulationSetupParameters(self, constant_params, system_params, existing_values)
-
 # ++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++
 
     #+++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++           
-    
-    
     def update_control_dict_parameters(self):
         # Read the content of the "controlDict" file
         self.control_dict_file_path = os.path.join(self.selected_file_path, "system", "controlDict")
@@ -1061,6 +1036,7 @@ _____________________________________________________
         else:
             tk.messagebox.showerror("Error", "No controlDict parameters found in the 'controlDict' file!")
 
+    # --------------------- running the simulation ---------------------------
     def run_simulation(self):
         if self.selected_file_path is None:
             tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
@@ -1189,9 +1165,6 @@ _____________________________________________________
         # Set the mode to 'determinate' to reset the progress bar
         self.progress_bar_canvas.configure(mode="determinate")
         self.progress_bar_canvas["value"] = 0
-   
-
-
 #______________________________________________________________________
 # FLAG: essentially intended to be dedicated for checkMesh script****
     def load_meshChecked(self): # Important, implement an error handling mechanism where the it spits useful info in case no mesh was created yet!
@@ -1343,8 +1316,8 @@ _____________________________________________________
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
         self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
-        #self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
-        self.text_box.configure(foreground="#ffff00", background="black", font=("courier", 13, "bold"))
+        self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
+        #self.text_box.configure(foreground="#ffff00", background="black", font=("courier", 13, "bold"))
 
         splash_welcome_msg = """
                         _____________________________________________________
@@ -1442,93 +1415,121 @@ _____________________________________________________
         self.text_box.configure(font=self.initial_font)
         self.text_box.configure(foreground=self.initial_foreground)
         self.text_box.configure(background=self.initial_background)
-  
-   
+        
+    def toggle_monitor_simulation(self):
+        if self.monitor_simulation_var.get():
+            # Call your monitor_simulation function here
+            self.monitor_simulation()
+        else:
+            # Handle the case when the Checkbutton is unchecked (if needed)
+            pass
+
+    def monitor_simulation(self):
+        # Get the path to solverInfo.dat
+        solver_info_file = os.path.join(self.selected_file_path, "postProcessing", "residuals", "0", "solverInfo.dat")
+
+        # Check if the solverInfo file exists
+        if not os.path.exists(solver_info_file):
+            messagebox.showerror("Error", "SolverInfo file not found!")
+            return
+
+        # Run the foamMonitor command with the given arguments
+        foam_monitor_command = ["foamMonitor", "-l", solver_info_file]
+
+        # Run foamMonitor in a subprocess
+        subprocess.Popen(foam_monitor_command)
+
+        # Update the plot (you may need to adjust this part based on your data)
+        # For example, you might want to call a function to update the plot
+        # with data from the solverInfo.dat file.
+
 if __name__ == "__main__":
     root = tk.Tk()
+    root.option_add('*tearOff', False)  # Disable menu tear-off
+    root.title("Splash v1.0")
+    root.wm_title("Splash v1.0")  # Set window manager title
     app = TerminalApp(root)
-    root.mainloop()   
+    root.mainloop()
 
+#    def monitor_simulation(self):
+#        solver_info_file = os.path.join(self.selected_file_path, "postProcessing", "residuals", "0", "solverInfo.dat")
 
-#        # Monitor residuals using foamMonitor
-#        self.monitor_residuals()
-
-#    def monitor_residuals(self):
-#        residuals_file = os.path.join(os.path.dirname(self.selected_file_path), "postProcessing", "residuals", "0", "residuals.dat")
-
-#        # Check if the residuals file exists
-#        if not os.path.exists(residuals_file):
-#            tk.messagebox.showerror("Error", "Residuals file not found!")
+#        # Check if the solverInfo file exists
+#        if not os.path.exists(solver_info_file):
+#            messagebox.showerror("Error", "SolverInfo file not found!")
 #            return
 
-#        # Run foamMonitor to continuously monitor residuals
-#        foam_monitor_command = f"foamMonitor -l {residuals_file}"
-#        process = subprocess.Popen(foam_monitor_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+#        # Run the monitor function
+#        self.monitor_solver_info(solver_info_file)
 
-#        # Read and display residuals in real-time
-#        for line in iter(process.stdout.readline, b''):
-#            print(line.decode("utf-8"))
+#    def monitor_solver_info(self, solver_info_file):
+#        # Open the solverInfo file for real-time monitoring
+#        with open(solver_info_file, 'r') as file:
+#            # Lists to store data for plotting
+#            header = None
+#            data_columns = [[] for _ in range(12)]  # Assuming there are 12 columns in the file
 
-#            # Extract residuals from the output and update the plot
-#            residuals = [float(x) for x in re.findall(r"residual\s*=\s*([\d.]+)", line.decode("utf-8"))]
+#            # Set initial x-axis limit
+#            self.ax.set_xlim(0, 100)
 
-#            if residuals:
-#                self.update_plot(residuals)
+#            # Skip header lines starting with '#'
+#            for line in file:
+#                if not line.startswith("#"):
+#                    break
 
-#        process.stdout.close()
-#        process.stderr.close()
+#            for line in file:
+#                # Extract relevant information from the line
+#                data = re.findall(r"\b\d+\b|\b[\d.]+\b", line)
 
-#        # Wait for foamMonitor to finish
-#        process.wait()
+#                if data:
+#                    # Check if the line contains only numeric data
+#                    if all(val.replace('.', '', 1).isdigit() for val in data):
+#                        # Store header for legends
+#                        if header is None:
+#                            header = ["Iteration"] + [f"Residual_{i}" for i in range(1, len(data))]
+#                            self.ax.legend(header)
+#                            self.plot_canvas.draw()
 
-#        # Update UI
-#        self.simulation_running = False
-#        print("Residual monitoring completed.")
+#                        # Append residuals for each iteration
+#                        for i, val in enumerate(data):
+#                            data_columns[i].append(float(val))
 
-#    def update_plot(self, residuals):
-#        # Update the plot with new residuals
-#        self.ax.clear()
-#        self.ax.plot(residuals, label="Residuals")
-#        self.ax.set_xlabel("Iteration")
-#        self.ax.set_ylabel("Residual Value")
-#        self.ax.legend()
-#        self.canvas.draw()
-    # --------------------- running the simulation ---------------------------
-            
-            
+#            # Plot residuals for each iteration
+#            for i in range(1, len(data_columns)):
+#                self.update_plot(data_columns[0], data_columns[i])
 
-#    def import_geometry(self):
-#        # Ask the user to select a geometry file
-#        geometry_file = filedialog.askopenfilename(
-#            #filetypes=[("Geometry files", "*.stl;*.obj"), ("All files", "*.*")],
-#            filetypes=[("Geometry files", "*.stl"), ("All files", "*.*")],
-#            initialdir=os.path.dirname(self.selected_file_path) if self.selected_file_path else None
-#        )
+#            # Set the x-axis limit dynamically based on the maximum iteration
+#            if data_columns[0]:
+#                max_iteration = max(data_columns[0])
+#                self.ax.set_xlim(0, max_iteration + 1)
 
-#        if geometry_file:
-#            # Get the destination path for the "Meshing" folder
-#            meshing_folder = os.path.join(os.path.dirname(self.selected_file_path), "Meshing")
+#            # Set the y-axis limit dynamically based on the maximum residual value
+#            max_residual = max(max(data_columns[1:]), default=0)
+#            current_ylim = self.ax.get_ylim()
+#            new_ylim = (0, max(max_residual, current_ylim[1]))
+#            self.ax.set_ylim(new_ylim)
 
-#            # Check if the "Meshing" folder exists; if not, create it
-#            if not os.path.exists(meshing_folder):
-#                os.makedirs(meshing_folder)
+#            # Redraw the canvas
+#            self.plot_canvas.draw()
 
-#            # Copy the selected geometry file to the "Meshing" folder and rename it to "CAD.stl"
-#            geometry_file_name = "CAD.stl"
-#            destination_path = os.path.join(meshing_folder, geometry_file_name)
-#            shutil.copy(geometry_file, destination_path)
+#    def update_plot(self, iterations, residuals):
+#        # Update the plot with new data
+#        self.ax.plot(iterations, residuals, 'bo')
 
-#            # Update the status label
-#            self.status_label.config(text=f"Geometry file {geometry_file_name} imported to Meshing folder", foreground="green")
-#        else:
-#            self.status_label.config(text="Geometry import canceled", foreground="blue")
-#            
-#        # Check if a file is selected
-#        if not self.selected_file_path:
-#            self.status_label.config(text="No file selected for import", foreground="red")
-#            return
-           
-         
+#        # Set the x-axis limit dynamically based on the maximum iteration
+#        max_iteration = max(iterations)
+#        self.ax.set_xlim(0, max_iteration + 1)
+
+#        # Set the y-axis limit dynamically based on the maximum residual value
+#        max_residual = max(residuals)
+#        current_ylim = self.ax.get_ylim()
+#        new_ylim = (0, max(max_residual, current_ylim[1]))
+#        self.ax.set_ylim(new_ylim)
+
+#        # Redraw the canvas
+#        self.plot_canvas.draw()
+
+   
             
 #        # Configure rows and columns to expand
 #        self.root.grid_columnconfigure(0, weight=1)
