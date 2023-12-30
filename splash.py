@@ -27,6 +27,7 @@ from ReplaceSimulationSetupParameters import ReplaceSimulationSetupParameters
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
+
 #______________
 #
 # TERMINAL APP 
@@ -169,7 +170,7 @@ class TerminalApp:
         style = ttk.Style()
         style.configure("Custom.TCheckbutton", foreground="black", background="white")
         toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Results Panel", command=self.toggle_visibility, style="Custom.TCheckbutton")
-        toggle_visibility_button.grid(row=13, column=1, pady=1, padx=7, sticky="w")
+        toggle_visibility_button.grid(row=14, column=1, pady=1, padx=7, sticky="w")
 
         # _____________________________Profile Theme_____________________________________
         theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme)
@@ -193,23 +194,12 @@ class TerminalApp:
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
         self.progress_bar_canvas.grid(row=12, column=2, padx=50, pady=1)
         self.progress_bar_canvas_flag=True
-        
-        
-        # Add a Canvas for plotting residuals column 5, row 8 (spans 5 rows)
-        self.plot_canvas = FigureCanvasTkAgg(Figure(figsize=(5, 4)))
-        self.plot_canvas.get_tk_widget().grid(row=8, column=5, pady=1, padx=10, sticky="ew", rowspan=5)
-        self.ax = self.plot_canvas.figure.add_subplot(111)
-        self.ax.set_xlabel("Iteration / Time Step")
-        self.ax.set_ylabel("Residuals")
-        self.plot_canvas.draw()
 
         # Create Checkbutton for monitoring simulation
         self.monitor_simulation_var = tk.BooleanVar()
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
-        monitor_simulation_checkbutton.grid(row=14, column=1, pady=1, padx=7, sticky="w")
-        
-        
-        
+        monitor_simulation_checkbutton.grid(row=13, column=1, pady=1, padx=7, sticky="w")
+
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
         #checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(1, 0), padx=10)
@@ -365,11 +355,6 @@ class TerminalApp:
             self.splash_bgImage_label.grid_remove()
             # ... (toggle other buttons)
     
-    
-    def run_terminal_command(self, command):
-        # Your existing method for running terminal commands goes here
-        pass
-    
     def browse_directory(self):
         selected_file = filedialog.askopenfilename()
 
@@ -457,7 +442,6 @@ class TerminalApp:
         self.status_label.config(text=f"Fuel replaced. Selected fuel: {selected_fuel}")
         # -----------------------------------------------------------------------------------------------------<
 
-            
     # -------------- Welcome Message --------------------------    
     def show_welcome_message(self):
         welcome_message = (
@@ -896,7 +880,7 @@ _____________________________________________________
             self.initialize_simulation_button["state"] = tk.NORMAL # Enable the "Initialize Simulation" button
             
             # Monitor residuals using foamMonitor | FLAG - monitoring residuals starts here 
-            self.monitor_simulation()
+            # self.monitor_simulation()
         else:
             self.status_label.config(text="No case directory selected.", foreground="red")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
@@ -1351,34 +1335,7 @@ _____________________________________________________
         # Create a vertical scrollbar for the Text widget
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
         self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
-        self.text_box['yscrollcommand'] = self.text_box_scrollbar.set
-
-###        # Add buttons to the self.text_box
-###        font_button = ttk.Button(self.root, text="Font", command=self.change_font)
-###        font_button.grid(row=3, column=4, padx=10, pady=5) # pady=(0, 1))
-
-###        color_button = ttk.Button(self.root, text="Color", command=self.change_color)
-###        color_button.grid(row=4, column=4, padx=10, pady=5)
-
-###    def change_font(self):
-###        current_font = self.text_box.cget("font")
-###        new_font = tkinter.simpledialog.askstring("Font", "Enter font (e.g., Arial 12 bold)", initialvalue=current_font)
-
-###        if new_font:
-###            self.text_box.configure(font=new_font)
-
-###    def change_color(self):
-###        # Ask for text color
-###        text_color = colorchooser.askcolor(color=self.text_box.cget("foreground"))[1]
-###        if text_color:
-###            self.text_box.configure(foreground=text_color)
-
-###        # Ask for background color
-###        bg_color = colorchooser.askcolor(color=self.text_box.cget("background"))[1]
-###        if bg_color:
-###            self.text_box.configure(background=bg_color)
-
-        
+        self.text_box['yscrollcommand'] = self.text_box_scrollbar.set      
 
     def change_theme(self):
         # Ask for font
@@ -1425,24 +1382,47 @@ _____________________________________________________
             pass
 
     def monitor_simulation(self):
+    
+        if self.selected_file_path is None:
+            tk.messagebox.showerror("Error", "No case was found to be monitored. Please make sure your case is loaded properly.")
+            return
+            
         # Get the path to solverInfo.dat
         solver_info_file = os.path.join(self.selected_file_path, "postProcessing", "residuals", "0", "solverInfo.dat")
+        #solver_info_file = os.path.join(self.selected_file_path, "postProcessing", "residuals", "0", "residuals.dat")
 
         # Check if the solverInfo file exists
         if not os.path.exists(solver_info_file):
             messagebox.showerror("Error", "SolverInfo file not found!")
             return
 
-        # Run the foamMonitor command with the given arguments
-        foam_monitor_command = ["foamMonitor", "-l", solver_info_file]
+        # Construct the SplashMonitor command with the given arguments
+        splash_monitor_command = ["./SplashMonitor", "-l", "-i", "2", "-r", "1", solver_info_file]
 
-        # Run foamMonitor in a subprocess
-        subprocess.Popen(foam_monitor_command)
+        # Run SplashMonitor in a subprocess, capturing the standard output
+        process = subprocess.Popen(splash_monitor_command, stdout=subprocess.PIPE, universal_newlines=True)
 
-        # Update the plot (you may need to adjust this part based on your data)
-        # For example, you might want to call a function to update the plot
-        # with data from the solverInfo.dat file.
+        # Check if Gnuplot is installed
+        try:
+            subprocess.run(["gnuplot", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except subprocess.CalledProcessError:
+            messagebox.showerror("Error", "Gnuplot is not installed. Please install Gnuplot.")
+            return
 
+        # Run Gnuplot with the output stream
+        gnuplot_command = ["gnuplot", "-persist"]
+        gnuplot_process = subprocess.Popen(gnuplot_command, stdin=subprocess.PIPE, universal_newlines=True)
+
+        # Pass the data to Gnuplot
+        for line in process.stdout:
+            gnuplot_process.stdin.write(line)
+
+        # Close the stdin of the Gnuplot process
+        gnuplot_process.stdin.close()
+
+        # Wait for Gnuplot to finish
+        gnuplot_process.wait()
+        
 if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', False)  # Disable menu tear-off
@@ -1450,206 +1430,7 @@ if __name__ == "__main__":
     root.wm_title("Splash v1.0")  # Set window manager title
     app = TerminalApp(root)
     root.mainloop()
-
-#    def monitor_simulation(self):
-#        solver_info_file = os.path.join(self.selected_file_path, "postProcessing", "residuals", "0", "solverInfo.dat")
-
-#        # Check if the solverInfo file exists
-#        if not os.path.exists(solver_info_file):
-#            messagebox.showerror("Error", "SolverInfo file not found!")
-#            return
-
-#        # Run the monitor function
-#        self.monitor_solver_info(solver_info_file)
-
-#    def monitor_solver_info(self, solver_info_file):
-#        # Open the solverInfo file for real-time monitoring
-#        with open(solver_info_file, 'r') as file:
-#            # Lists to store data for plotting
-#            header = None
-#            data_columns = [[] for _ in range(12)]  # Assuming there are 12 columns in the file
-
-#            # Set initial x-axis limit
-#            self.ax.set_xlim(0, 100)
-
-#            # Skip header lines starting with '#'
-#            for line in file:
-#                if not line.startswith("#"):
-#                    break
-
-#            for line in file:
-#                # Extract relevant information from the line
-#                data = re.findall(r"\b\d+\b|\b[\d.]+\b", line)
-
-#                if data:
-#                    # Check if the line contains only numeric data
-#                    if all(val.replace('.', '', 1).isdigit() for val in data):
-#                        # Store header for legends
-#                        if header is None:
-#                            header = ["Iteration"] + [f"Residual_{i}" for i in range(1, len(data))]
-#                            self.ax.legend(header)
-#                            self.plot_canvas.draw()
-
-#                        # Append residuals for each iteration
-#                        for i, val in enumerate(data):
-#                            data_columns[i].append(float(val))
-
-#            # Plot residuals for each iteration
-#            for i in range(1, len(data_columns)):
-#                self.update_plot(data_columns[0], data_columns[i])
-
-#            # Set the x-axis limit dynamically based on the maximum iteration
-#            if data_columns[0]:
-#                max_iteration = max(data_columns[0])
-#                self.ax.set_xlim(0, max_iteration + 1)
-
-#            # Set the y-axis limit dynamically based on the maximum residual value
-#            max_residual = max(max(data_columns[1:]), default=0)
-#            current_ylim = self.ax.get_ylim()
-#            new_ylim = (0, max(max_residual, current_ylim[1]))
-#            self.ax.set_ylim(new_ylim)
-
-#            # Redraw the canvas
-#            self.plot_canvas.draw()
-
-#    def update_plot(self, iterations, residuals):
-#        # Update the plot with new data
-#        self.ax.plot(iterations, residuals, 'bo')
-
-#        # Set the x-axis limit dynamically based on the maximum iteration
-#        max_iteration = max(iterations)
-#        self.ax.set_xlim(0, max_iteration + 1)
-
-#        # Set the y-axis limit dynamically based on the maximum residual value
-#        max_residual = max(residuals)
-#        current_ylim = self.ax.get_ylim()
-#        new_ylim = (0, max(max_residual, current_ylim[1]))
-#        self.ax.set_ylim(new_ylim)
-
-#        # Redraw the canvas
-#        self.plot_canvas.draw()
-
-   
-            
-#        # Configure rows and columns to expand
-#        self.root.grid_columnconfigure(0, weight=1)
-#        self.root.grid_columnconfigure(1, weight=1)
-#        self.root.grid_columnconfigure(2, weight=1)
-#        self.root.grid_columnconfigure(3, weight=1)
-
-#        # Create an entry field for entering the command
-#        self.entry = ttk.Entry(self.root, width=40)
-#        self.entry.grid(row=0, column=0, pady=10, padx=10, columnspan=2, sticky="ew")
-
-#        # Create a button to execute the command
-#        self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
-#        self.execute_button.grid(row=0, column=2, pady=10, padx=10, sticky="ew")
-
-#        # Create a label to display the status of the command execution
-#        self.status_label = ttk.Label(self.root, text="", foreground="blue")
-#        self.status_label.grid(row=1, column=0, pady=5, padx=10, columnspan=2, sticky="w")
-
-#        # Create a button to stop the command execution
-#        self.stop_button = ttk.Button(self.root, text="Stop Command", command=self.stop_command, state=tk.DISABLED)
-#        self.stop_button.grid(row=0, column=3, pady=5, padx=10, sticky="ew")
-
-#        # Create a button to start meshing
-#        self.mesh_button = ttk.Button(self.root, text="Start Meshing!", command=self.create_mesh)
-#        self.mesh_button.grid(row=1, column=3, pady=5, padx=10, sticky="ew")
-
-#        # Create buttons to load and display images or GIFs
-#        self.load_image_button = ttk.Button(self.root, text="Load Image or GIF", command=lambda: self.load_image("image1"))
-#        self.load_image_button.grid(row=2, column=3, pady=10, padx=10, sticky="ew")
-
-#        # Create labels to display the loaded images or GIFs
-#        self.image_labels = []
-
-#        # Load and display the logo
-#        #self.logo_image = Image.open("logoWinGD.jpg")  # Replace with your logo file name
-#        self.logo_image = Image.open("logoS.png")  # Replace with your logo file name
-#        self.logo_image = self.logo_image.resize((100, 100))
-#        self.logo_image = ImageTk.PhotoImage(self.logo_image)
-#        self.logo_label = tk.Label(self.root, image=self.logo_image)
-#        self.logo_label.grid(row=95, column=3, pady=10, padx=10, rowspan=5, columnspan=10, sticky="ew")
-
-#        # Create a label for copyright text
-#        self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
-#        self.copyright_label.grid(row=100, column=3, rowspan=5, columnspan=6, pady=10, padx=10, sticky="ew")
-
-#        self.terminal_process = None
-
-#    # -------------------------- COMBOBOX ---------------------------------------
-#    #=============================================================================
-#    def execute_command(self):
-#        #command = "source ~/.bashrc"; self.entry.get()
-#        command = self.entry.get()
-
-#        # Create a new terminal window and execute the command
-#        self.terminal_process = subprocess.Popen(
-#            #f"gnome-terminal -- bash -c 'source ~/.bashrc'",
-#            f"gnome-terminal -- bash -c '{command}; exec bash'",
-#            shell=True,
-#            stdout=subprocess.PIPE,
-#            stderr=subprocess.PIPE,
-#            text=True,
-#            preexec_fn=os.setsid,  # Create a new process group
-#        )
-#        # Enable the stop button
-#        self.stop_button.config(state=tk.NORMAL)
-
-#        # Disable the execute button
-#        self.execute_button.config(state=tk.DISABLED)
-
-#        # Monitor the terminal process and display the output
-#        self.monitor_terminal()
-## ================================================================
-#    # Defining the function of meshing button 
-#    def create_mesh(self):
-#        command = "sh mesh.sh"
-
-#        # Create a new terminal window and execute the command
-#        self.terminal_process = subprocess.Popen(
-#            f"gnome-terminal -- bash -c '{command}; exec bash'",
-#            shell=True,
-#            stdout=subprocess.PIPE,
-#            stderr=subprocess.PIPE,
-#            text=True,
-#            preexec_fn=os.setsid,  # Create a new process group
-#        )
-
-#        # Enable the stop button
-#        self.stop_button.config(state=tk.NORMAL)
-
-#        # Disable the execute button
-#        self.execute_button.config(state=tk.NORMAL)
-
-#        # Monitor the terminal process and display the output
-#        self.monitor_terminal()
-## ================================================================
-#    def monitor_terminal(self):
-#        if self.terminal_process:
-#            try:
-#                # Read the standard output and standard error of the terminal
-#                output, _ = self.terminal_process.communicate(timeout=0.1)
-#                if output:
-#                    self.output_text.insert(tk.END, output)
-#                    self.output_text.see(tk.END)
-#            except subprocess.TimeoutExpired:
-#                # The terminal process is still running
-#                self.root.after(100, self.monitor_terminal)
-#            else:
-#                # The terminal process has completed
-#                self.execute_button.config(state=tk.NORMAL)
-#                self.stop_button.config(state=tk.DISABLED)
-#                self.status_label.config(text="Command executed successfully", foreground="green")
-#                #self.status_label.delete(0, END)
-## ================================================================
-#    def stop_command(self):
-#        if self.terminal_process:
-#            # Terminate the terminal process and its process group
-#            os.killpg(os.getpgid(self.terminal_process.pid), signal.SIGTERM)
-#            self.status_label.config(text="Command execution stopped", foreground="red")
-## ================================================================
+    
 #    def load_image(self, image_type):
 #        file_path = filedialog.askopenfilename(filetypes=[
 #            ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp"),
@@ -1673,6 +1454,5 @@ if __name__ == "__main__":
 #            image_label.grid(row=row, column=column, pady=5, padx=10, sticky="nsew")
 #            
 #            self.status_label.config(text=f"{image_type.capitalize()} loaded successfully", foreground="green")
-## ================================================================
 
 
