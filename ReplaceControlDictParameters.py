@@ -41,13 +41,10 @@ class ReplaceControlDictParameters:
             update_button.pack(pady=10)
             
             # Create a "Launch" button immediately starts the simulation 
-            ##style = ttk.Style()
-            ##style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
             style = ttk.Style()
             style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
-            update_button = ttk.Button(self.popup, text="Launch Simulation", command=self.parent.run_openfoam_simulation)
-            update_button.pack(pady=10)
-
+            launch_button = ttk.Button(self.popup, text="Launch Simulation", command=self.launch_simulation_and_close)
+            launch_button.pack(pady=10)
         else:
             tk.messagebox.showinfo("Process Canceled", "No changes were made nor simulations were run.")
             
@@ -55,19 +52,21 @@ class ReplaceControlDictParameters:
             self.parent.simulation_running = False
 
     def update_control_dict_parameters(self):
-        # Close the popup
-        ## self.popup.destroy() # FLAG!
 
         # Get the new values from the entry fields
         new_values = {param: entry.get() for param, entry in self.new_values.items()}
 
         # Update controlDict parameters
         self.replace_control_dict_parameters(new_values)
+        
+    def launch_simulation_and_close(self):
+        # Close the popup window
+        self.popup.destroy()
+        
+        # Now, run the simulation
+        self.parent.run_openfoam_simulation()
 
     def replace_control_dict_parameters(self, new_values):
-        # Implement the logic to replace old values with new ones in the controlDict file
-        # Similar to what you did in the ReplaceMeshParameters class
-        # ...
         controlDict_start = 'FoamFile\n{'
         controlDict_end = '}'
         
