@@ -24,10 +24,27 @@ from ReplaceMeshParameters import ReplaceMeshParameters
 from ReplaceControlDictParameters import ReplaceControlDictParameters
 from ReplaceSimulationSetupParameters import ReplaceSimulationSetupParameters
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
+#from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+#from matplotlib.figure import Figure
+
+import webbrowser
 
 
+# Define menu functions
+def file_new():
+    print("New File")
+
+def edit_undo():
+    print("Undo Edit")
+
+def show_help():
+    print("Show Help")
+
+def view_status_bar():
+    print("Status Bar View")
+
+def view_toolbar():
+    print("Toolbar View")
 #______________
 #
 # TERMINAL APP 
@@ -44,6 +61,50 @@ class TerminalApp:
         icon_image = tk.PhotoImage(file=icon_path)
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
         
+        # Create a menu bar ----------------->
+        menubar = tk.Menu(root)
+
+        # Create a File menu and add it to the menu bar
+        file_menu = tk.Menu(menubar, tearoff=0)
+        file_menu.add_command(label="New", command=file_new)
+        file_menu.add_command(label="Profile theme", command=self.change_theme)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=root.quit)
+        menubar.add_cascade(label="File", menu=file_menu)
+
+        # Create an Edit menu and add it to the menu bar
+        edit_menu = tk.Menu(menubar, tearoff=0)
+        edit_menu.add_command(label="Undo", command=edit_undo)
+        menubar.add_cascade(label="Edit", menu=edit_menu)
+        
+        # Create a View menu and add it to the menu bar
+        view_menu = tk.Menu(menubar, tearoff=0)
+        view_menu.add_command(label="Status Bar", command=view_status_bar)
+
+        # Create a submenu for the Toolbar option
+        toolbar_submenu = tk.Menu(view_menu, tearoff=0)
+        toolbar_submenu.add_command(label="Show Toolbar", command=view_toolbar)
+        toolbar_submenu.add_command(label="Hide Toolbar", command=lambda: print("Hide Toolbar"))
+        
+        # Add the submenu to the "View" menu
+        view_menu.add_command(label="Results Panel", command=self.toggle_results_panel)
+
+        # Add the submenu to the "View" menu
+        view_menu.add_cascade(label="Toolbar", menu=toolbar_submenu)
+   
+       # Add the "View" menu to the menu bar
+        menubar.add_cascade(label="View", menu=view_menu)
+
+        # Create a Help menu and add it to the menu bar
+        help_menu = tk.Menu(menubar, tearoff=0)
+        help_menu.add_command(label="About", command=show_help)
+        help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
+        menubar.add_cascade(label="Help", menu=help_menu)
+        
+        # Display the menu bar
+        root.config(menu=menubar)
+        # Create a menu bar -----------------<
+        
         # Display a welcome message
         self.show_welcome_message()
         
@@ -53,9 +114,6 @@ class TerminalApp:
         # Variable to track visibility state of the action bar
         self.show_first_column = True  
 
-        #  Source OpenFOAM Libraries
-        #self.source_openfoam_libraries()
-        
         # Add logos
         self.add_logos()
   
@@ -169,12 +227,21 @@ class TerminalApp:
         # Create a Checkbutton using the custom style for showing/hiding results section 
         style = ttk.Style()
         style.configure("Custom.TCheckbutton", foreground="black", background="white")
-        toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Results Panel", command=self.toggle_visibility, style="Custom.TCheckbutton")
+        toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Results Panel", command=self.toggle_results_panel, style="Custom.TCheckbutton")
         toggle_visibility_button.grid(row=14, column=1, pady=1, padx=7, sticky="w")
-
+        
         # _____________________________Profile Theme_____________________________________
-        theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme)
-        theme_button.grid(row=3, column=4, padx=10, pady=5)
+        
+        # Configure a smaller style for the button
+        style = ttk.Style()
+        style.configure("Small.TButton", font=("TkDefaultFont", 10), padding=3, background="lightblue")
+
+        # Apply the style to the "Theme" button
+        theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme, style="Small.TButton")
+        theme_button.grid(row=3, column=4, padx=5, pady=3)
+        
+##        theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme)
+##        theme_button.grid(row=3, column=4, padx=10, pady=5)
 
         self.reset_var = tk.BooleanVar()
         
@@ -199,6 +266,13 @@ class TerminalApp:
         self.monitor_simulation_var = tk.BooleanVar()
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
         monitor_simulation_checkbutton.grid(row=13, column=1, pady=1, padx=7, sticky="w")
+        
+        
+        # Create a clickable "Report a bug" label
+        report_bug_label = tk.Label(self.root, text="Report a bug", fg="red", cursor="hand2")
+        report_bug_label.grid(row=14, column=0, sticky="w")
+        report_bug_label.bind("<Button-1>", lambda e: self.open_contact_page(e))
+        
 
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
@@ -324,9 +398,15 @@ class TerminalApp:
         self.logo_simulitica = self.logo_simulitica.subsample(5, 5)  # Adjust the subsample as needed
 
         # Create Labels with the images
-        self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
-        self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
-        self.OF_label.configure(background="white")
+##        self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
+##        self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
+##        self.OF_label.configure(background="white")
+
+        style = ttk.Style()
+        style.configure('White.TButton', background='white')
+        self.OF_version_button = ttk.Button(text="OF version", command=self.select_openfoam_version, image=self.logo_openfoam, style='White.TButton')
+        self.OF_version_button.image=self.logo_openfoam
+        self.OF_version_button.grid(row=10, column=0, pady=1, padx=10, sticky="ew")
 
         self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
         self.simLabel.grid(row=11, column=0, pady=1, padx=10, sticky="ew")
@@ -340,7 +420,7 @@ class TerminalApp:
     # -------------- Main logos -------------------------- 
     
     # Toggle function for action bar visibility
-    def toggle_visibility(self):
+    def toggle_results_panel(self):
         self.show_first_column = not self.show_first_column
 
     # Toggle the visibility of buttons in the first column
@@ -1422,6 +1502,89 @@ _____________________________________________________
 
         # Wait for Gnuplot to finish
         gnuplot_process.wait()
+        
+    #____________________________________________ sourcing OF __________________________________________________    
+    # Sourcing openfoam (version option)
+    def source_openfoam(self, version, popup):
+        paths = {
+            "8": "/opt/openfoam8/etc/bashrc",
+            "9": "/opt/openfoam9/etc/bashrc",
+            "10": "/opt/openfoam10/etc/bashrc",
+            "11": "/opt/openfoam11/etc/bashrc",
+            "2212": "/usr/lib/openfoam/openfoam2212/etc/bashrc",
+            "2306": "/usr/lib/openfoam/openfoam2306/etc/bashrc",
+            "2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc"
+        }
+        bashrc_path = paths.get(version)
+        if not bashrc_path:
+            messagebox.showerror("Error", "Unsupported OpenFOAM version specified.")
+            popup.destroy()
+            return  
+
+
+        command = f'source {bashrc_path}'
+        #command = f'source {bashrc_path} && env'
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, executable="/bin/bash")
+        output, errors = process.communicate()
+
+        if errors:
+            error_message = errors.decode()
+            #messagebox.showerror("Error Sourcing OpenFOAM", f"Failed to source OpenFOAM version {version}:\n{error_message}")
+            messagebox.showerror("Error Sourcing OpenFOAM", f"Failed to source OpenFOAM version {version}. Please make sure the chosen version is pre-installed on your system!")
+            popup.destroy()
+            return
+
+        ##print("Command:", command) #FLAG! DEBUGGING
+        ##print("Output:", output.decode())
+        
+        # Decode the output and split it into lines
+        env_vars = output.decode().split('\n')
+    
+        # Set each environment variable in the current Python process
+        for var in env_vars:
+            parts = var.split('=', 1)
+            if len(parts) == 2:
+                os.environ[parts[0]] = parts[1]
+                
+        # If you reach this point, sourcing was successful
+        print(f"Sourced OpenFOAM version {version}!") 
+        messagebox.showinfo("Success", f"Sourced OpenFOAM version {version} successfully!")
+        popup.destroy()
+
+    def select_openfoam_version(self):
+        popup = tk.Toplevel(self.root)
+        popup.title("Select OpenFOAM Version")
+        popup.geometry("350x450")  # Adjust size as necessary
+        selected_version = tk.StringVar()
+
+        # Create a style object for padding
+        style = ttk.Style()
+        style.configure("TRadiobutton", padding=5)
+
+        # OpenFOAM Foundation Versions
+        foundation_frame = ttk.LabelFrame(popup, text="OpenFOAM Foundation", padding=(10, 5))
+        foundation_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
+
+        foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11")]
+        for text, version in foundation_versions:
+            ttk.Radiobutton(foundation_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
+
+        # OpenFOAM Extended Versions
+        extended_frame = ttk.LabelFrame(popup, text="OpenFOAM ESI", padding=(10, 5))
+        extended_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
+
+        extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312")]
+        for text, version in extended_versions:
+            ttk.Radiobutton(extended_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
+
+        # Confirm button calls source_openfoam with the selected version and closes the popup
+        ttk.Button(popup, text="Activate", command=lambda: self.source_openfoam(selected_version.get(), popup)).pack(pady=10)
+    #____________________________________________ sourcing OF __________________________________________________    
+             
+    def open_contact_page(self, event=None):
+        webbrowser.open_new("https://www.simulitica.com/contact")
+
+
         
 if __name__ == "__main__":
     root = tk.Tk()
