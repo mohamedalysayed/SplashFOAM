@@ -6,6 +6,7 @@ import time
 import shutil # For file copying
 import threading # Import threading for running simulation in a separate thread
 import tkinter as tk
+import webbrowser
 from tkinter import ttk, filedialog, font, messagebox, simpledialog, colorchooser
 import tkinter.simpledialog 
 from PIL import Image, ImageTk
@@ -23,11 +24,6 @@ from ReplaceProperties import ReplacePropertiesPopup
 from ReplaceMeshParameters import ReplaceMeshParameters
 from ReplaceControlDictParameters import ReplaceControlDictParameters
 from ReplaceSimulationSetupParameters import ReplaceSimulationSetupParameters
-
-#from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-#from matplotlib.figure import Figure
-
-import webbrowser
 
 
 # Define menu functions
@@ -97,7 +93,9 @@ class TerminalApp:
 
         # Create a Help menu and add it to the menu bar
         help_menu = tk.Menu(menubar, tearoff=0)
-        help_menu.add_command(label="About", command=show_help)
+        help_menu.add_command(label="About", command=self.show_about_message)
+        help_menu.add_command(label="Manual", command=show_help)
+        
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
         menubar.add_cascade(label="Help", menu=help_menu)
         
@@ -235,17 +233,9 @@ class TerminalApp:
         # Configure a smaller style for the button
         style = ttk.Style()
         style.configure("Small.TButton", font=("TkDefaultFont", 10), padding=3, background="lightblue")
-
-        # Apply the style to the "Theme" button
-        theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme, style="Small.TButton")
-        theme_button.grid(row=3, column=4, padx=5, pady=3)
-        
-##        theme_button = ttk.Button(self.root, text="Theme", command=self.change_theme)
-##        theme_button.grid(row=3, column=4, padx=10, pady=5)
-
-        self.reset_var = tk.BooleanVar()
         
         # Create a Checkbutton for resetting profile theme to default 
+        self.reset_var = tk.BooleanVar()
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
         reset_checkbutton = ttk.Checkbutton(self.root, text="Reset theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
@@ -339,6 +329,7 @@ class TerminalApp:
 
         # ... (other initialization code)
         self.selected_file_path = None
+        self.selected_openfoam_path = None  
         self.selected_file_content = None
         self.mesh_dict_file_path = None
         self.control_dict_file_path = None
@@ -347,6 +338,7 @@ class TerminalApp:
         self.geometry_dest_path = None
         self.control_dict_path = None 
         self.separateMeshLogFile = False
+        self.openfoam_sourced = False
         self.caseMeshLogFile = False
         self.solverLogFile = False 
         
@@ -550,6 +542,34 @@ class TerminalApp:
         self.root.update()
         time.sleep(2)  # Sleep for 2 seconds
         welcome_label.destroy()  # Destroy the Label to collapse the popup
+        
+    def show_about_message(self):
+        welcome_message = (
+            "Welcome to Splash OpenFOAM!\n\n"
+            "Your interactive OpenFOAM simulation tool.\n"
+            "_____________________________________________________________________________\n"
+            "\n"
+            "Copyright (C) Simulitica Ltd. - All Rights Reserved\n"
+            "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
+            "Written by Mohamed SAYED (m.sayed@simulitica.com), November 2023.\n"
+            "Proprietary and confidential!\n"
+            "_____________________________________________________________________________"
+        )
+
+        # Create a Toplevel window for the welcome message
+        popup = tk.Toplevel(self.root)
+        popup.title("Splash v1.0")
+        popup.geometry("700x700")  # Adjust the size as needed
+
+        # Create a Label in the Toplevel window to display the welcome message
+        welcome_label = ttk.Label(popup, text=welcome_message, font=("TkDefaultFont", 12), justify='center')
+        welcome_label.pack(padx=10, pady=10)
+
+        # Create a PhotoImage object and set it to the Label
+        welcome_image = tk.PhotoImage(file="Resources/Images/racing-car.png")  # Adjust the path as needed
+        welcome_image = welcome_image.subsample(4, 4)  # Adjust subsampling as needed
+        welcome_label.config(image=welcome_image, compound="top")
+        welcome_label.image = welcome_image  # Keep a reference
         
     # -------------- Welcome Message -------------------------- 
      
@@ -967,11 +987,10 @@ _____________________________________________________
             
                 
     def initialize_simulation(self):
-    
         if self.selected_file_path is None:
             tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
             return
-            
+
         allclean_script = os.path.join(self.selected_file_path, "Allclean")
         if os.path.exists(allclean_script):
             chmod_command = ["chmod", "+x", allclean_script]
@@ -1010,9 +1029,56 @@ _____________________________________________________
             finally:
                 self.stop_progress_bar()
         else:
-            tk.messagebox.showerror("Error", "Allclean script not found!")
-                  
-                  
+#            tk.messagebox.showerror("Error", "Allclean script not found!")
+            # Allclean script not found, creating a temporary script to clean the case
+            temp_clean_script_path = os.path.join(self.selected_file_path, "temp_clean.sh")
+            try:
+                with open(temp_clean_script_path, 'w') as temp_script:
+                    temp_script.write("#!/bin/bash\n")
+                    if hasattr(self, 'selected_openfoam_path') and self.selected_openfoam_path:
+                        temp_script.write(f". {self.selected_openfoam_path}\n")  # Source the selected version
+                    else:
+                        raise Exception("OpenFOAM path is not set. Please select an OpenFOAM version first.")
+                    temp_script.write("cd ${0%/*} || exit 1\n")  # Go to the directory
+                    temp_script.write(". ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions\n")  # Tutorial clean functions
+                    
+                    if 'openfoam' in self.selected_openfoam_path:
+                        if '/opt/openfoam' in self.selected_openfoam_path:
+                            temp_script.write("foamCleanCase\n")  # Foundation version command
+                        elif '/usr/lib/openfoam' in self.selected_openfoam_path:
+                            temp_script.write("foamCleanTutorials\n")  # ESI version command
+                    else:
+                        raise Exception("Unknown OpenFOAM path, no cleaning command executed.")
+
+                chmod_command = ["chmod", "+x", temp_clean_script_path]
+                self.text_box.delete(1.0, tk.END)  # Clear existing content
+                subprocess.run(chmod_command, check=True)
+
+                self.start_progress_bar()
+                # Use Popen to capture real-time output and run the temporary clean script
+                process = subprocess.Popen(["./temp_clean.sh"], cwd=self.selected_file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+
+                while True:
+                    line = process.stdout.readline()
+                    if not line:
+                        break
+                    self.text_box.insert("end", line)
+                    self.text_box.see("end")  # Scroll to the end to show real-time updates
+                    self.text_box.update_idletasks()  # Update the widget
+                   
+                process.communicate()
+
+                if process.returncode == 0:
+                    tk.messagebox.showinfo("Simulation Initialized", "Simulation directory has been reset to default!")
+                else:
+                    raise Exception("Temporary clean script failed to run successfully.")
+            except Exception as e:
+                tk.messagebox.showerror("Error", f"Failed to initialize simulation: {e}")
+            finally:
+                self.stop_progress_bar()
+                if os.path.exists(temp_clean_script_path):
+                    os.remove(temp_clean_script_path)
+                         
     #+++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++           
     # Define this method to read existing parameter values
     def read_simulation_setup_existing_values(self, directory, file_name, param_list):
@@ -1026,7 +1092,7 @@ _____________________________________________________
                 }
             return existing_values
         except FileNotFoundError:
-            tk.messagebox.showerror("Error", f"File not found - {file_path}")
+            #tk.messagebox.showerror("Error", f"File not found - {file_path}")
             self.simulation_running = False  # Let the user try again
             return {}
         except Exception as e:
@@ -1102,6 +1168,9 @@ _____________________________________________________
 
     # --------------------- running the simulation ---------------------------
     def run_simulation(self):
+        if not self.openfoam_sourced:
+            tk.messagebox.showerror("Error", "OpenFOAM is not sourced. Please source matching OpenFOAM version first.")
+            return
         if self.selected_file_path is None:
             tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
             return
@@ -1118,6 +1187,34 @@ _____________________________________________________
     def run_openfoam_simulation(self):
         allrun_script = os.path.join(self.selected_file_path, "Allrun")
         if os.path.exists(allrun_script):
+
+            #_____________________________________________________________________________
+            # Important! to run an existing script we need 2 things; 
+            # 1- header must be bin/bash
+            # 2- sourcing the openfoam version chosen by the user
+            
+            # Read the current content of the Allrun script
+            print(f"Selected OpenFOAM path: {self.selected_openfoam_path}")  # Debug print
+            with open(allrun_script, "r") as file:
+                lines = file.readlines()
+
+            # Ensure the first line is '#!/bin/bash'
+            if not lines[0].startswith("#!/bin/bash"):
+                lines[0] = "#!/bin/bash\n"
+
+            source_command = f". {self.selected_openfoam_path}\n" if self.selected_openfoam_path else ""
+
+            # Insert or replace source command after the first line
+            if len(lines) > 1 and lines[1].strip().startswith('. '):
+                lines[1] = source_command  # Replace the existing source command
+            else:
+                lines.insert(1, source_command)  # Insert a new source command after the shebang line
+
+            # Write the modified content back to the Allrun script
+            with open(allrun_script, "w") as file:
+                file.writelines(lines)
+            #_____________________________________________________________________________
+
             chmod_command = ["chmod", "+x", allrun_script]
             subprocess.run(chmod_command, check=True)
 
@@ -1531,8 +1628,12 @@ _____________________________________________________
             error_message = errors.decode()
             #messagebox.showerror("Error Sourcing OpenFOAM", f"Failed to source OpenFOAM version {version}:\n{error_message}")
             messagebox.showerror("Error Sourcing OpenFOAM", f"Failed to source OpenFOAM version {version}. Please make sure the chosen version is pre-installed on your system!")
+            self.openfoam_sourced = False
             popup.destroy()
             return
+        else: 
+            self.selected_openfoam_path = bashrc_path  # Update the path
+
 
         ##print("Command:", command) #FLAG! DEBUGGING
         ##print("Output:", output.decode())
@@ -1549,6 +1650,8 @@ _____________________________________________________
         # If you reach this point, sourcing was successful
         print(f"Sourced OpenFOAM version {version}!") 
         messagebox.showinfo("Success", f"Sourced OpenFOAM version {version} successfully!")
+        self.openfoam_sourced = True
+        return True
         popup.destroy()
 
     def select_openfoam_version(self):
@@ -1577,8 +1680,16 @@ _____________________________________________________
         for text, version in extended_versions:
             ttk.Radiobutton(extended_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
-        # Confirm button calls source_openfoam with the selected version and closes the popup
-        ttk.Button(popup, text="Activate", command=lambda: self.source_openfoam(selected_version.get(), popup)).pack(pady=10)
+        def activate_and_close():
+            version = selected_version.get()
+            if version:
+                self.source_openfoam(version, popup)
+                popup.destroy()
+
+        ttk.Button(popup, text="Activate", command=activate_and_close).pack(pady=10)
+    
+#        # Confirm button calls source_openfoam with the selected version and closes the popup
+#        ttk.Button(popup, text="Activate", command=lambda: self.source_openfoam(selected_version.get(), popup)).pack(pady=10)
     #____________________________________________ sourcing OF __________________________________________________    
              
     def open_contact_page(self, event=None):
