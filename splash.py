@@ -197,7 +197,7 @@ class TerminalApp:
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
         # Create a button to plot results using xmgrace
-        self.plot_results_xmgrace_button = ttk.Button(self.root, text="Plot Results", command=self.plot_results_xmgrace)
+        self.plot_results_xmgrace_button = ttk.Button(self.root, text="Xmgrace", command=self.plot_results_xmgrace)
         self.plot_results_xmgrace_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
 
@@ -218,9 +218,9 @@ class TerminalApp:
         self.style.configure("Custom.Horizontal.TProgressbar", thickness=20, troughcolor="lightgray", background="lightblue")
         
         # Test button [10-12 taken!]
-        self.magic_box_button = ttk.Button(self.root, text="Magic box!", command=self.magic_box)
-        self.magic_box_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.magic_box_button, "Magicbox! click to see what's inside :)")
+        self.paraview_button = ttk.Button(self.root, text="Paraview", command=self.paraview_application)
+        self.paraview_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
+        self.add_tooltip(self.paraview_button, "Paraview! click here you won't regret it ;)")
 
         # Create a Checkbutton using the custom style for showing/hiding results section 
         style = ttk.Style()
@@ -297,7 +297,7 @@ class TerminalApp:
         self.simulation_running = False
         
         # Initialize the available fuels to choose from
-        self.fuels = ["Methanol", "Ammonia", "Dodecane"]
+        self.fuels = ["Propane", "Gasoline", "Ethanol" , "Hydrogen", "Methanol", "Ammonia", "Dodecane", "Heptane"]
         
         # Create a label for the "Fuel Selector" dropdown
         self.fuel_selector_label = ttk.Label(self.root, text="Fuel selector ▼", font=("TkDefaultFont", 12), background="white") # , foreground="green")
@@ -314,7 +314,7 @@ class TerminalApp:
         self.selected_fuel.set(default_value)
 
         # Create a dropdown menu for fuel selection
-        self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=fuels)
+        self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=self.fuels)
         self.fuel_selector.grid(row=1, column=1, pady=1, padx=10, sticky="w")
 
         # Bind an event handler to the <<ComboboxSelected>> event
@@ -344,7 +344,7 @@ class TerminalApp:
         
         # Mesh parameters 
         self.mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"] 
-        self.control_dict_params = ["startTime", "endTime", "deltaT", "writeInterval", "purgeWrite", "maxCo"]
+        self.control_dict_params = ["application", "startFrom", "startTime", "stopAt", "endTime", "deltaT", "writeControl", "writeInterval", "purgeWrite", "writeFormat", "writePrecision", "timePrecision", "runTimeModifiable", "maxCo"]
         
         self.header = """/*--------------------------------*- C++ -*----------------------------------*\\
   =========                 |
@@ -408,9 +408,12 @@ class TerminalApp:
         self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
         self.copyright_label.grid(row=12, column=0, pady=1, padx=10, sticky="ew")
         self.copyright_label.configure(background="white", font="bold")
-        
     # -------------- Main logos -------------------------- 
     
+    def paraview_application(self):
+        subprocess.run(["paraview"], check=True)
+
+                
     # Toggle function for action bar visibility
     def toggle_results_panel(self):
         self.show_first_column = not self.show_first_column
@@ -1175,6 +1178,10 @@ _____________________________________________________
             tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
             return
 
+        # FLAG! In case the controlDict still has more than 1 instance of "writeNow"
+        control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
+        self.replace_write_now_with_end_time(control_dict_path)
+                
         if not self.simulation_running:
             #self.simulation_thread = threading.Thread(target=self.run_openfoam_simulation)
             self.simulation_thread = threading.Thread(target=self.update_control_dict_parameters)
@@ -1221,9 +1228,7 @@ _____________________________________________________
             try:
                 self.start_progress_bar()
 
-                # FLAG! In case the controlDict still has more than 1 instance of "writeNow"
-                control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
-                self.replace_write_now_with_end_time(control_dict_path)
+                
                 
                 # Initiate the text_box with a nice mesh representation! 
                 self.generate_run_visual()
@@ -1459,18 +1464,7 @@ _____________________________________________________
             self.tooltip.destroy()
             del self.tooltip
             
-    def magic_box(self): # Fixing the issue of updating process with the modification in controlDict | FLAG!
     
-        if not self.solverLogFile:
-            messagebox.showinfo("No solver run!", "No simulation was run to help you with :/")
-            return
-            
-        # Manually touch the controlDict file
-        control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
-        try:
-            subprocess.run(["touch", control_dict_path], check=True)
-        except subprocess.CalledProcessError as e:
-            tk.messagebox.showerror("Error", f"Error touching controlDict: {e.stderr}")
 
                   
     def setup_ui(self):
@@ -1705,6 +1699,22 @@ if __name__ == "__main__":
     app = TerminalApp(root)
     root.mainloop()
     
+    
+#    def magic_box(self): # Fixing the issue of updating process with the modification in controlDict | FLAG!
+#    
+#        if not self.solverLogFile:
+#            messagebox.showinfo("No solver run!", "No simulation was run to help you with :/")
+#            return
+#            
+#        # Manually touch the controlDict file
+#        control_dict_path = os.path.join(self.selected_file_path, "system", "controlDict")
+#        try:
+#            subprocess.run(["touch", control_dict_path], check=True)
+#        except subprocess.CalledProcessError as e:
+#            tk.messagebox.showerror("Error", f"Error touching controlDict: {e.stderr}")
+            
+            
+            
 #    def load_image(self, image_type):
 #        file_path = filedialog.askopenfilename(filetypes=[
 #            ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp"),

@@ -16,7 +16,7 @@ class ReplaceControlDictParameters:
 
             self.popup = tk.Toplevel(parent.root)
             self.popup.title("Update ControlDict Parameters")
-            self.popup.geometry("300x450")
+            self.popup.geometry("400x800")
 
             # Create a label for the "ControlDict Parameters" group
             control_dict_label = ttk.Label(self.popup, text="ControlDict Parameters", font=("TkDefaultFont", 15, "bold"),
