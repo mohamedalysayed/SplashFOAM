@@ -295,6 +295,10 @@ class ReplaceSimulationSetupParameters:
         self.fuel_combobox = ttk.Combobox(injection_combustion_frame, values=fuel_options, state="readonly")
         self.fuel_combobox.pack(pady=10)
 
+        # Create a button in the injection_combustion_frame
+        self.physicalProperties_button = ttk.Button(injection_combustion_frame, text="Fuel Physical Properties", command=self.parent.browse_directory)
+        self.physicalProperties_button.pack(pady=10)
+
         # Configure the style to set the background color of options to white
         style = ttk.Style()
         style.configure("White.TCombobox", fieldbackground="white")
