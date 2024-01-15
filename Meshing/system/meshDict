@@ -2,31 +2,59 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  10
+    \\  /    A nd           | Version:  Splash OpenFOAM v1.0
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version         2;
+    version         2306;
     format          ascii;
     class           dictionary;
     location        "system";
     object          meshDict;
 }
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 surfaceFile     "CAD.stl";
 
-minCellSize 0.03;
+maxCellNo 15000; // Replace 1000000 with your desired maximum cell count
 
-maxCellSize 0.06;
+minCellSize 0.0002;
 
-boundaryCellSize 0.05;
+maxCellSize 0.0004;
+
+boundaryCellSize 0.0003;
 
 boundaryLayers
 {
-    nLayers 3;
-    thicknessRatio 1.2;
-    maxFirstLayerThickness 0.5;
+    nLayers 4;
+    optimiseLayer 1; 
+    untangleLayers 1; // active by default; 0 to disable
+    thicknessRatio 1.15;
+    maxFirstLayerThickness 0.0001;
+    
+    
+    optimisationParameters
+    {
+        // Number of iterations in the procedure for smoothing normal vectors in the boundary layer
+        nSmoothNormals 1; 
+        // Number of iterations in the smoothing procedure. 
+        maxNumIterations 5; 
+        // The ratio between the maximum allowed layer thickness and the estimated feature size.
+        featureSizeFactor 0.3; 
+        // Calculates the surface normal vectors, and aligns boundary-layer edges to point in the normal direction
+        reCalculateNormals 2; 
+        // Controls the maximum difference of the layer thickness between the two neighbouring points, divided by the distance between the points.
+        relThicknessTol 0.1; 
+    }
 }
 
+workflowControl
+{
+    stopAfter boundaryLayerRefinement;
+    restartFromLatestStep 0; 
+}
+
+// 1 for active; 0 for disabled -> Stops the meshing process when it's not possible to capture all the features of the input geometry
+enforceGeometryConstraints 0; 
 // ************************************************************************* //
