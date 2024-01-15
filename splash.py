@@ -96,6 +96,7 @@ class TerminalApp:
         help_menu.add_command(label="About", command=self.show_about_message)
         help_menu.add_command(label="Manual", command=show_help)
         
+        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="lightblue")
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
         menubar.add_cascade(label="Help", menu=help_menu)
         
@@ -200,6 +201,18 @@ class TerminalApp:
         self.plot_results_xmgrace_button = ttk.Button(self.root, text="Xmgrace", command=self.plot_results_xmgrace)
         self.plot_results_xmgrace_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
+        
+        
+        #______________Splash-GPT_____________________
+#        # Create an entry field for user input
+#        self.splash_GPT_entry = tk.Entry(root, width=30)
+#        self.splash_GPT_entry.grid(row=8, column=5, pady=1, padx=10, sticky="ew")
+
+#        # Create a button to initiate interaction
+#        self.interact_button = tk.Button(root, text="Splash-GPT it!", command=self.interact_with_splash_gpt)
+#        self.interact_button.grid(row=9, column=5, pady=1, padx=10, sticky="ew")
+        #______________Splash-GPT_____________________
+
 
         # Create a button to execute the command
         self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
@@ -343,14 +356,14 @@ class TerminalApp:
         self.solverLogFile = False 
         
         # Mesh parameters 
-        self.mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "thicknessRatio", "maxFirstLayerThickness"] 
+        self.mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "optimiseLayer", "untangleLayers", "thicknessRatio", "maxFirstLayerThickness", "nSmoothNormals", "maxNumIterations", "featureSizeFactor", "reCalculateNormals", "relThicknessTol", "restartFromLatestStep", "enforceGeometryConstraints"] # "stopAfter"
         self.control_dict_params = ["application", "startFrom", "startTime", "stopAt", "endTime", "deltaT", "writeControl", "writeInterval", "purgeWrite", "writeFormat", "writePrecision", "timePrecision", "runTimeModifiable", "maxCo"]
         
         self.header = """/*--------------------------------*- C++ -*----------------------------------*\\
   =========                 |
   \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\\\    /   O peration     | Website:  https://openfoam.org
-    \\\\  /    A nd           | Version:  10
+    \\\\  /    A nd           | Version:  Splash OpenFOAM v1.0
      \\\\/     M anipulation  |
 \\*---------------------------------------------------------------------------*/\n"""
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
@@ -360,27 +373,6 @@ class TerminalApp:
     # -------------- Main logos --------------------------    
     def add_logos(self):
 
-###        # Load and display openfoam logo
-###        self.logo_openfoam = Image.open("Resources/Logos/openfoam_logo.png")  
-###        self.logo_openfoam = self.logo_openfoam.resize((140, 40))
-###        self.logo_openfoam = ImageTk.PhotoImage(self.logo_openfoam)
-###        self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
-###        self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
-###        self.OF_label.configure(background="white")
-###        
-###        # Load and display SMLT logo
-###        self.logo_simulitica = Image.open("Resources/Logos/simulitica_logo.png") 
-###        self.logo_simulitica = self.logo_simulitica.resize((140, 70))
-###        self.logo_simulitica = ImageTk.PhotoImage(self.logo_simulitica)
-###        self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
-###        self.simLabel.grid(row=11, column=0, pady=10, padx=10, sticky="ew")
-###        self.simLabel.configure(background="white")
-
-###        # Create a label for copyright text
-###        self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
-###        self.copyright_label.grid(row=12, column=0, pady=10, padx=10, sticky="ew")
-###        self.copyright_label.configure(background="white", font="bold")
-
         # Create PhotoImage objects directly from image files
         self.logo_openfoam = tk.PhotoImage(file="Resources/Logos/openfoam_logo.png")
         self.logo_simulitica = tk.PhotoImage(file="Resources/Logos/simulitica_logo.png")
@@ -388,11 +380,6 @@ class TerminalApp:
         # Resize images if needed
         self.logo_openfoam = self.logo_openfoam.subsample(2, 2)  # Adjust the subsample as needed
         self.logo_simulitica = self.logo_simulitica.subsample(5, 5)  # Adjust the subsample as needed
-
-        # Create Labels with the images
-##        self.OF_label = tk.Label(self.root, image=self.logo_openfoam)
-##        self.OF_label.grid(row=10, column=0, pady=10, padx=10, sticky="ew")
-##        self.OF_label.configure(background="white")
 
         style = ttk.Style()
         style.configure('White.TButton', background='white')
@@ -577,20 +564,6 @@ class TerminalApp:
     # -------------- Welcome Message -------------------------- 
      
      # -------------- Splash background image(s) --------------------------  
-       
-###    def add_bgImage(self):
-
-###        # Load and display openfoam logo
-###        self.splash_bgImage = Image.open("Resources/Images/racing-car.jpg")  
-###        self.splash_bgImage = self.splash_bgImage.resize((800, 600))
-###        ##self.splash_bgImage = Image.open("Resources/Images/bubbles.jpg")  
-###        ##self.splash_bgImage = self.splash_bgImage.resize((1300, 850))
-###        #self.splash_bgImage = Image.open("Resources/Images/airplaneEngine.jpg")  
-###        #self.splash_bgImage = self.splash_bgImage.resize((1300, 950))
-###        self.splash_bgImage = ImageTk.PhotoImage(self.splash_bgImage)
-###        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-###        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=13)
-###        self.splash_bgImage_label.configure(background="white")  
 
     # Static bg image (png directly loaded with tk.PhotoImage)
     def add_bgImage(self):
@@ -608,55 +581,6 @@ class TerminalApp:
         self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
         self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=8)
         self.splash_bgImage_label.configure(background="white")
-
-        # Dynamic bg jpg images (uses PIL - NOT good when packaging)
-####    def add_bgImage(self):
-####        self.splash_bgImage_label = tk.Label(self.root)
-####        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=14)
-####        self.splash_bgImage_label.configure(background="white")
-####        self.show_next_image()
-
-####    def show_next_image(self):
-####        image_path = self.image_paths[self.current_image_index]
-####        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
-
-####        # Load and display the next image in the list
-####        splash_bgImage = Image.open(image_path)
-####        splash_bgImage = splash_bgImage.resize((800, 600))
-####        splash_bgImage = ImageTk.PhotoImage(splash_bgImage)
-####        self.splash_bgImage_label.configure(image=splash_bgImage)
-####        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
-
-####        # Schedule the next image after the total time delay
-####        self.root.after(self.time_delay, self.show_next_image)
-
-####    def start_slideshow(self):
-####        # Start the slideshow after the pre-specified delay
-####        self.root.after(self.time_delay, self.show_next_image)
-
-      # Dynamic bg png images (directly loaded with tk.PhotoImage)
-##    def add_bgImage(self):
-##        self.splash_bgImage_label = tk.Label(self.root)
-##        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=14)
-##        self.splash_bgImage_label.configure(background="white")
-##        self.show_next_image()
-
-##    def show_next_image(self):
-##        image_path = self.image_paths[self.current_image_index]
-##        self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
-
-##        # Load and display the next image in the list
-##        splash_bgImage = tk.PhotoImage(file=image_path)
-##        self.splash_bgImage_label.configure(image=splash_bgImage)
-##        self.splash_bgImage_label.image = splash_bgImage  # Keep a reference to prevent garbage collection
-
-##        # Schedule the next image after the total time delay
-##        self.root.after(self.time_delay, self.show_next_image)
-
-##    def start_slideshow(self):
-##        # Start the slideshow after the pre-specified delay
-##        self.root.after(self.time_delay, self.show_next_image)
-
 
         # -------------- Splash background image(s) -------------------------- 
             
@@ -717,16 +641,8 @@ class TerminalApp:
             def open_paraview():
                 subprocess.run(["paraview", geometry_dest], check=True)
                 popup.destroy()
-                
-            # Load logos (jpg)
-###            freecad_logo = Image.open(freecad_logo_path).resize((160, 50), Image.ANTIALIAS)
-###            gmsh_logo = Image.open(gmsh_logo_path).resize((80, 70), Image.ANTIALIAS)
-###            paraview_logo = Image.open(paraview_logo_path).resize((200, 40), Image.ANTIALIAS)
 
-###            freecad_logo = ImageTk.PhotoImage(freecad_logo)
-###            gmsh_logo = ImageTk.PhotoImage(gmsh_logo)
-###            paraview_logo = ImageTk.PhotoImage(paraview_logo)
-            
+            # Load logos
             freecad_logo = tk.PhotoImage(file=freecad_logo_path)
             freecad_logo = freecad_logo.subsample(4, 4)
             gmsh_logo = tk.PhotoImage(file=gmsh_logo_path)
@@ -1089,10 +1005,15 @@ _____________________________________________________
         try:
             with open(file_path, "r") as file:
                 file_content = file.read()
+#                existing_values = {
+#                    param: match.group(1) for param in param_list
+#                    for match in re.finditer(f'{param}\\s+([^;]+)(;|;//.*)', file_content)
+#                }
                 existing_values = {
-                    param: match.group(1) for param in param_list
-                    for match in re.finditer(f'{param}\\s+([^;]+)(;|;//.*)', file_content)
+                    param: match.group(1).strip() for param in param_list
+                    for match in re.finditer(f'{param}[ \\t]+([^;]+?)(;|[ \\t]*//.*)', file_content)
                 }
+
             return existing_values
         except FileNotFoundError:
             #tk.messagebox.showerror("Error", f"File not found - {file_path}")
@@ -1112,13 +1033,14 @@ _____________________________________________________
         # Specify the list of parameters for each file
         constant_params = {
             "transportProperties": ["transportModel", "nu"],
-            "thermophysicalProperties": ["molWeight", "Cp", "Hf", "mu", "Pr"],
+            "thermophysicalProperties": ["equationOfState", "molWeight", "Cp", "Hf", "mu", "Pr"],
             "turbulenceProperties": ["simulationType", "RASModel", "printCoeffs"]
             # more files can be added in a similar fashion
         }
         system_params = {
-            #"fvSchemes": ["param7", "param8", "param9"],
-            "fvSolution": ["nOuterCorrectors", "nCorrectors", "nNonOrthogonalCorrectors"]
+            "fvSchemes": ["turbulence", "energy", "method"],
+            "fvSolution": ["nOuterCorrectors", "nCorrectors", "nNonOrthogonalCorrectors", "pMinFactor", "pMaxFactor"],
+            "snappyHexMeshDict": ["castellatedMesh", "snap", "addLayers", "maxLocalCells", "maxGlobalCells", "minRefinementCells", "maxLoadUnbalance", "nCellsBetweenLevels", "nSmoothPatch", "tolerance", "nSolveIter", "nRelaxIter", "nFeatureSnapIter", "implicitFeatureSnap", "explicitFeatureSnap", "multiRegionFeatureSnap"]
         }
 
         # Read existing values for constant parameters
@@ -1688,8 +1610,8 @@ _____________________________________________________
              
     def open_contact_page(self, event=None):
         webbrowser.open_new("https://www.simulitica.com/contact")
-
-
+    def splash_GPT_page(self, event=None):
+        webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
         
 if __name__ == "__main__":
     root = tk.Tk()

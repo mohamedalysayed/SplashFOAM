@@ -5,24 +5,14 @@ cd "${0%/*}" || exit 1
 
 #of2306
 . /usr/lib/openfoam/openfoam2306/etc/bashrc
+#of2312
+#. /usr/lib/openfoam/openfoam2312/etc/bashrc
+
+# Setting the number of utilized cores
+export OMP_NUM_THREADS=4  # Replace '4' with the desired number of threads
 
 # Source tutorial run functions
 . "$WM_PROJECT_DIR/bin/tools/RunFunctions"
-
-#### Define a spinner to entertain the user while the mesh is being created
-###spinner() {
-###  local pid=$1
-###  local delay=0.1
-###  local spinstr='|/-\'
-###  while ps -p $pid > /dev/null; do
-###    local temp=${spinstr#?}
-###    printf " [%c]  " "$spinstr"
-###    local spinstr=$temp${spinstr%"$temp"}
-###    sleep $delay
-###    printf "\b\b\b\b\b\b"
-###  done
-###  printf "    \b\b\b\b"
-###}
 
 # Removing old mesh
 rm -f log.cartesianMesh 
@@ -38,8 +28,7 @@ echo "Mesh is being crafted, please hang on... " &
 echo
 # build the mesh in cartesian mode 
 cartesianMesh > log.cartesianMesh & 
-###spinner $! 
-
+wait
 echo "Mesh is successfully generated! Now creating the vtk files for you..." &
 
 # Extract ClockTime value from log.cartesianMesh
@@ -50,11 +39,13 @@ sleep_time=$((clock_time + 1))
 sleep $sleep_time # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
 
 # Saving the mesh in VTK format (for CAD viewers)
+wait # Wait for the previous background process to finish
 runApplication foamToVTK 
-sleep 1 
+wait # Wait for the previous background process to finish
 runApplication paraFoam   
 
 echo "Checking mesh quality..." &
+wait
 runApplication checkMesh 
 echo "Mesh quality checked! Click on 'Load mesh quality' to view the report."
 echo
