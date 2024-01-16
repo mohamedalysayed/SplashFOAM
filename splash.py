@@ -119,24 +119,6 @@ class TerminalApp:
         # Add a background image
         self.add_bgImage()
         
-        #________________Sliding images_________________
-###        # Sliding images
-###        self.current_image_index = 0
-###        self.image_paths = [
-###            #"Resources/Images/airplaneEngine.jpg",
-###            "Resources/Images/airplaneEngine.png",
-###            #"Resources/Images/racing-car.jpg",
-###            "Resources/Images/racing-car.png",
-###            #"Resources/Images/bubbles.jpg",
-###            "Resources/Images/bubbles.png",
-###            #"Resources/Images/watermeloni.jpeg"
-###            "Resources/Images/watermeloni.png"
-###        ]
-###        self.time_delay = 2500  # Setting the time delay in milliseconds
-###        self.add_bgImage()
-###        self.start_slideshow()
-        #________________Sliding images_________________
-        
         # A dictionary to define a help message for each mesh parameter 
         self.PARAMETER_HELP = {
         "minCellSize": "minCellSize:\nSpecify the minimum cell size [in meters]. As a first guess you might take divide the size of the smallest element in your geometry divided by 2!",
@@ -147,20 +129,16 @@ class TerminalApp:
         # Create a button to import a geometry
         style = ttk.Style()
         style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
-        #style.configure("TButton", padding=10, relief="flat", background="cyan", foreground="black") 
-        #style.configure("TButton", padding=10, relief="solid", background="#ffffe0", foreground="black")
-        #style.configure("TButton", width=15, height=10, relief="solid", background="#ffffe0", foreground="black") # thinner buttons 
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
         self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.import_button, "Click to import the geometry to be simulated")     
         # Allow the button to expand horizontally with the window
         #root.columnconfigure(0, weight=1)   
         
-        # Create a button to open a directory dialog
-        self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
-        self.browse_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.browse_button, "Click to change the physical properties of your fluid")
-        self.geometry_loaded = False
+        ## Create a button to open a directory dialog
+        #self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
+        #self.browse_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
+        #self.add_tooltip(self.browse_button, "Click to change the physical properties of your fluid")
         
         # Create a mesh type variable (set it so "Cartesian" as a default)
         self.mesh_type_var = tk.StringVar(value="Cartesian")
@@ -168,51 +146,39 @@ class TerminalApp:
         
         # Create a button to create the mesh
         self.create_mesh_button = ttk.Button(self.root, text="Create Mesh", command=self.create_mesh)
-        self.create_mesh_button.grid(row=2, column=0, pady=1, padx=10, sticky="ew")
+        self.create_mesh_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.create_mesh_button, "Click to start building your mesh")
         
         # Create a button to load the case directory
         self.load_case_button = ttk.Button(self.root, text="Load Case", command=self.load_case)
-        self.load_case_button.grid(row=3, column=0, pady=1, padx=10, sticky="ew")
+        self.load_case_button.grid(row=2, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.load_case_button, "Click to choose the running directory of your case")
         
         # Create a button to initialize the command execution
         self.initialize_simulation_button = ttk.Button(self.root, text="Initialize Simulation", command=self.initialize_simulation)
-        self.initialize_simulation_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
+        self.initialize_simulation_button.grid(row=3, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.initialize_simulation_button, "Click to initialize/reset your simulation")
         
         # Create a button to configure the simulation settings before run
         self.configure_simulation_button = ttk.Button(self.root, text="Configure Simulation", command=self.open_simulation_setup_popup)
-        self.configure_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
+        self.configure_simulation_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.configure_simulation_button, "Click to configure your simulation")
         
         # Create a button to run simulation
         self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
-        self.run_simulation_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
+        self.run_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.run_simulation_button, "Click to start your simulation")
         
         # Stop Simulation Button
         self.stop_simulation_button = ttk.Button(self.root, text="Stop Simulation", command=self.stop_simulation)
-        self.stop_simulation_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
+        self.stop_simulation_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.stop_simulation_button, "Click to terminate your simulation")
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
         # Create a button to plot results using xmgrace
         self.plot_results_xmgrace_button = ttk.Button(self.root, text="Xmgrace", command=self.plot_results_xmgrace)
-        self.plot_results_xmgrace_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
+        self.plot_results_xmgrace_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
-        
-        
-        #______________Splash-GPT_____________________
-#        # Create an entry field for user input
-#        self.splash_GPT_entry = tk.Entry(root, width=30)
-#        self.splash_GPT_entry.grid(row=8, column=5, pady=1, padx=10, sticky="ew")
-
-#        # Create a button to initiate interaction
-#        self.interact_button = tk.Button(root, text="Splash-GPT it!", command=self.interact_with_splash_gpt)
-#        self.interact_button.grid(row=9, column=5, pady=1, padx=10, sticky="ew")
-        #______________Splash-GPT_____________________
-
 
         # Create a button to execute the command
         self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
@@ -232,7 +198,7 @@ class TerminalApp:
         
         # Test button [10-12 taken!]
         self.paraview_button = ttk.Button(self.root, text="Paraview", command=self.paraview_application)
-        self.paraview_button.grid(row=9, column=0, pady=1, padx=10, sticky="ew")
+        self.paraview_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.paraview_button, "Paraview! click here you won't regret it ;)")
 
         # Create a Checkbutton using the custom style for showing/hiding results section 
@@ -275,18 +241,17 @@ class TerminalApp:
         report_bug_label = tk.Label(self.root, text="Report a bug", fg="red", cursor="hand2")
         report_bug_label.grid(row=14, column=0, sticky="w")
         report_bug_label.bind("<Button-1>", lambda e: self.open_contact_page(e))
-        
 
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
         #checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(1, 0), padx=10)
-        checkMesh_button.grid(row=2, column=1, pady=1, padx=10, sticky="ew")
+        checkMesh_button.grid(row=1, column=1, pady=1, padx=10, sticky="ew")
         checkMesh_button['width'] = 18  # Adjust the width as needed
         
-        checkMesh_button = ttk.Button(self.root, text="Load log file", command=self.load_log_file)
-        #checkMesh_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
-        checkMesh_button.grid(row=2, column=2, pady=1, padx=1, sticky="ew")
-        checkMesh_button['width'] = 9  # Adjust the width as needed
+        solverLog_button = ttk.Button(self.root, text="Load log file", command=self.load_log_file)
+        #solverLog_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
+        solverLog_button.grid(row=1, column=2, pady=1, padx=1, sticky="ew")
+        solverLog_button['width'] = 9  # Adjust the width as needed
         
         # Add the search widget to the main app
         self.search_widget = SearchWidget(root, self.text_box)
@@ -312,8 +277,8 @@ class TerminalApp:
         # Initialize the available fuels to choose from
         self.fuels = ["Propane", "Gasoline", "Ethanol" , "Hydrogen", "Methanol", "Ammonia", "Dodecane", "Heptane"]
         
-        # Create a label for the "Fuel Selector" dropdown
-        self.fuel_selector_label = ttk.Label(self.root, text="Fuel selector ▼", font=("TkDefaultFont", 12), background="white") # , foreground="green")
+        ## Create a label for the "Fuel Selector" dropdown
+        #self.fuel_selector_label = ttk.Label(self.root, text="Fuel selector ▼", font=("TkDefaultFont", 12), background="white") # , foreground="green")
         #self.fuel_selector_label.grid(row=0, column=1, pady=1, padx=10, sticky="w") # can be shown when needed! FLAG
 
         # Define the fuel options
@@ -327,11 +292,11 @@ class TerminalApp:
         self.selected_fuel.set(default_value)
 
         # Create a dropdown menu for fuel selection
-        self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=self.fuels)
-        self.fuel_selector.grid(row=1, column=1, pady=1, padx=10, sticky="w")
+#        self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=self.fuels)
+#        self.fuel_selector.grid(row=1, column=1, pady=1, padx=10, sticky="w")
 
         # Bind an event handler to the <<ComboboxSelected>> event
-        self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
+        #self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
        
         # Create a label for status messages
         self.status_label = ttk.Label(self.root, text="")
@@ -354,6 +319,7 @@ class TerminalApp:
         self.openfoam_sourced = False
         self.caseMeshLogFile = False
         self.solverLogFile = False 
+        self.geometry_loaded = False
         
         # Mesh parameters 
         self.mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "optimiseLayer", "untangleLayers", "thicknessRatio", "maxFirstLayerThickness", "nSmoothNormals", "maxNumIterations", "featureSizeFactor", "reCalculateNormals", "relThicknessTol", "restartFromLatestStep", "enforceGeometryConstraints"] # "stopAfter"
@@ -549,7 +515,7 @@ class TerminalApp:
         # Create a Toplevel window for the welcome message
         popup = tk.Toplevel(self.root)
         popup.title("Splash v1.0")
-        popup.geometry("700x700")  # Adjust the size as needed
+        popup.geometry("750x700")  # Adjust the size as needed
 
         # Create a Label in the Toplevel window to display the welcome message
         welcome_label = ttk.Label(popup, text=welcome_message, font=("TkDefaultFont", 12), justify='center')
@@ -575,11 +541,11 @@ class TerminalApp:
 
         # Resize the image if needed
         #self.splash_bgImage = self.splash_bgImage.zoom(2)  # Adjust the zoom factor as needed
-        self.splash_bgImage = self.splash_bgImage.subsample(5, 5)  # Adjust the subsample as needed
+        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)  # Adjust the subsample as needed
 
         # Create a label to display the image
         self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-        self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=8)
+        self.splash_bgImage_label.grid(row=11, column=3, pady=1, padx=10, sticky="ew", rowspan=5)
         self.splash_bgImage_label.configure(background="white")
 
         # -------------- Splash background image(s) -------------------------- 
@@ -1005,15 +971,15 @@ _____________________________________________________
         try:
             with open(file_path, "r") as file:
                 file_content = file.read()
-#                existing_values = {
-#                    param: match.group(1) for param in param_list
-#                    for match in re.finditer(f'{param}\\s+([^;]+)(;|;//.*)', file_content)
-#                }
+##                existing_values = {
+##                    param: match.group(1) for param in param_list
+##                    for match in re.finditer(f'{param}\\s+([^;]+)(;|;//.*)', file_content)
+##                }
                 existing_values = {
                     param: match.group(1).strip() for param in param_list
                     for match in re.finditer(f'{param}[ \\t]+([^;]+?)(;|[ \\t]*//.*)', file_content)
                 }
-
+            
             return existing_values
         except FileNotFoundError:
             #tk.messagebox.showerror("Error", f"File not found - {file_path}")
@@ -1038,6 +1004,7 @@ _____________________________________________________
             # more files can be added in a similar fashion
         }
         system_params = {
+            #"fvSchemes": ["div(phi,U)", "div(phi,k)", "div(phi,epsilon)", "div(phi,omega)", "turbulence", "energy", "method"],
             "fvSchemes": ["turbulence", "energy", "method"],
             "fvSolution": ["nOuterCorrectors", "nCorrectors", "nNonOrthogonalCorrectors", "pMinFactor", "pMaxFactor"],
             "snappyHexMeshDict": ["castellatedMesh", "snap", "addLayers", "maxLocalCells", "maxGlobalCells", "minRefinementCells", "maxLoadUnbalance", "nCellsBetweenLevels", "nSmoothPatch", "tolerance", "nSolveIter", "nRelaxIter", "nFeatureSnapIter", "implicitFeatureSnap", "explicitFeatureSnap", "multiRegionFeatureSnap"]
@@ -1385,14 +1352,12 @@ _____________________________________________________
         if hasattr(self, "tooltip"):
             self.tooltip.destroy()
             del self.tooltip
-            
-    
-
-                  
+                
     def setup_ui(self):
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
-        self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
+        #self.text_box.grid(row=3, column=1, columnspan=4, padx=10, pady=1, sticky="ew", rowspan=8)
+        self.text_box.grid(row=2, column=1, columnspan=4, padx=10, pady=1, sticky="nsew", rowspan=9)
         self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
         #self.text_box.configure(foreground="#ffff00", background="black", font=("courier", 13, "bold"))
 
@@ -1427,7 +1392,7 @@ _____________________________________________________
 
         # Create a vertical scrollbar for the Text widget
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=3, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
+        self.text_box_scrollbar.grid(row=2, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set      
 
     def change_theme(self):
