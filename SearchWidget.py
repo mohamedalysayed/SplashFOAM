@@ -9,7 +9,7 @@ class SearchWidget:
         # Create a search bar
         search_default_sentence = "Search here!"
         self.search_entry = tk.Entry(root, width=30)
-        self.search_entry.grid(row=2, column=3, padx=10, pady=(0, 10))
+        self.search_entry.grid(row=1, column=3, padx=10, pady=(0, 10))
         self.search_entry.insert(0, search_default_sentence)
         self.search_entry.configure(background="white", foreground="blue")
 
@@ -17,7 +17,7 @@ class SearchWidget:
         #style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
         self.search_button = tk.Button(root, text="Find", command=self.search_text)
         self.search_button.configure(relief="flat", background="lightblue", foreground="black", font=(12))
-        self.search_button.grid(row=2, column=4, padx=10, pady=(0, 5))
+        self.search_button.grid(row=1, column=4, padx=10, pady=(0, 5))
 
         self.result_label = tk.Label(root, text="")
         self.result_label.grid(row=1, column=3, pady=(0, 5))
