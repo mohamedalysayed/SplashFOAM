@@ -96,13 +96,25 @@ class TerminalApp:
         help_menu.add_command(label="About", command=self.show_about_message)
         help_menu.add_command(label="Manual", command=show_help)
         
-        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="lightblue")
+        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
         menubar.add_cascade(label="Help", menu=help_menu)
         
         # Display the menu bar
         root.config(menu=menubar)
         # Create a menu bar -----------------<
+        
+        # ============= Time Recorder ====================
+        # Record the start time
+        self.start_time = time.time()
+
+        # Create a label for the timer
+        self.timer_label = tk.Label(root, text="00:00:00", font=("Helvetica", 48), fg="blue")
+        self.timer_label.grid(row=0, column=5, sticky="w")
+
+        # Start updating the timer
+        self.update_timer()
+        # ============= Time Recorder ====================
         
         # Display a welcome message
         self.show_welcome_message()
@@ -864,11 +876,28 @@ _____________________________________________________
             self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
             self.initialize_simulation_button["state"] = tk.NORMAL # Enable the "Initialize Simulation" button
             
+            # Create a dummy 'splash.foam' file in the selected directory
+            try:
+                dummy_file_path = os.path.join(selected_directory, "splash.foam")
+                with open(dummy_file_path, 'w') as dummy_file:
+                    dummy_file.write('')  # Write an empty string to create an empty file
+            except Exception as e:
+                self.status_label.config(text=f"Error creating 'splash.foam': {e}", foreground="red")
+                
+            # Check for constant/polyMesh directory
+            polyMesh_path = os.path.join(selected_directory, "constant", "polyMesh")
+            if os.path.isdir(polyMesh_path):
+                # Prompt the user
+                response = messagebox.askyesno("Mesh Confirmation", "This case might have a ready mesh, do you want to load it?")
+                if response:
+                    self.paraview_application()  # Call the function to load the mesh
+            
             # Monitor residuals using foamMonitor | FLAG - monitoring residuals starts here 
             # self.monitor_simulation()
         else:
             self.status_label.config(text="No case directory selected.", foreground="red")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
+            self.initialize_simulation_button["state"] = tk.DISABLED  # Disable the "Initialize Simulation" button
             
                 
     def initialize_simulation(self):
@@ -1392,7 +1421,7 @@ _____________________________________________________
 
         # Create a vertical scrollbar for the Text widget
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=2, column=1, columnspan=4, pady=1, sticky='nse', rowspan=8)
+        self.text_box_scrollbar.grid(row=2, column=4, columnspan=1, pady=1, sticky='nse', rowspan=9)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set      
 
     def change_theme(self):
@@ -1577,7 +1606,14 @@ _____________________________________________________
         webbrowser.open_new("https://www.simulitica.com/contact")
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
-        
+    
+    def update_timer(self):
+        elapsed_time = int(time.time() - self.start_time)
+        minutes, seconds = divmod(elapsed_time, 60)
+        hours, minutes = divmod(minutes, 60)
+        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}")
+        self.root.after(1000, self.update_timer)
+
 if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', False)  # Disable menu tear-off
@@ -1585,7 +1621,7 @@ if __name__ == "__main__":
     root.wm_title("Splash v1.0")  # Set window manager title
     app = TerminalApp(root)
     root.mainloop()
-    
+        
     
 #    def magic_box(self): # Fixing the issue of updating process with the modification in controlDict | FLAG!
 #    

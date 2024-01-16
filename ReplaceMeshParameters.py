@@ -11,25 +11,34 @@ class ReplaceMeshParameters:
         self.entry_widgets = {}  # Dictionary to store references to entry widgets
         self.new_values = {}
 
-        # Create a canvas and a scrollbar
+        # Create a canvas, a vertical scrollbar, and a horizontal scrollbar
         self.canvas = tk.Canvas(parent.root, bg="#f0f0f0", bd=2, relief="ridge")
         self.canvas.grid(row=2, column=5, sticky="nsew", rowspan=12)
-        self.scrollbar = tk.Scrollbar(parent.root, orient="vertical", command=self.canvas.yview)
-        self.scrollbar.grid(row=2, column=6, sticky='ns', rowspan=12)
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.frame = ttk.Frame(self.canvas, style="My.TFrame")  # Custom style for ttk Frame
 
-        # Create a style for the frame
-        style = ttk.Style()
-        #style.configure("My.TFrame", background="#f0f0f0", borderwidth=1, relief="sunken")
+        self.v_scrollbar = tk.Scrollbar(parent.root, orient="vertical", command=self.canvas.yview)
+        self.v_scrollbar.grid(row=2, column=6, sticky='ns', rowspan=12)
+
+        self.h_scrollbar = tk.Scrollbar(parent.root, orient="horizontal", command=self.canvas.xview)
+        self.h_scrollbar.grid(row=14, column=5, sticky='ew')  # Adjust the grid position
+
+        self.canvas.configure(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
+
+        self.frame = ttk.Frame(self.canvas, style="My.TFrame")
         self.canvas.create_window((0, 0), window=self.frame, anchor="nw")
 
-        # Update the scroll region when the size of the frame changes
-        self.frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.frame.bind("<Configure>", self.on_frame_configure)
+        
         
         # Create a label for the "Mesh Parameters" group
         mesh_label = ttk.Label(self.frame, text="Mesh Parameters", font=("TkDefaultFont", 15, "bold"), foreground="red")
         mesh_label.grid(row=3, column=5, pady=10, sticky="w")
+        
+        # Create a separator
+        separator = ttk.Separator(self.frame, orient='horizontal')
+        separator.grid(row=4, column=5, columnspan=3, pady=5, sticky='ew')  # Adjust grid positioning as needed
+        
+        # Dictionary to store references to checkbutton variables
+        self.comment_vars = {}
         
         # Create entry fields for each parameter
         for index, param in enumerate(mesh_params):
@@ -41,6 +50,12 @@ class ReplaceMeshParameters:
             entry.grid(row=index+9, column=6)  # Adjust grid positioning as needed
             self.new_values[param] = entry_var
             self.entry_widgets[param] = entry_var
+            
+            # Create a variable to track the checkbutton state
+            comment_var = tk.BooleanVar()
+            checkbutton = tk.Checkbutton(self.frame, text="Disable", variable=comment_var)
+            checkbutton.grid(row=index+9, column=7)  # Adjust grid positioning as needed
+            self.comment_vars[param] = comment_var
         
         # Create a frame for workflow controls
         workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control")
@@ -90,6 +105,10 @@ class ReplaceMeshParameters:
                 return last_choice
         return None
 
+    def on_frame_configure(self, event=None):
+        """Reset the scroll region to encompass the inner frame"""
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
     def save_last_selected_choice(self, choice):
         # Save the last selected choice to a configuration file
         config_file_path = "last_selected_choice.txt"
@@ -97,6 +116,10 @@ class ReplaceMeshParameters:
             config_file.write(choice)
 
     def update_mesh_parameters(self):
+    
+        # Initialize body_content
+        body_content = self.parent.selected_mesh_file_content
+
         # Get the new values from the entry fields
         new_values = {param: entry.get() for param, entry in self.new_values.items()}
         
@@ -111,6 +134,33 @@ class ReplaceMeshParameters:
         
         # Update mesh parameters (you need to implement this part based on your application's needs)
         self.replace_mesh_parameters(new_values)
+        
+        # Initialize body_content with the latest file content
+        with open(self.parent.mesh_dict_file_path, 'r') as file:
+            body_content = file.read()
+
+        # Get the new values from the entry fields and apply them
+        for param, entry_var in self.new_values.items():
+            value = entry_var.get()  # gets the new values from the user 
+            if value != "":
+                old_pattern = f'{param}\\s*([^;]+);'
+                new_pattern = f'{param} {value};'
+                body_content = re.sub(old_pattern, new_pattern, body_content)
+
+        # Apply commenting logic
+        for param, var in self.comment_vars.items():
+            if var.get():
+                # If the checkbutton is checked, comment out the parameter in the file content
+                pattern = f'(?m)^\s*{param}\s+[^;]+;'
+                replacement = f'// {param} {self.new_values[param].get()};'
+                body_content = re.sub(pattern, replacement, body_content)
+
+        # Write the updated content to the file
+        with open(self.parent.mesh_dict_file_path, 'w') as file:
+            file.write(body_content)
+            
+        # Maybe give a hint something was updated 
+        self.parent.status_label.config(text="Mesh parameters' values are updated successfully!")
 
     def replace_mesh_parameters(self, new_values):
         meshdict_start = 'FoamFile\n{'
@@ -172,4 +222,5 @@ class ReplaceMeshParameters:
         # Functionality to close/hide the ReplaceMeshParameters frame
         # This could be simply hiding the frame, resetting its state, etc.
         self.canvas.grid_forget()  # Hide the canvas
-        self.scrollbar.grid_forget()  # Hide the scrollbar
+        self.v_scrollbar.grid_forget()  # Hide the vertical scrollbar
+        self.h_scrollbar.grid_forget()  # Hide the horizontal scrollbar
