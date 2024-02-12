@@ -109,7 +109,7 @@ class TerminalApp:
         self.start_time = time.time()
 
         # Create a label for the timer
-        self.timer_label = tk.Label(root, text="00:00:00", font=("Helvetica", 48), fg="blue")
+        self.timer_label = tk.Label(root, text="00:00:00", font=("Helvetica", 48), bg="black", fg="lightblue")
         self.timer_label.grid(row=0, column=5, sticky="w")
 
         # Start updating the timer
