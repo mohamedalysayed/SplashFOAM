@@ -105,15 +105,36 @@ class TerminalApp:
         # Create a menu bar -----------------<
         
         # ============= Time Recorder ====================
-        # Record the start time
-        self.start_time = time.time()
+##        self.elapsed_time_file = "elapsed_time.txt"  # File to store the elapsed time
+
+##        # Load the last recorded time
+##        self.start_time = self.load_last_recorded_time()
+
+##        # Create a label for the timer
+##        self.timer_label = tk.Label(root, text="00:00:00.000", font=("Helvetica", 36), bg="black", fg="lightblue")
+##        self.timer_label.grid(row=0, column=5, sticky="w")
+
+##        # Start updating the timer
+##        self.update_timer()
+
+##        # Bind the window close event
+##        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        self.elapsed_time_file = "elapsed_time.txt"  # File to store the elapsed time
+
+        # Load the last recorded time
+        self.start_time = self.load_last_recorded_time()
 
         # Create a label for the timer
-        self.timer_label = tk.Label(root, text="00:00:00", font=("Helvetica", 48), bg="black", fg="lightblue")
-        self.timer_label.grid(row=0, column=5, sticky="w")
+        self.timer_label = tk.Label(root, text="00:00:00.0", font=("Helvetica", 36), bg="black", fg="lightblue")
+        self.timer_label.grid(row=2, column=5, sticky="w")
 
         # Start updating the timer
         self.update_timer()
+
+        # Bind the window close event
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
         # ============= Time Recorder ====================
         
         # Display a welcome message
@@ -387,12 +408,14 @@ class TerminalApp:
         if self.show_first_column:
             #self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="ew")
             #self.browse_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
-            self.splash_bgImage_label.grid(row=0, column=5, pady=1, padx=10, sticky="ew", rowspan=8)
+            self.splash_bgImage_label.grid(row=3, column=5, pady=1, padx=10, sticky="ew", rowspan=8)
+            self.timer_label.grid(row=2, column=5, sticky="w")
             # ... (toggle other buttons)
         else:
             #self.import_button.grid_remove()
             #self.browse_button.grid_remove()
             self.splash_bgImage_label.grid_remove()
+            self.timer_label.grid_remove()
             # ... (toggle other buttons)
     
     def browse_directory(self):
@@ -1607,13 +1630,65 @@ _____________________________________________________
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
     
-    def update_timer(self):
-        elapsed_time = int(time.time() - self.start_time)
-        minutes, seconds = divmod(elapsed_time, 60)
-        hours, minutes = divmod(minutes, 60)
-        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}")
-        self.root.after(1000, self.update_timer)
+##    def update_timer(self):
+##        elapsed_time = time.time() - self.start_time
+##        # Extract milliseconds
+##        milliseconds = int((elapsed_time - int(elapsed_time)) * 1000)
+##        minutes, seconds = divmod(int(elapsed_time), 60)
+##        hours, minutes = divmod(minutes, 60)
+##        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}")
+##        self.root.after(50, self.update_timer)  # Update the timer every 50 milliseconds for a smoother effect
 
+##    def load_last_recorded_time(self):
+##        if os.path.exists(self.elapsed_time_file):
+##            with open(self.elapsed_time_file, "r") as file:
+##                try:
+##                    last_time = float(file.read())
+##                    return time.time() - last_time
+##                except ValueError:
+##                    return time.time()
+##        else:
+##            return time.time()
+
+##    def save_elapsed_time(self):
+##        with open(self.elapsed_time_file, "w") as file:
+##            elapsed_time = time.time() - self.start_time
+##            file.write(str(elapsed_time))
+
+##    def on_closing(self):
+##        self.save_elapsed_time()
+##        self.root.destroy()
+
+    def update_timer(self):
+        elapsed_time = time.time() - self.start_time
+        # Extract tenths of a second
+        tenths_of_second = int((elapsed_time - int(elapsed_time)) * 10)
+        minutes, seconds = divmod(int(elapsed_time), 60)
+        hours, minutes = divmod(minutes, 60)
+        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
+        self.root.after(100, self.update_timer)  # Update the timer every 100 milliseconds to match the tenths of a second
+
+    def load_last_recorded_time(self):
+        if os.path.exists(self.elapsed_time_file):
+            with open(self.elapsed_time_file, "r") as file:
+                try:
+                    last_time = float(file.read())
+                    return time.time() - last_time
+                except ValueError:
+                    return time.time()
+        else:
+            return time.time()
+
+    def save_elapsed_time(self):
+        with open(self.elapsed_time_file, "w") as file:
+            elapsed_time = time.time() - self.start_time
+            file.write(str(elapsed_time))
+
+    def on_closing(self):
+        self.save_elapsed_time()
+        self.root.destroy()
+        
+    
 if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', False)  # Disable menu tear-off
