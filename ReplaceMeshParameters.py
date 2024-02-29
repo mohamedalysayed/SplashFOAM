@@ -13,14 +13,15 @@ class ReplaceMeshParameters:
 
         # Create a canvas, a vertical scrollbar, and a horizontal scrollbar
         self.canvas = tk.Canvas(parent.root, bg="#f0f0f0", bd=2, relief="ridge")
-        self.canvas.grid(row=2, column=5, sticky="nsew", rowspan=12)
+        self.canvas.grid(row=0, column=1, sticky="nsew", rowspan=12)        
+        
 
         self.v_scrollbar = tk.Scrollbar(parent.root, orient="vertical", command=self.canvas.yview)
-        self.v_scrollbar.grid(row=2, column=6, sticky='ns', rowspan=12)
-
+        self.v_scrollbar.grid(row=0, column=2, sticky='ns', rowspan=12)
+        
         self.h_scrollbar = tk.Scrollbar(parent.root, orient="horizontal", command=self.canvas.xview)
-        self.h_scrollbar.grid(row=14, column=5, sticky='ew')  # Adjust the grid position
-
+        self.h_scrollbar.grid(row=12, column=1, sticky='ew')  # Adjust the grid position
+        
         self.canvas.configure(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
 
         self.frame = ttk.Frame(self.canvas, style="My.TFrame")
@@ -31,36 +32,36 @@ class ReplaceMeshParameters:
         
         # Create a label for the "Mesh Parameters" group
         mesh_label = ttk.Label(self.frame, text="Mesh Parameters", font=("TkDefaultFont", 15, "bold"), foreground="red")
-        mesh_label.grid(row=3, column=5, pady=10, sticky="w")
-        
+        mesh_label.grid(row=1, column=1, pady=10, sticky="w")
+                
         # Create a separator
         separator = ttk.Separator(self.frame, orient='horizontal')
-        separator.grid(row=4, column=5, columnspan=3, pady=5, sticky='ew')  # Adjust grid positioning as needed
-        
+        separator.grid(row=2, column=1, columnspan=3, pady=5, sticky='ew')  # Adjust grid positioning as needed
+                
         # Dictionary to store references to checkbutton variables
         self.comment_vars = {}
         
         # Create entry fields for each parameter
         for index, param in enumerate(mesh_params):
             label = tk.Label(self.frame, text=f"{param}", font=("TkDefaultFont", 10, "bold"))
-            label.grid(row=index+9, column=5, sticky="w")  # Adjust grid positioning as needed
+            label.grid(row=index+9, column=1, sticky="w")  # Adjust grid positioning as needed            
             entry_var = tk.StringVar()
             entry_var.set(existing_values.get(param, ""))
             entry = tk.Entry(self.frame, textvariable=entry_var, fg="blue", font=("TkDefaultFont", 10))
-            entry.grid(row=index+9, column=6)  # Adjust grid positioning as needed
+            entry.grid(row=index+9, column=2)  # Adjust grid positioning as needed
             self.new_values[param] = entry_var
             self.entry_widgets[param] = entry_var
             
             # Create a variable to track the checkbutton state
             comment_var = tk.BooleanVar()
             checkbutton = tk.Checkbutton(self.frame, text="Disable", variable=comment_var)
-            checkbutton.grid(row=index+9, column=7)  # Adjust grid positioning as needed
+            checkbutton.grid(row=index+9, column=3)  # Adjust grid positioning as needed
             self.comment_vars[param] = comment_var
         
         # Create a frame for workflow controls
         workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control")
-        workflow_frame.grid(row=25, column=5, padx=10, pady=20, sticky="nsew")  # Adjust the row and column as needed
-
+        workflow_frame.grid(row=24, column=1, padx=10, pady=20, sticky="nsew")  # Adjust the row and column as needed
+        
         # Create radio buttons for workflow options
         self.selected_workflow = tk.StringVar()
         self.workflow_options = ["templateGeneration", "surfaceTopology", "surfaceProjection",
@@ -87,8 +88,13 @@ class ReplaceMeshParameters:
         style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         # Update Mesh Parameters Button
         update_button = ttk.Button(self.frame, text="Update", command=self.update_mesh_parameters)
-        update_button.grid(row=100, column=5, pady=10)  # Adjust grid row as needed
-
+        update_button.grid(row=98, column=1, pady=10)  # Adjust grid row as needed
+        
+        # Close Replace Mesh Parameters Button
+        self.close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters)
+        self.close_button.grid(row=98, column=2, pady=10)  # Placed right next to the Update buttons
+        
+                
     def extract_stop_after_value(self, mesh_file_content):
         # Extract the stopAfter value from the workflowControl block in the meshDict file
         match = re.search(r'workflowControl\s*{[^}]*stopAfter\s+(\w+);', mesh_file_content, re.DOTALL)
@@ -210,12 +216,10 @@ class ReplaceMeshParameters:
         # Show a confirmation popup after ReplaceMeshParameters finishes
         confirmation = tk.messagebox.askyesno("Confirmation", "Do you want to start meshing?")
         if confirmation:
-            #self.popup.destroy()  # Close the ReplaceMeshParameters popup
-            self.close_replace_mesh_parameters()  # Hide or reset the ReplaceMeshParameters interface
+            # Start meshing!
             self.parent.start_meshing()   # Start the meshing process
         else:
             tk.messagebox.showinfo("Meshing Canceled", "No mesh will be created.")
-            self.close_replace_mesh_parameters()
             
             
     def close_replace_mesh_parameters(self):
