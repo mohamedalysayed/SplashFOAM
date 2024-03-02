@@ -105,35 +105,25 @@ class TerminalApp:
         # Create a menu bar -----------------<
         
         # ============= Time Recorder ====================
-##        self.elapsed_time_file = "elapsed_time.txt"  # File to store the elapsed time
-
-##        # Load the last recorded time
-##        self.start_time = self.load_last_recorded_time()
-
-##        # Create a label for the timer
-##        self.timer_label = tk.Label(root, text="00:00:00.000", font=("Helvetica", 36), bg="black", fg="lightblue")
-##        self.timer_label.grid(row=0, column=5, sticky="w")
-
-##        # Start updating the timer
-##        self.update_timer()
-
-##        # Bind the window close event
-##        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-
         # File to save elapsed time (for license type)
         self.elapsed_time_file = "elapsed_time.txt"  # File to store the elapsed time
         
         # License parameters
         self.license_duration = 50 * 60 * 60 # 29 * 60 * 60  # 29 hours in seconds
+        #self.license_duration = 1 * 60 * 60  # Testing
         self.notice_period_before_end = 1 * 60 * 60  # 1 hour in seconds
 
         # Load the last recorded time
         self.start_time = self.load_last_recorded_time()
+        
+        # Create a label for the "Elapsed time:" text
+        self.elapsed_time_label = tk.Label(root, text="Elapsed time", font=("Helvetica", 24), bg="white", fg="darkblue")
+        self.elapsed_time_label.grid(row=2, column=10, sticky="ew")
 
         # Create a label for the timer
-        self.timer_label = tk.Label(root, text="00:00:00.0", font=("Helvetica", 36), bg="black", fg="lightblue")
-#        self.timer_label.grid(row=2, column=7, sticky="w")
-        self.timer_label.grid(row=2, column=10, sticky="w")
+        self.timer_label = tk.Label(root, text="00:00:00.0", font=("Helvetica", 36, "bold"), bg="white", fg="darkblue")
+        self.timer_label.grid(row=3, column=10, sticky="ew")
+
         
         # Start updating the timer
         self.update_timer()
@@ -421,18 +411,16 @@ class TerminalApp:
 
     # Toggle the visibility of buttons in the first column
         if self.show_first_column:
-            #self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="ew")
-            #self.browse_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
-##            self.splash_bgImage_label.grid(row=3, column=7, pady=1, padx=10, sticky="ew", rowspan=8)
+
+            # The following elements are shown by default
             self.splash_bgImage_label.grid(row=3, column=10, pady=1, padx=10, sticky="ew", rowspan=8)        
-            self.timer_label.grid(row=2, column=10, sticky="w")
-            # ... (toggle other buttons)
-        else:
-            #self.import_button.grid_remove()
-            #self.browse_button.grid_remove()
-            self.splash_bgImage_label.grid_remove()
+            self.elapsed_time_label.grid(row=2, column=10, sticky="ew")
+            self.timer_label.grid(row=3, column=10, sticky="ew")
+        else:            
+            self.elapsed_time_label.grid_remove()
             self.timer_label.grid_remove()
-            # ... (toggle other buttons)
+            self.splash_bgImage_label.grid_remove()
+
     
     def browse_directory(self):
         selected_file = filedialog.askopenfilename()
@@ -530,7 +518,7 @@ class TerminalApp:
         "\n"
         "Copyright (C) Simulitica Ltd. - All Rights Reserved\n"
         "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
-        "Written by Mohamed SAYED (m.sayed@simulitica.com), November 2023.\n"
+        "Written by Mohamed SAYED (mohamed.sayed@simulitica.com), November 2023.\n"
         "Proprietary and confidential!\n"
         "_____________________________________________________________________________"
         )
@@ -558,7 +546,7 @@ class TerminalApp:
             "\n"
             "Copyright (C) Simulitica Ltd. - All Rights Reserved\n"
             "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
-            "Written by Mohamed SAYED (m.sayed@simulitica.com), November 2023.\n"
+            "Written by Mohamed SAYED (mohamed.sayed@simulitica.com), November 2023.\n"
             "Proprietary and confidential!\n"
             "_____________________________________________________________________________"
         )
@@ -583,6 +571,42 @@ class TerminalApp:
      # -------------- Splash background image(s) --------------------------  
 
     # Static bg image (png directly loaded with tk.PhotoImage)
+##    def add_bgImage(self):
+##        # Specify the image path
+##        image_path = "Resources/Images/racing-car.png"
+
+##        # Create a tk.PhotoImage object directly from the file
+##        self.splash_bgImage = tk.PhotoImage(file=image_path)
+
+##        # Resize the image if needed
+##        #self.splash_bgImage = self.splash_bgImage.zoom(2)  # Adjust the zoom factor as needed
+##        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)  # Adjust the subsample as needed
+
+##        # Create a label to display the image
+##        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
+###        self.splash_bgImage_label.grid(row=11, column=3, pady=1, padx=10, sticky="ew", rowspan=5)
+##        self.splash_bgImage_label.grid(row=3, column=10, pady=1, padx=10, sticky="ew", rowspan=8)        
+##        self.splash_bgImage_label.configure(background="white")
+    
+#    def add_bgImage(self):
+#        # Specify the image path
+#        image_path = "Resources/Images/racing-car.png"
+
+#        # Create a tk.PhotoImage object directly from the file
+#        self.splash_bgImage = tk.PhotoImage(file=image_path)
+
+#        # Resize the image if needed
+#        #self.splash_bgImage = self.splash_bgImage.zoom(2)  # Adjust the zoom factor as needed
+#        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)  # Adjust the subsample as needed
+
+#        # Create a label to display the image
+#        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
+#        self.splash_bgImage_label.grid(row=3, column=10, pady=1, padx=10, sticky="ew", rowspan=8)
+#        self.splash_bgImage_label.configure(background="white")
+
+#        # Make the image clickable
+#        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica"))
+
     def add_bgImage(self):
         # Specify the image path
         image_path = "Resources/Images/racing-car.png"
@@ -590,16 +614,28 @@ class TerminalApp:
         # Create a tk.PhotoImage object directly from the file
         self.splash_bgImage = tk.PhotoImage(file=image_path)
 
-        # Resize the image if needed
-        #self.splash_bgImage = self.splash_bgImage.zoom(2)  # Adjust the zoom factor as needed
-        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)  # Adjust the subsample as needed
+        # Adjust the subsample as needed
+        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
 
-        # Create a label to display the image
-        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-#        self.splash_bgImage_label.grid(row=11, column=3, pady=1, padx=10, sticky="ew", rowspan=5)
-        self.splash_bgImage_label.grid(row=3, column=10, pady=1, padx=10, sticky="ew", rowspan=8)        
-        self.splash_bgImage_label.configure(background="white")
+        # Create a label to display the image, initially without the frame effect
+        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white")
+        self.splash_bgImage_label.grid(row=3, column=10, pady=1, padx=10, sticky="ew", rowspan=8)
 
+        # Bind the hover effect
+        self.splash_bgImage_label.bind("<Enter>", self.on_hover)
+        self.splash_bgImage_label.bind("<Leave>", self.off_hover)
+
+        # Make the image clickable
+        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
+
+    def on_hover(self, event):
+        # Change the label appearance to simulate a frame around it on hover
+        event.widget.config(bg="lightgrey", bd=2, relief="groove")
+
+    def off_hover(self, event):
+        # Revert the label appearance when not hovering over it
+        event.widget.config(bg="white", bd=0, relief="flat")
+    
         # -------------- Splash background image(s) -------------------------- 
             
     # -------------- importing the geometry --------------------------------------------------------------------    
@@ -1660,21 +1696,7 @@ _____________________________________________________
 # --- Timer UNLIMITED version --- 
 
 
-# ------------------------------------------->
-# --- Timer LIMITED version --- 
-##    def update_timer(self):
-##        elapsed_time = time.time() - self.start_time
-##        # Check if elapsed time has reached 25 hours (90000 seconds)
-##        if elapsed_time >= 103860:  # 25 hours * 3600 seconds/hour
-##            self.on_closing()  # Call the closing function to save the time and close the app
-##            return  # Stop the timer and prevent further updates
-
-##        # Extract tenths of a second, minutes, seconds, and hours as before
-##        tenths_of_second = int((elapsed_time - int(elapsed_time)) * 10)
-##        minutes, seconds = divmod(int(elapsed_time), 60)
-##        hours, minutes = divmod(minutes, 60)
-##        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
-##        self.root.after(100, self.update_timer)  # Continue updating the timer every 100 milliseconds
+# ------------------------------- 2.03.2024 --------------------------------
 
     def update_timer(self):
         elapsed_time = time.time() - self.start_time
@@ -1682,7 +1704,7 @@ _____________________________________________________
         minutes, seconds = divmod(remainder, 60)
         tenths_of_second = int((elapsed_time - int(elapsed_time)) * 10)
 
-        # Explicitly cast hours, minutes, and seconds to int for safety
+        # Update the timer label
         self.timer_label.config(text=f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}.{tenths_of_second}")
 
         # Determine the remaining time before the license expires
@@ -1690,24 +1712,32 @@ _____________________________________________________
 
         # Check if it's time to notify about the license expiration
         if 0 < remaining_time <= self.notice_period_before_end:
-            self.notify_license_expiration()
+            self.notify_license_expiration(expiring_soon=True)
+        elif remaining_time <= 0:
+            self.notify_license_expiration(expiring_soon=False)
 
-        # Schedule the next update
-        self.root.after(100, self.update_timer)
-        
-    def notify_license_expiration(self):
-    
+        # Schedule the next update if license has not expired
+        if remaining_time > 0:
+            self.root.after(100, self.update_timer)
+        else:
+            # Optionally delay closing to allow the user to read the message
+            self.root.after(10000, self.root.destroy)  # Closes the app after 10 seconds
+            
+
+    def notify_license_expiration(self, expiring_soon=True):
         # Prevent multiple notifications
         if not hasattr(self, 'license_expiration_notified'):
-        
             self.license_expiration_notified = True  # Set the flag immediately
-            # Calculate the notice period in minutes for the message
-            notice_period_minutes = self.notice_period_before_end / 60
-    
+
+            if expiring_soon:
+                notice_period_minutes = self.notice_period_before_end / 60
+                message = f"License Expiring Soon!\nYour license will expire in less than {notice_period_minutes:.0f} minutes. Please save your work."
+            else:
+                message = "License Expired!\nYour license has already expired. Please renew your license to continue using Splash."
+
             license_message = (
             "\n"
-            f"License Expiring Soon!\n"
-            f"Your license will expire in less than {notice_period_minutes:.0f} minutes. Please save your work.\n\n"
+            f"{message}\n\n"
             "_____________________________________________________________________________\n"
             "\n"
             "Copyright (C) Simulitica Ltd. - All Rights Reserved\n"
@@ -1717,42 +1747,29 @@ _____________________________________________________
             "_____________________________________________________________________________"
             )
 
-            # Create a Toplevel window for the welcome message
+            # Create a Toplevel window for the message
             popup = tk.Toplevel(self.root)
             popup.title("Splash v1.0")
-            popup.geometry("750x700")  # Adjust the size as needed
+            popup.geometry("800x600")  # Adjust the size as needed
 
-            # Create a Label in the Toplevel window to display the welcome message
-            welcome_label = ttk.Label(popup, text=license_message, font=("TkDefaultFont", 12), justify='center')
-            welcome_label.pack(padx=10, pady=10)
+            # Create a Label in the Toplevel window to display the message
+            license_message_label = tk.Label(popup, text=license_message, font=("Helvetica", 14, "bold"), fg="darkred", justify='center')
+            license_message_label.pack(padx=10, pady=10)
 
             # Create a PhotoImage object and set it to the Label
             welcome_image = tk.PhotoImage(file="Resources/Logos/simulitica_icon_logo.png")  # Adjust the path as needed
             welcome_image = welcome_image.subsample(4, 4)  # Adjust subsampling as needed
-            welcome_label.config(image=welcome_image, compound="top")
-            welcome_label.image = welcome_image  # Keep a reference
-            
+            license_message_label.config(image=welcome_image, compound="top")
+            license_message_label.image = welcome_image  # Keep a reference
 
-
-##    def notify_license_expiration(self):
-##        # Prevent multiple notifications
-##        if not hasattr(self, 'license_expiration_notified'):
-##            # Calculate the notice period in minutes for the message
-##            notice_period_minutes = self.notice_period_before_end / 60
-##            messagebox.showwarning("License Expiring Soon",
-##                                   f"Your license will expire in less than {notice_period_minutes:.0f} minutes.\nPlease save your work.")
-##            self.license_expiration_notified = True
-            
-    
-
-## A more general message.            
-#    def notify_license_expiration(self):
-#        # Prevent multiple notifications
-#        if not hasattr(self, 'license_expiration_notified'):
-#            messagebox.showwarning("License Expiring Soon",
-#                                   "Your license will expire soon.\nPlease save your work.")
-#            self.license_expiration_notified = True
+            # Create a "Renew License Now" button inside the popup
+            renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/"))
+            renew_button.pack(pady=20)  # Adjust padding as needed
         
+  
+# https://www.simulitica.com/splash-v10
+# https://www.buymeacoffee.com/simulitica
+            
 # ---------------------------------------------<
 
     def load_last_recorded_time(self):
@@ -1762,6 +1779,9 @@ _____________________________________________________
                     last_time = float(file.read())
                     return time.time() - last_time
                 except ValueError:
+                
+                
+                
                     return time.time()
         else:
             return time.time()

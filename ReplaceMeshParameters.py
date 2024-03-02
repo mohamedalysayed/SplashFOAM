@@ -1,7 +1,8 @@
 import tkinter as tk
 import re
 import os
-from tkinter import ttk, simpledialog
+import shutil
+from tkinter import ttk, simpledialog, filedialog, messagebox
 
 class ReplaceMeshParameters:
     def __init__(self, parent, mesh_params, existing_values):
@@ -90,11 +91,41 @@ class ReplaceMeshParameters:
         update_button = ttk.Button(self.frame, text="Update", command=self.update_mesh_parameters)
         update_button.grid(row=98, column=1, pady=10)  # Adjust grid row as needed
         
-        # Close Replace Mesh Parameters Button
-        self.close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters)
-        self.close_button.grid(row=98, column=2, pady=10)  # Placed right next to the Update buttons
+         # Add "Save Mesh" button
+        self.save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh)
+        self.save_mesh_button.grid(row=98, column=2, pady=10)  # Adjust the position to fit between Update and Close
         
+        # Close Replace Mesh Parameters Button
+        self.close_button = ttk.Button(self.frame, text="Close",                    command=self.close_replace_mesh_parameters)
+        # Adjust the Close button to the next column to make space for "Save Mesh" button
+        self.close_button.grid(row=98, column=3, pady=10)
+
+    # ...............................................................................
+    # Saving the created mesh (polyMesh dir) to a specific location 
+    def save_mesh(self):
+        # Ask the user where to save the folder
+        target_directory = filedialog.askdirectory(title="Select Folder to Save Mesh")
+        if target_directory:  # Proceed only if the user selected a directory
+            try:
+                # Assuming self.parent.mesh_dict_file_path points to a file, get the directory containing that file
+                base_directory = os.path.dirname(self.parent.geometry_dest_path)
+                # Construct the source directory path to the polyMesh folder
+                source_directory = os.path.join(base_directory, "constant", "polyMesh")
                 
+                # Define the destination path including the polyMesh folder name
+                destination_path = os.path.join(target_directory, "polyMesh")
+                
+                # Check if destination path already exists to avoid shutil.copytree error
+                if os.path.exists(destination_path):
+                    shutil.rmtree(destination_path)  # Remove the existing directory to replace it
+                
+                # Copy the entire polyMesh folder to the new location
+                shutil.copytree(source_directory, destination_path)
+                messagebox.showinfo("Success", "Mesh saved successfully!")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to save mesh: {e}")
+    # ...............................................................................
+                        
     def extract_stop_after_value(self, mesh_file_content):
         # Extract the stopAfter value from the workflowControl block in the meshDict file
         match = re.search(r'workflowControl\s*{[^}]*stopAfter\s+(\w+);', mesh_file_content, re.DOTALL)
