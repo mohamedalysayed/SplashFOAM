@@ -212,13 +212,11 @@ class TerminalApp:
         # Create a button to execute the command
         self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
         self.execute_button.grid(row=11, column=4, pady=1, padx=10, sticky="ew")
-#        self.execute_button.grid(row=11, column=1, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
         # Create an entry field for entering the commands by user
         default_sentence =  "top" # Or "htop"
         self.entry = ttk.Entry(self.root, width=10)
-#        self.entry.grid(row=11, column=2, pady=1, padx=10, sticky="ew")
         self.entry.grid(row=11, column=5, pady=1, padx=10, sticky="ew")        
         self.entry.insert(0, default_sentence) 
         self.entry.configure(foreground="blue", background="black")
@@ -236,7 +234,6 @@ class TerminalApp:
         style = ttk.Style()
         style.configure("Custom.TCheckbutton", foreground="black", background="white")
         toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Results Panel", command=self.toggle_results_panel, style="Custom.TCheckbutton")
-#        toggle_visibility_button.grid(row=14, column=1, pady=1, padx=7, sticky="w")
         toggle_visibility_button.grid(row=14, column=4, pady=1, padx=7, sticky="w")        
         
         # _____________________________Profile Theme_____________________________________
@@ -250,7 +247,6 @@ class TerminalApp:
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
         reset_checkbutton = ttk.Checkbutton(self.root, text="Reset theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
-#        reset_checkbutton.grid(row=12, column=1, padx=10, pady=1, sticky="w")
         reset_checkbutton.grid(row=12, column=4, padx=10, pady=1, sticky="w")
                 
         # Store initial profile theme values
@@ -262,14 +258,12 @@ class TerminalApp:
 
         # Create a progress bar with the custom style
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-#        self.progress_bar_canvas.grid(row=12, column=2, padx=50, pady=1)
         self.progress_bar_canvas.grid(row=12, column=5, padx=50, pady=1)                
         self.progress_bar_canvas_flag=True
 
         # Create Checkbutton for monitoring simulation
         self.monitor_simulation_var = tk.BooleanVar()
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
-#        monitor_simulation_checkbutton.grid(row=13, column=1, pady=1, padx=7, sticky="w")
         monitor_simulation_checkbutton.grid(row=13, column=4, pady=1, padx=7, sticky="w")        
         
         # Create a clickable "Report a bug" label
@@ -279,14 +273,10 @@ class TerminalApp:
 
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
-        #checkMesh_button.grid(row=2, column=1, sticky=tk.W, pady=(1, 0), padx=10)
-#        checkMesh_button.grid(row=1, column=1, pady=1, padx=10, sticky="ew")
         checkMesh_button.grid(row=1, column=4, pady=1, padx=10, sticky="ew")
         checkMesh_button['width'] = 18  # Adjust the width as needed
         
         solverLog_button = ttk.Button(self.root, text="Load log file", command=self.load_log_file)
-        #solverLog_button.grid(row=2, column=2, sticky=tk.E, pady=(1, 0), padx=10)
-#        solverLog_button.grid(row=1, column=2, pady=1, padx=1, sticky="ew")
         solverLog_button.grid(row=1, column=5, pady=1, padx=1, sticky="ew")
         solverLog_button['width'] = 9  # Adjust the width as needed
         
@@ -367,7 +357,7 @@ class TerminalApp:
   =========                 |
   \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\\\    /   O peration     | Website:  https://openfoam.org
-    \\\\  /    A nd           | Version:  Splash OpenFOAM v1.0
+    \\\\  /    A nd           | Version:  SplashFOAM v1.0
      \\\\/     M anipulation  |
 \\*---------------------------------------------------------------------------*/\n"""
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
@@ -512,7 +502,7 @@ class TerminalApp:
     # -------------- Welcome Message --------------------------    
     def show_welcome_message(self):
         welcome_message = (
-        "Welcome to Splash OpenFOAM!\n\n"
+        "Welcome to SplashFOAM!\n\n"
         "Your interactive OpenFOAM simulation tool.\n"
         "_____________________________________________________________________________\n"
         "\n"
@@ -520,11 +510,11 @@ class TerminalApp:
         "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
         "Written by Mohamed SAYED (mohamed.sayed@simulitica.com), November 2023.\n"
         "Proprietary and confidential!\n"
-        "_____________________________________________________________________________"
+#        "_____________________________________________________________________________"
         )
 
         # Create a Label to display the welcome message
-        welcome_label = ttk.Label(self.root, text=welcome_message, font=("TkDefaultFont", 12), background="white", justify='center', relief='sol', borderwidth=2)
+        welcome_label = ttk.Label(self.root, text=welcome_message, font=("TkDefaultFont", 12), background="white", justify='center', relief='sol', borderwidth=1)
         welcome_label.grid(row=0, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
 
         # Create a PhotoImage object and set it to the Label
@@ -540,15 +530,15 @@ class TerminalApp:
         
     def show_about_message(self):
         welcome_message = (
-            "Welcome to Splash OpenFOAM!\n\n"
+            "Welcome to SplashFOAM!\n\n"
             "Your interactive OpenFOAM simulation tool.\n"
             "_____________________________________________________________________________\n"
             "\n"
             "Copyright (C) Simulitica Ltd. - All Rights Reserved\n"
             "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
-            "Written by Mohamed SAYED (mohamed.sayed@simulitica.com), November 2023.\n"
-            "Proprietary and confidential!\n"
-            "_____________________________________________________________________________"
+            " Written by Mohamed SAYED (mohamed.sayed@simulitica.com), November 2023.\n"
+            "Proprietary and confidential! \n"
+#            "_____________________________________________________________________________"
         )
 
         # Create a Toplevel window for the welcome message
@@ -1457,39 +1447,57 @@ _____________________________________________________
         if hasattr(self, "tooltip"):
             self.tooltip.destroy()
             del self.tooltip
+
+#                        __        __   _                            _        
+#                        \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
+#                         \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
+#                          \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
+#                           \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
+#                                                                             
+#                                 ____        _           _                           
+#                                / ___| _ __ | | __ _ ___| |__                        
+#                                \___ \| '_ \| |/ _` / __| '_ \                       
+#                                 ___) | |_) | | (_| \__ \ | | |                      
+#                                |____/| .__/|_|\__,_|___/_| |_|                      
+#                                      |_|                                            
+#                          ___                   _____ ___    _    __  __     
+#                         / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
+#                        | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
+#                        | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
+#                         \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
+#                              |_|
                 
     def setup_ui(self):
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
-#        self.text_box.grid(row=2, column=1, columnspan=4, padx=10, pady=1, sticky="nsew", rowspan=9)
         self.text_box.grid(row=2, column=4, columnspan=4, padx=10, pady=1, sticky="nsew", rowspan=9)
         self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
-        #self.text_box.configure(foreground="#ffff00", background="black", font=("courier", 13, "bold"))
 
         splash_welcome_msg = """
-                        _____________________________________________________
-                        __        __   _                            _        
-                        \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
-                         \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
-                          \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
-                           \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
-                                                                             
-                                 ____        _           _                           
-                                / ___| _ __ | | __ _ ___| |__                        
-                                \___ \| '_ \| |/ _` / __| '_ \                       
-                                 ___) | |_) | | (_| \__ \ | | |                      
-                                |____/| .__/|_|\__,_|___/_| |_|                      
-                                      |_|                                            
-                          ___                   _____ ___    _    __  __     
-                         / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
-                        | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
-                        | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
-                         \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
-                              |_|
-                        _____________________________________________________ 
+        
+                        ___________________________________________________________
+
+                              
+                        
+                         __        __   _                            _           
+                         \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___     
+                          \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \    
+                           \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |   
+                            \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/    
+                                                                                 
+                          ____        _           _     _____ ___    _    __  __ 
+                         / ___| _ __ | | __ _ ___| |__ |  ___/ _ \  / \  |  \/  |
+                         \___ \| '_ \| |/ _` / __| '_ \| |_ | | | |/ _ \ | |\/| |
+                          ___) | |_) | | (_| \__ \ | | |  _|| |_| / ___ \| |  | |
+                         |____/| .__/|_|\__,_|___/_| |_|_|   \___/_/   \_\_|  |_|
+                               |_|                                               
+                                          
+                                          
+                                                                                                     
+                        ___________________________________________________________ 
                              
-                               Your gate to efficient CFD production! 
-                        _____________________________________________________
+                                   Your gate to efficient CFD production! 
+                        ___________________________________________________________
     """
         self.text_box.insert(tk.END, splash_welcome_msg)
         # Make the Text widget read-only
@@ -1497,7 +1505,6 @@ _____________________________________________________
 
         # Create a vertical scrollbar for the Text widget
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-#        self.text_box_scrollbar.grid(row=2, column=4, columnspan=1, pady=1, sticky='nse', rowspan=9)
         self.text_box_scrollbar.grid(row=2, column=7, columnspan=1, pady=1, sticky='nse', rowspan=9)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set      
 

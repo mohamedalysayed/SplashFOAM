@@ -46,10 +46,6 @@ class ReplacePropertiesPopup:
             row_counter_plus = row_counter + 1 
 
         # Create an "Update" button that calls the replace_values method for the mixture block
-        style = ttk.Style()
-        
-        #style.configure("TButton", padding=10, relief="flat", background="#3EAAAF", foreground="black")
-        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
         updateButton = ttk.Button(self.popup, text="Update", command=self.replace_mixture_values).grid(row=row_counter,         column=2, pady=10, padx=10)
         addButton = ttk.Button(self.popup, text="Add parameter", command=self.add_missing_parameters).grid(row=row_counter_plus, column=2, pady=10, padx=10)
 
