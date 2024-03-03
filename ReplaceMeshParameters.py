@@ -31,37 +31,47 @@ class ReplaceMeshParameters:
         self.frame.bind("<Configure>", self.on_frame_configure)
         
         
-        # Create a label for the "Mesh Parameters" group
-        mesh_label = ttk.Label(self.frame, text="Mesh Parameters", font=("TkDefaultFont", 15, "bold"), foreground="red")
-        mesh_label.grid(row=1, column=1, pady=10, sticky="w")
-                
-        # Create a separator
+        # Style configuration (optional)
+        style = ttk.Style()
+        style.configure("My.TLabel", font=("TkDefaultFont", 10, "bold"), padding=5)
+        style.configure("My.TEntry", padding=5, foreground="blue")
+        style.configure("My.TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+        style.configure("My.TCheckbutton", padding=5)
+
+        # Modified to use custom styles and added padding
+        mesh_label = ttk.Label(self.frame, text="Mesh Parameters", style="My.TLabel", foreground="red")
+        mesh_label.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="w")
+
         separator = ttk.Separator(self.frame, orient='horizontal')
-        separator.grid(row=2, column=1, columnspan=3, pady=5, sticky='ew')  # Adjust grid positioning as needed
+        separator.grid(row=2, column=1, columnspan=3, pady=5, padx=10, sticky='ew')
                 
         # Dictionary to store references to checkbutton variables
         self.comment_vars = {}
         
-        # Create entry fields for each parameter
+
         for index, param in enumerate(mesh_params):
-            label = tk.Label(self.frame, text=f"{param}", font=("TkDefaultFont", 10, "bold"))
-            label.grid(row=index+9, column=1, sticky="w")  # Adjust grid positioning as needed            
-            entry_var = tk.StringVar()
-            entry_var.set(existing_values.get(param, ""))
-            entry = tk.Entry(self.frame, textvariable=entry_var, fg="blue", font=("TkDefaultFont", 10))
-            entry.grid(row=index+9, column=2)  # Adjust grid positioning as needed
-            self.new_values[param] = entry_var
-            self.entry_widgets[param] = entry_var
+            # Prepend a bullet point to the parameter name
+            bullet_point = u"\u2022"  # Unicode character for a bullet point
+            parameter_with_bullet = f"{bullet_point} {param}"
             
-            # Create a variable to track the checkbutton state
-            comment_var = tk.BooleanVar()
-            checkbutton = tk.Checkbutton(self.frame, text="Disable", variable=comment_var)
-            checkbutton.grid(row=index+9, column=3)  # Adjust grid positioning as needed
+            label = ttk.Label(self.frame, text=parameter_with_bullet, style="My.TLabel")
+            label.grid(row=index+9, column=1, padx=10, sticky="w")
+            entry_var = tk.StringVar(value=existing_values.get(param, ""))
+            entry = ttk.Entry(self.frame, textvariable=entry_var, style="My.TEntry")
+            entry.grid(row=index+9, column=2, padx=10)
+            self.new_values[param] = entry_var
+            self.entry_widgets[param] = entry
+
+            comment_var = tk.BooleanVar(value=False)
+            checkbutton = ttk.Checkbutton(self.frame, text="Disable", variable=comment_var, style="My.TCheckbutton")
+            checkbutton.grid(row=index+9, column=3, padx=10)
             self.comment_vars[param] = comment_var
+
+
         
-        # Create a frame for workflow controls
-        workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control")
-        workflow_frame.grid(row=24, column=1, padx=10, pady=20, sticky="nsew")  # Adjust the row and column as needed
+        # Workflow Control Frame
+        workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control", padding=10)
+        workflow_frame.grid(row=24, column=1, padx=10, pady=20, sticky="ew", columnspan=3)
         
         # Create radio buttons for workflow options
         self.selected_workflow = tk.StringVar()
@@ -84,21 +94,15 @@ class ReplaceMeshParameters:
         if existing_stop_after_value in self.workflow_options:
             self.selected_workflow.set(existing_stop_after_value)
 
-        # Create an "Update" button that calls the update_mesh_parameters method
-        style = ttk.Style()
-        style.configure("TButton", padding=10, relief="flat", background="lightblue", foreground="black")
-        # Update Mesh Parameters Button
-        update_button = ttk.Button(self.frame, text="Update", command=self.update_mesh_parameters)
-        update_button.grid(row=98, column=1, pady=10)  # Adjust grid row as needed
-        
-         # Add "Save Mesh" button
-        self.save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh)
-        self.save_mesh_button.grid(row=98, column=2, pady=10)  # Adjust the position to fit between Update and Close
-        
-        # Close Replace Mesh Parameters Button
-        self.close_button = ttk.Button(self.frame, text="Close",                    command=self.close_replace_mesh_parameters)
-        # Adjust the Close button to the next column to make space for "Save Mesh" button
-        self.close_button.grid(row=98, column=3, pady=10)
+        # Buttons with modified padding and placement
+        update_button = ttk.Button(self.frame, text="Update", command=self.update_mesh_parameters, style="My.TButton")
+        update_button.grid(row=98, column=1, pady=10, padx=10)
+
+        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="My.TButton")
+        save_mesh_button.grid(row=98, column=2, pady=10, padx=10)
+
+        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")
+        close_button.grid(row=98, column=3, pady=10, padx=10)
 
     # ...............................................................................
     # Saving the created mesh (polyMesh dir) to a specific location 
