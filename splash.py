@@ -18,6 +18,16 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 from tkinter.colorchooser import askcolor
 from tkinter.font import Font
 
+import vtk
+from mpl_toolkits import mplot3d
+from stl import mesh
+
+#from vtkmodules.tk.vtkTkRenderWindowInteractor import vtkTkRenderWindowInteractor
+
+
+
+
+
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
 from ReplaceProperties import ReplacePropertiesPopup
@@ -63,6 +73,7 @@ class TerminalApp:
         # Create a File menu and add it to the menu bar
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New", command=file_new)
+        file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl_vtk)
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
@@ -135,6 +146,12 @@ class TerminalApp:
         
         # Display a welcome message
         self.show_welcome_message()
+        
+        # ..............:> Load and display .stl files
+        #self.load_and_display_stl_vtk()
+        
+        # Setup for the VTK render window within Tkinter
+        #self.setup_vtk_render_window()
         
         # Display the main text box widget
         self.setup_ui()
@@ -660,13 +677,14 @@ class TerminalApp:
             # CAD programs logo paths 
             freecad_logo_path = os.path.join("Resources", "Logos", "freecad_logo.png")
             gmsh_logo_path = os.path.join("Resources", "Logos", "gmsh_logo.png")
+            blender_logo_path = os.path.join("Resources", "Logos", "blender_logo.png")
             paraview_logo_path = os.path.join("Resources", "Logos", "paraview_logo.png")
 
 
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
             popup.title("Choose CAD Viewer")
-            popup.geometry("400x550")
+            popup.geometry("400x660")
 
             def open_freecad():
                 subprocess.run(["freecad", geometry_dest, "&"], check=True)
@@ -681,16 +699,36 @@ class TerminalApp:
             def open_gmsh():
                 subprocess.run(["gmsh", geometry_dest, "&"], check=True)
                 popup.destroy()
+    
+            def open_blender():
+                # Adjust this to the actual location of the script
+                ### FLAG: absolute paths should be avoided (move from current better)
+                ##script_path = "/home/mo/Development/Simulitica/Splash/github/test/import_stl_to_blender.py"  
+                
+                # Get the directory of the currently running script
+                current_dir = os.path.dirname(os.path.abspath(__file__))
+                # Construct the full path to the Blender Python import script
+                script_path = os.path.join(current_dir, "import_stl_to_blender.py")
+
+                try:
+                    # Run Blender with the script and the path to the STL file
+                    subprocess.run(["blender", "--python", script_path, "--", geometry_dest], check=True)
+                except subprocess.CalledProcessError as e:
+                    print(f"Failed to open Blender: {e}")
+                finally:
+                    popup.destroy()
 
             def open_paraview():
                 subprocess.run(["paraview", geometry_dest], check=True)
                 popup.destroy()
-
+ 
             # Load logos
             freecad_logo = tk.PhotoImage(file=freecad_logo_path)
             freecad_logo = freecad_logo.subsample(4, 4)
             gmsh_logo = tk.PhotoImage(file=gmsh_logo_path)
             gmsh_logo = gmsh_logo.subsample(9, 9)
+            blender_logo = tk.PhotoImage(file=blender_logo_path)
+            blender_logo = blender_logo.subsample(9, 9)
             paraview_logo = tk.PhotoImage(file=paraview_logo_path)
             paraview_logo = paraview_logo.subsample(9, 9)
 
@@ -702,6 +740,10 @@ class TerminalApp:
             gmsh_button = ttk.Button(popup, text="Open in Gmsh", command=open_gmsh, image=gmsh_logo, compound="top")
             gmsh_button.image = gmsh_logo
             gmsh_button.pack(side=tk.TOP, padx=20, pady=1)
+
+            blender_button = ttk.Button(popup, text="Open in Blender", command=open_blender, image=blender_logo, compound="top")
+            blender_button.image = blender_logo
+            blender_button.pack(side=tk.TOP, padx=20, pady=1)
 
             paraview_button = ttk.Button(popup, text="Open in ParaView", command=open_paraview, image=paraview_logo, compound="top")
             paraview_button.image = paraview_logo
@@ -1691,6 +1733,78 @@ _____________________________________________________
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
 
+
+    def load_and_display_stl(self):
+        root = tk.Tk()
+        root.withdraw()  # Hide the main window
+        stl_file_path = filedialog.askopenfilename(
+            title="Select STL file",
+            filetypes=[("STL files", "*.stl")]
+        )
+        if stl_file_path:
+            # Load the STL file
+            your_mesh = mesh.Mesh.from_file(stl_file_path)
+            
+            # Create a new plot
+            figure = plt.figure()
+            axes = mplot3d.Axes3D(figure)
+
+            # Add the loaded STL mesh to the plot
+            axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors))
+
+            # Auto scale to the mesh size
+            scale = your_mesh.points.flatten('C')
+            axes.auto_scale_xyz(scale, scale, scale)
+
+            # Show the plot to the screen
+            plt.show()
+        else:
+            print("No file selected.")
+            
+    def load_and_display_stl_vtk(self):
+        # Hide the root Tkinter window
+        root = tk.Tk()
+        root.withdraw()
+
+        # Open file dialog to select an STL file
+        stl_file_path = filedialog.askopenfilename(
+            title="Select STL file",
+            filetypes=[("STL files", "*.stl")]
+        )
+
+        if not stl_file_path:
+            print("No file selected.")
+            return
+
+        # Create a reader for the STL file
+        reader = vtk.vtkSTLReader()
+        reader.SetFileName(stl_file_path)
+
+        # Create a mapper
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+        # Create an actor
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+
+        # A renderer and render window
+        renderer = vtk.vtkRenderer()
+        renderWindow = vtk.vtkRenderWindow()
+        renderWindow.AddRenderer(renderer)
+        
+        # Add the actor to the scene
+        renderer.AddActor(actor)
+        renderer.SetBackground(.1, .2, .3)  # Background color
+
+        # A render window interactor (to handle mouse interactions)
+        renderWindowInteractor = vtk.vtkRenderWindowInteractor()
+        renderWindowInteractor.SetRenderWindow(renderWindow)
+
+        # Begin interaction
+        renderWindow.Render()
+        renderWindowInteractor.Start()
+        
 # --- Timer UNLIMITED version --- 
 ###    def update_timer(self):
 ###        elapsed_time = time.time() - self.start_time
@@ -1700,9 +1814,8 @@ _____________________________________________________
 ###        hours, minutes = divmod(minutes, 60)
 ###        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
 ###        self.root.after(100, self.update_timer)  # Update the timer every 100 milliseconds to match the tenths of a second
+
 # --- Timer UNLIMITED version --- 
-
-
 # ------------------------------- 2.03.2024 --------------------------------
 
     def update_timer(self):
