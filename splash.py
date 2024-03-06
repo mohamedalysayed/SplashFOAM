@@ -23,6 +23,7 @@ import vtk
 from mpl_toolkits import mplot3d
 from stl import mesh
 
+
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
 from ReplaceProperties import ReplacePropertiesPopup
@@ -67,7 +68,7 @@ class TerminalApp:
         # Create a File menu and add it to the menu bar
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New", command=file_new)
-        file_menu.add_command(label="Load Geometry (2D)", command=self.load_and_display_stl_2D)
+        #file_menu.add_command(label="Load Geometry (2D)", command=self.load_and_display_stl_2D)
         file_menu.add_command(label="Load Geometry (3D)", command=self.load_and_display_stl_3D)
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
@@ -135,7 +136,7 @@ class TerminalApp:
         self.update_timer()
         
         # Initialize the vg color of the 3D stl CAD
-        self.bg_color_counter = 3
+        self.bg_color_counter = 5
 
         # Bind the window close event
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -1726,6 +1727,7 @@ _____________________________________________________
     def load_and_display_stl_2D(self):
         root = tk.Tk()
         root.withdraw()  # Hide the main window
+        
         stl_file_path = filedialog.askopenfilename(
             title="Select STL file",
             filetypes=[("STL files", "*.stl")]
@@ -1749,7 +1751,7 @@ _____________________________________________________
             plt.show()
         else:
             print("No file selected.")
-            
+
 
     def load_and_display_stl_3D(self):
         # Hide the root Tkinter window
@@ -2016,10 +2018,7 @@ _____________________________________________________
                 try:
                     last_time = float(file.read())
                     return time.time() - last_time
-                except ValueError:
-                
-                
-                
+                except ValueError:   
                     return time.time()
         else:
             return time.time()
