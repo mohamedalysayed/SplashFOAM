@@ -23,7 +23,6 @@ import vtk
 from mpl_toolkits import mplot3d
 from stl import mesh
 
-
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
 from ReplaceProperties import ReplacePropertiesPopup
@@ -68,7 +67,6 @@ class TerminalApp:
         # Create a File menu and add it to the menu bar
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New", command=file_new)
-        #file_menu.add_command(label="Load Geometry (2D)", command=self.load_and_display_stl_2D)
         file_menu.add_command(label="Load Geometry (3D)", command=self.load_and_display_stl_3D)
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
@@ -115,7 +113,9 @@ class TerminalApp:
         # File to save elapsed time (for license type)
         self.elapsed_time_file = "elapsed_time.txt"  # File to store the elapsed time
         
-        # License parameters
+        #---------------------
+        # License parameters #
+        #---------------------
         self.license_duration = 50 * 60 * 60 # 29 * 60 * 60  # 29 hours in seconds
         #self.license_duration = 1 * 60 * 60  # Testing
         self.notice_period_before_end = 1 * 60 * 60  # 1 hour in seconds
@@ -1723,36 +1723,7 @@ _____________________________________________________
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
 
 
-    # This function is only good for quick and dirty 2D stl files!
-    def load_and_display_stl_2D(self):
-        root = tk.Tk()
-        root.withdraw()  # Hide the main window
-        
-        stl_file_path = filedialog.askopenfilename(
-            title="Select STL file",
-            filetypes=[("STL files", "*.stl")]
-        )
-        if stl_file_path:
-            # Load the STL file
-            your_mesh = mesh.Mesh.from_file(stl_file_path)
-            
-            # Create a new plot
-            figure = plt.figure()
-            axes = mplot3d.Axes3D(figure)
-
-            # Add the loaded STL mesh to the plot
-            axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors))
-
-            # Auto scale to the mesh size
-            scale = your_mesh.points.flatten('C')
-            axes.auto_scale_xyz(scale, scale, scale)
-
-            # Show the plot to the screen
-            plt.show()
-        else:
-            print("No file selected.")
-
-
+    # This function is good for quick and dirty 2D/3D stl files!
     def load_and_display_stl_3D(self):
         # Hide the root Tkinter window
         root = tk.Tk()
