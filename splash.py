@@ -136,7 +136,7 @@ class TerminalApp:
         self.update_timer()
         
         # Initialize the vg color of the 3D stl CAD
-        self.bg_color_counter = 5
+        self.bg_color_counter = 0
 
         # Bind the window close event
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
