@@ -67,7 +67,7 @@ class TerminalApp:
         # Create a File menu and add it to the menu bar
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New", command=file_new)
-        file_menu.add_command(label="Load Geometry (3D)", command=self.load_and_display_stl_3D)
+        file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl)
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
@@ -618,7 +618,7 @@ class TerminalApp:
         self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
 
         # Create a label to display the image, initially without the frame effect
-        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white")
+        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white", cursor="hand2")
         self.splash_bgImage_label.grid(row=3, column=10, pady=1, padx=10, sticky="ew", rowspan=8)
 
         # Bind the hover effect
@@ -1724,7 +1724,7 @@ _____________________________________________________
 
 
     # This function is good for quick and dirty 2D/3D stl files!
-    def load_and_display_stl_3D(self):
+    def load_and_display_stl(self):
         # Hide the root Tkinter window
         root = tk.Tk()
         root.withdraw()
@@ -1785,7 +1785,9 @@ _____________________________________________________
         
         # Add the actor to the scene
         self.renderer.AddActor(actor)
-        self.renderer.SetBackground(.1, .2, .3)  # Background color
+        self.renderer.SetBackground(0, 0, 0)  # Background color: Black
+        #self.renderer.SetBackground(1, 1, 1)  # Background color: White
+        #self.renderer.SetBackground(.1, .2, .3)  # Background color: RGB (Red, Blue, Green)
         
         # Modify the part where you initialize renderWindowInteractor to add the key press event
         renderWindowInteractor = vtk.vtkRenderWindowInteractor()
@@ -1803,7 +1805,7 @@ _____________________________________________________
     def change_background_color(self):
         colors = vtk.vtkNamedColors()
         # Cycle through some colors
-        color_names = ["MidnightBlue", "RoyalBlue", "SkyBlue", "Cyan", "DarkGreen", "LimeGreen", "Yellow", "OrangeRed", "Red", "DeepPink"]
+        color_names = ["black", "MidnightBlue", "RoyalBlue", "SkyBlue", "Cyan", "DarkGreen", "LimeGreen", "Yellow", "OrangeRed", "Red", "DeepPink", "white"]
         current_color = self.bg_color_counter % len(color_names)  # Use an instance variable for the counter
         color = colors.GetColor3d(color_names[current_color])
         self.renderer.SetBackground(color)  # Use the renderer stored as an instance variable
