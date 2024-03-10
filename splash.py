@@ -23,6 +23,10 @@ import vtk
 from mpl_toolkits import mplot3d
 from stl import mesh
 
+## The following two lines where added here for executable creation (createExec.sh - still not working!)
+#import matplotlib
+#from mpl_toolkits.mplot3d import Axes3D   Explicit import to help PyInstaller
+
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
 from ReplaceProperties import ReplacePropertiesPopup
