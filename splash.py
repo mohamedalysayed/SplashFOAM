@@ -101,7 +101,7 @@ class TerminalApp:
         help_menu.add_command(label="About", command=self.show_about_message)
         help_menu.add_command(label="Manual", command=show_help)
         
-        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
+##        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
         menubar.add_cascade(label="Help", menu=help_menu)
         
@@ -110,21 +110,18 @@ class TerminalApp:
         # Create a menu bar -----------------<
         
         # ============= Time Recorder ====================
-        # File to save elapsed time (for license type)
-        self.elapsed_time_file = "elapsed_time.txt"  # File to store the elapsed time
-        
         #---------------------
         # License parameters #
         #---------------------
-        self.license_duration = 50 * 60 * 60 # 29 * 60 * 60  # 29 hours in seconds
-        #self.license_duration = 1 * 60 * 60  # Testing
-        self.notice_period_before_end = 1 * 60 * 60  # 1 hour in seconds
-
-        # Load the last recorded time
-        self.start_time = self.load_last_recorded_time()
+        self.start_time = time.time()
+        self.license_start_date_file = "license_start_date.txt"  # File to store the start date
+        self.license_duration = 182 * 24 * 3600  # 6 months in seconds
+        #self.license_duration = 365 * 24 * 3600  # 1 year in seconds
+        self.notice_period_before_end = 30 * 24 * 3600  # Notify 30 days before the license expires
+        self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
         
         # Create a label for the "Elapsed time:" text
-        self.elapsed_time_label = tk.Label(root, text="Elapsed time", font=("Helvetica", 24), bg="white", fg="darkblue")
+        self.elapsed_time_label = tk.Label(root, text="Elapsed Time", font=("Helvetica", 24), bg="white", fg="darkblue")
         self.elapsed_time_label.grid(row=2, column=10, sticky="ew")
 
         # Create a label for the timer
@@ -243,7 +240,7 @@ class TerminalApp:
         # Create a Checkbutton using the custom style for showing/hiding results section 
         style = ttk.Style()
         style.configure("Custom.TCheckbutton", foreground="black", background="white")
-        toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Results Panel", command=self.toggle_results_panel, style="Custom.TCheckbutton")
+        toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Elapsed Time", command=self.toggle_results_panel, style="Custom.TCheckbutton")
         toggle_visibility_button.grid(row=14, column=4, pady=1, padx=7, sticky="w")        
         
         # _____________________________Profile Theme_____________________________________
@@ -276,10 +273,10 @@ class TerminalApp:
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
         monitor_simulation_checkbutton.grid(row=13, column=4, pady=1, padx=7, sticky="w")        
         
-        # Create a clickable "Report a bug" label
-        report_bug_label = tk.Label(self.root, text="Ask me ANYTHING!", fg="green", cursor="hand2")
-        report_bug_label.grid(row=14, column=0, sticky="w")
-        report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
+##        # This can be enabled or disabled (according to the customer)
+##        report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
+##        report_bug_label.grid(row=14, column=0, sticky="w")
+##        report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
 
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
@@ -1899,6 +1896,8 @@ _____________________________________________________
         
         
 # --- Timer UNLIMITED version --- 
+
+
 ###    def update_timer(self):
 ###        elapsed_time = time.time() - self.start_time
 ###        # Extract tenths of a second
@@ -1912,22 +1911,36 @@ _____________________________________________________
 # ------------------------------- 2.03.2024 --------------------------------
 
     def update_timer(self):
-        elapsed_time = time.time() - self.start_time
-        hours, remainder = divmod(int(elapsed_time), 3600)
+        current_time = time.time()
+
+        # Calculate elapsed time since the app was opened
+        app_elapsed_time = current_time - self.start_time
+        hours, remainder = divmod(int(app_elapsed_time), 3600)
         minutes, seconds = divmod(remainder, 60)
-        tenths_of_second = int((elapsed_time - int(elapsed_time)) * 10)
+        tenths_of_second = int((app_elapsed_time - int(app_elapsed_time)) * 10)
 
-        # Update the timer label
-        self.timer_label.config(text=f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}.{tenths_of_second}")
+        # Update the elapsed time label
+        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
+    
+    
+        # Load or set the license start date
+        if not os.path.exists(self.license_start_date_file):
+            with open(self.license_start_date_file, "w") as file:
+                file.write(str(current_time))
+            license_start_date = current_time
+        else:
+            with open(self.license_start_date_file, "r") as file:
+                license_start_date = float(file.read())
 
-        # Determine the remaining time before the license expires
-        remaining_time = self.license_duration - elapsed_time
+        # Calculate remaining license duration
+        elapsed_time_since_start = current_time - license_start_date
+        remaining_time = self.license_duration - elapsed_time_since_start
 
         # Check if it's time to notify about the license expiration
         if 0 < remaining_time <= self.notice_period_before_end:
-            self.notify_license_expiration(expiring_soon=True)
+            self.notify_license_expiration(remaining_time, expiring_soon=True)
         elif remaining_time <= 0:
-            self.notify_license_expiration(expiring_soon=False)
+            self.notify_license_expiration(remaining_time, expiring_soon=False)
 
         # Schedule the next update if license has not expired
         if remaining_time > 0:
@@ -1937,14 +1950,20 @@ _____________________________________________________
             self.root.after(10000, self.root.destroy)  # Closes the app after 10 seconds
             
 
-    def notify_license_expiration(self, expiring_soon=True):
+    def notify_license_expiration(self, remaining_time, expiring_soon=True):
         # Prevent multiple notifications
         if not hasattr(self, 'license_expiration_notified'):
             self.license_expiration_notified = True  # Set the flag immediately
 
             if expiring_soon:
-                notice_period_minutes = self.notice_period_before_end / 60
-                message = f"License Expiring Soon!\nYour license will expire in less than {notice_period_minutes:.0f} minutes. Please save your work."
+                remaining_days = remaining_time / (3600 * 24)  # Convert remaining time in seconds to days
+                if remaining_days < 1:
+                    # For less than 1 day, show the remaining hours
+                    remaining_hours = remaining_time / 3600
+                    message = f"License Expiring Soon!\nYour license will expire in less than {remaining_hours:.0f} hours. Please save your work."
+                else:
+                    # For 1 day or more, show the remaining days
+                    message = f"License Expiring Soon!\nYour license will expire in less than {remaining_days:.0f} days. Please save your work."
             else:
                 message = "License Expired!\nYour license has already expired. Please renew your license to continue using Splash."
 
@@ -1955,7 +1974,7 @@ _____________________________________________________
             "\n"
             "Copyright (C) Simulitica Ltd. - All Rights Reserved\n"
             "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
-            "Written by Mohamed SAYED (m.sayed@simulitica.com), November 2023.\n"
+            "Written by Mohamed SAYED (mohamed.sayed@simulitica.com), November 2023.\n"
             "Proprietary and confidential!\n"
             "_____________________________________________________________________________"
             )
@@ -1966,7 +1985,7 @@ _____________________________________________________
             popup.geometry("800x600")  # Adjust the size as needed
 
             # Create a Label in the Toplevel window to display the message
-            license_message_label = tk.Label(popup, text=license_message, font=("Helvetica", 14, "bold"), fg="darkred", justify='center')
+            license_message_label = tk.Label(popup, text=license_message, font=("Helvetica", 14, "bold"), fg="darkblue", justify='center')
             license_message_label.pack(padx=10, pady=10)
 
             # Create a PhotoImage object and set it to the Label
@@ -1976,7 +1995,7 @@ _____________________________________________________
             license_message_label.image = welcome_image  # Keep a reference
 
             # Create a "Renew License Now" button inside the popup
-            renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/"))
+            renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/splash-v1"))
             renew_button.pack(pady=20)  # Adjust padding as needed
         
   
@@ -2001,6 +2020,11 @@ _____________________________________________________
             elapsed_time = time.time() - self.start_time
             file.write(str(elapsed_time))
 
+        # Make the file hidden on Windows
+        if os.name == 'nt':  # Checking if the OS is Windows
+            os.system(f'attrib +h {self.elapsed_time_file}')
+     
+    # Saving elapsed time on closing the app (now ignored!)
     def on_closing(self):
         self.save_elapsed_time()
         self.root.destroy()
