@@ -19,13 +19,12 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 from tkinter.colorchooser import askcolor
 from tkinter.font import Font
 
-import vtk
-from mpl_toolkits import mplot3d
-from stl import mesh
-
-## The following two lines where added here for executable creation (createExec.sh - still not working!)
-#import matplotlib
-#from mpl_toolkits.mplot3d import Axes3D   Explicit import to help PyInstaller
+#_______________________________________
+## FLAG: uncomment for STANDARD package
+#import vtk
+#from mpl_toolkits import mplot3d
+#from stl import mesh
+#_______________________________________
 
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
@@ -71,7 +70,10 @@ class TerminalApp:
         # Create a File menu and add it to the menu bar
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New", command=file_new)
-        file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl)
+        #________________________________________________________________________
+        ## FLAG: uncomment the following line for STANDARD package
+        #file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl)
+        #________________________________________________________________________
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
@@ -257,7 +259,7 @@ class TerminalApp:
         self.reset_var = tk.BooleanVar()
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
-        reset_checkbutton = ttk.Checkbutton(self.root, text="Reset theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
+        reset_checkbutton = ttk.Checkbutton(self.root, text="Reset Profile Theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
         reset_checkbutton.grid(row=12, column=4, padx=10, pady=1, sticky="w")
                 
         # Store initial profile theme values
@@ -558,6 +560,9 @@ class TerminalApp:
         popup.geometry("750x700")  # Adjust the size as needed
 
         # Create a Label in the Toplevel window to display the welcome message
+        #welcome_label = tk.Label(popup, text=welcome_message, font=("Helvetica", 14, "bold"), fg="darkblue", justify='center')
+        #welcome_label.pack(padx=10, pady=10)
+            
         welcome_label = ttk.Label(popup, text=welcome_message, font=("TkDefaultFont", 12), justify='center')
         welcome_label.pack(padx=10, pady=10)
 
@@ -1479,25 +1484,6 @@ _____________________________________________________
         if hasattr(self, "tooltip"):
             self.tooltip.destroy()
             del self.tooltip
-
-#                        __        __   _                            _        
-#                        \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
-#                         \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
-#                          \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
-#                           \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
-#                                                                             
-#                                 ____        _           _                           
-#                                / ___| _ __ | | __ _ ___| |__                        
-#                                \___ \| '_ \| |/ _` / __| '_ \                       
-#                                 ___) | |_) | | (_| \__ \ | | |                      
-#                                |____/| .__/|_|\__,_|___/_| |_|                      
-#                                      |_|                                            
-#                          ___                   _____ ___    _    __  __     
-#                         / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
-#                        | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
-#                        | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
-#                         \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
-#                              |_|
                 
     def setup_ui(self):
         # Create the Text widget
@@ -1630,13 +1616,17 @@ _____________________________________________________
     # Sourcing openfoam (version option)
     def source_openfoam(self, version, popup):
         paths = {
-            "8": "/opt/openfoam8/etc/bashrc",
-            "9": "/opt/openfoam9/etc/bashrc",
+            
             "10": "/opt/openfoam10/etc/bashrc",
-            "11": "/opt/openfoam11/etc/bashrc",
-            "2212": "/usr/lib/openfoam/openfoam2212/etc/bashrc",
             "2306": "/usr/lib/openfoam/openfoam2306/etc/bashrc",
-            "2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc"
+            #______________________________________________________
+            ## Uncomment the following block for STANDARD package
+            #"8": "/opt/openfoam8/etc/bashrc",
+            #"9": "/opt/openfoam9/etc/bashrc",
+            #"11": "/opt/openfoam11/etc/bashrc",
+            #"2212": "/usr/lib/openfoam/openfoam2212/etc/bashrc",
+            #"2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc"
+            #______________________________________________________
         }
         bashrc_path = paths.get(version)
         if not bashrc_path:
@@ -1694,15 +1684,18 @@ _____________________________________________________
         foundation_frame = ttk.LabelFrame(popup, text="OpenFOAM Foundation", padding=(10, 5))
         foundation_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
 
-        foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11")]
+        foundation_versions = [("v11", "11")]
+        # FLAG: Uncomment line below for STANDARD package
+        # foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11")]
         for text, version in foundation_versions:
             ttk.Radiobutton(foundation_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
         # OpenFOAM Extended Versions
         extended_frame = ttk.LabelFrame(popup, text="OpenFOAM ESI", padding=(10, 5))
         extended_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
-
-        extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312")]
+        extended_versions = [("v2306", "2306")]
+        # FLAG: Uncomment line below for STANDARD package
+        #extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312")]
         for text, version in extended_versions:
             ttk.Radiobutton(extended_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
@@ -2041,4 +2034,24 @@ if __name__ == "__main__":
     root.wm_title("Splash v1.0")  # Set window manager title
     app = TerminalApp(root)
     root.mainloop()
+    
+    
+#                        __        __   _                            _        
+#                        \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
+#                         \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
+#                          \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
+#                           \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
+#                                                                             
+#                                 ____        _           _                           
+#                                / ___| _ __ | | __ _ ___| |__                        
+#                                \___ \| '_ \| |/ _` / __| '_ \                       
+#                                 ___) | |_) | | (_| \__ \ | | |                      
+#                                |____/| .__/|_|\__,_|___/_| |_|                      
+#                                      |_|                                            
+#                          ___                   _____ ___    _    __  __     
+#                         / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
+#                        | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
+#                        | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
+#                         \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
+#                              |_|
         

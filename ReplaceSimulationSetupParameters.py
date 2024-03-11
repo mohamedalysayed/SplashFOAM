@@ -28,9 +28,7 @@ class ReplaceSimulationSetupParameters:
         system_frame = ttk.LabelFrame(self.main_frame, text="System Parameters", padding=(10, 5))
         system_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
-        # Create LabelFrame for "Injection/Combustion Simulation"
-        injection_combustion_frame = ttk.LabelFrame(self.main_frame, text="Injection/Combustion Simulation", padding=(10, 5))
-        injection_combustion_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        
 
         # Create entry fields for each parameter in the "Constant Parameters" group
         self.create_label_and_entry_widgets(constant_frame, self.constant_params, "constant")
@@ -43,29 +41,40 @@ class ReplaceSimulationSetupParameters:
         
         update_button = ttk.Button(self.main_frame, text="Update", command=self.update_simulation_setup_parameters)
         update_button.grid(row=2, column=0, columnspan=2, pady=10)
+        
+        #_______________________________________________________________________________________________________________________
+        ## Flag: Uncomment the following block for "Fuel Type" feature in STANDARD package
+        # # Create LabelFrame for "Injection/Combustion Simulation"
+        # injection_combustion_frame = ttk.LabelFrame(self.main_frame, text="Injection/Combustion Simulation", padding=(10, 5))
+        # injection_combustion_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        
+        # # Create LabelFrame for "Injection/Combustion Simulation"
+        # injection_combustion_frame = ttk.LabelFrame(self.main_frame, text="Injection/Combustion Simulation", padding=(10, 5))
+        # injection_combustion_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-        # Create a Combobox for fuel selection in the "Injection/Combustion Simulation" frame
-        self.fuel_selection_label = ttk.Label(injection_combustion_frame, text="Fuel Selection")
-        self.fuel_selection_label.pack(pady=10)
+        # # Create a Combobox for fuel selection in the "Injection/Combustion Simulation" frame
+        # self.fuel_selection_label = ttk.Label(injection_combustion_frame, text="Fuel Selection")
+        # self.fuel_selection_label.pack(pady=10)
 
-        # Create a list of available fuel options
-        fuel_options = ["Propane", "Gasoline", "Ethanol", "Hydrogen", "Methanol", "Ammonia", "Dodecane", "Heptane"]
+        # # Create a list of available fuel options
+        # fuel_options = ["Propane", "Gasoline", "Ethanol", "Hydrogen", "Methanol", "Ammonia", "Dodecane", "Heptane"]
 
-        # Create a Combobox widget with white background for options
-        self.fuel_combobox = ttk.Combobox(injection_combustion_frame, values=fuel_options, state="readonly")
-        self.fuel_combobox.pack(pady=10)
+        # # Create a Combobox widget with white background for options
+        # self.fuel_combobox = ttk.Combobox(injection_combustion_frame, values=fuel_options, state="readonly")
+        # self.fuel_combobox.pack(pady=10)
 
-        # Create a button in the injection_combustion_frame
-        self.physicalProperties_button = ttk.Button(injection_combustion_frame, text="Fuel Physical Properties", command=self.parent.browse_directory)
-        self.physicalProperties_button.pack(pady=10)
+        # # Create a button in the injection_combustion_frame
+        # self.physicalProperties_button = ttk.Button(injection_combustion_frame, text="Fuel Physical Properties", command=self.parent.browse_directory)
+        # self.physicalProperties_button.pack(pady=10)
 
-        # Configure the style to set the background color of options to white
-        style = ttk.Style()
-        style.configure("White.TCombobox", fieldbackground="white")
+        # # Configure the style to set the background color of options to white
+        # style = ttk.Style()
+        # style.configure("White.TCombobox", fieldbackground="white")
 
-        # Apply the custom style to the Combobox
-        self.fuel_combobox.config(style="White.TCombobox")
-        self.fuel_combobox.set("Available fuel options")  # Set default value
+        # # Apply the custom style to the Combobox
+        # self.fuel_combobox.config(style="White.TCombobox")
+        # self.fuel_combobox.set("Available fuel options")  # Set default value
+        #_______________________________________________________________________________________________________________________
 
     def pre_fill_existing_values(self):
         # Pre-fill entry fields with existing values
