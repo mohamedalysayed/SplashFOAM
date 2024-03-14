@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+. /usr/lib/openfoam/openfoam2306/etc/bashrc
 
 # Run from this directory
 cd "${0%/*}" || exit 1

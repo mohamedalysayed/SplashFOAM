@@ -19,12 +19,9 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 from tkinter.colorchooser import askcolor
 from tkinter.font import Font
 
-#_______________________________________
-## FLAG: uncomment for STANDARD package
-#import vtk
-#from mpl_toolkits import mplot3d
-#from stl import mesh
-#_______________________________________
+import vtk
+from mpl_toolkits import mplot3d
+from stl import mesh
 
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
@@ -70,10 +67,7 @@ class TerminalApp:
         # Create a File menu and add it to the menu bar
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New", command=file_new)
-        #________________________________________________________________________
-        ## FLAG: uncomment the following line for STANDARD package
-        #file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl)
-        #________________________________________________________________________
+        file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl)
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
@@ -121,8 +115,7 @@ class TerminalApp:
         #---------------------
         self.start_time = time.time()
         self.license_start_date_file = "license_start_date.txt"  # File to store the start date
-        self.license_duration = 182 * 24 * 3600  # 6 months in seconds
-        #self.license_duration = 365 * 24 * 3600  # 1 year in seconds
+        self.license_duration = 365 * 24 * 3600  # 1 year in seconds
         self.notice_period_before_end = 30 * 24 * 3600  # Notify 30 days before the license expires
         self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
         
@@ -279,10 +272,9 @@ class TerminalApp:
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
         monitor_simulation_checkbutton.grid(row=13, column=4, pady=1, padx=7, sticky="w")        
         
-##        # This can be enabled or disabled (according to the customer) STANDARD Package 
-##        report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
-##        report_bug_label.grid(row=14, column=0, sticky="w")
-##        report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
+        report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
+        report_bug_label.grid(row=14, column=0, sticky="w")
+        report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
 
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
@@ -1583,9 +1575,12 @@ _____________________________________________________
         if not os.path.exists(solver_info_file):
             messagebox.showerror("Error", "SolverInfo file not found!")
             return
+        
+        # Get the absolute path to the SplashMonitor binary
+        splash_monitor_path = os.path.abspath("./Resources/Utilities/SplashMonitor")
 
         # Construct the SplashMonitor command with the given arguments
-        splash_monitor_command = ["./SplashMonitor", "-l", "-i", "2", "-r", "1", solver_info_file]
+        splash_monitor_command = [splash_monitor_path, "-l", "-i", "2", "-r", "1", solver_info_file]
 
         # Run SplashMonitor in a subprocess, capturing the standard output
         process = subprocess.Popen(splash_monitor_command, stdout=subprocess.PIPE, universal_newlines=True)
@@ -1618,14 +1613,11 @@ _____________________________________________________
             
             "10": "/opt/openfoam10/etc/bashrc",
             "2306": "/usr/lib/openfoam/openfoam2306/etc/bashrc",
-            #______________________________________________________
-            ## Uncomment the following block for STANDARD package
-            #"8": "/opt/openfoam8/etc/bashrc",
-            #"9": "/opt/openfoam9/etc/bashrc",
-            #"11": "/opt/openfoam11/etc/bashrc",
-            #"2212": "/usr/lib/openfoam/openfoam2212/etc/bashrc",
-            #"2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc"
-            #______________________________________________________
+            "8": "/opt/openfoam8/etc/bashrc",
+            "9": "/opt/openfoam9/etc/bashrc",
+            "11": "/opt/openfoam11/etc/bashrc",
+            "2212": "/usr/lib/openfoam/openfoam2212/etc/bashrc",
+            "2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc"
         }
         bashrc_path = paths.get(version)
         if not bashrc_path:
@@ -1684,8 +1676,7 @@ _____________________________________________________
         foundation_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
 
         foundation_versions = [("v11", "11")]
-        # FLAG: Uncomment line below for STANDARD package
-        # foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11")]
+        foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11")]
         for text, version in foundation_versions:
             ttk.Radiobutton(foundation_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
@@ -1693,8 +1684,7 @@ _____________________________________________________
         extended_frame = ttk.LabelFrame(popup, text="OpenFOAM ESI", padding=(10, 5))
         extended_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
         extended_versions = [("v2306", "2306")]
-        # FLAG: Uncomment line below for STANDARD package
-        #extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312")]
+        extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312")]
         for text, version in extended_versions:
             ttk.Radiobutton(extended_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
@@ -1706,8 +1696,6 @@ _____________________________________________________
 
         ttk.Button(popup, text="Activate", command=activate_and_close).pack(pady=10)
     
-#        # Confirm button calls source_openfoam with the selected version and closes the popup
-#        ttk.Button(popup, text="Activate", command=lambda: self.source_openfoam(selected_version.get(), popup)).pack(pady=10)
     #____________________________________________ sourcing OF __________________________________________________    
              
     def open_contact_page(self, event=None):
