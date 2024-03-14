@@ -19,13 +19,6 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 from tkinter.colorchooser import askcolor
 from tkinter.font import Font
 
-#_______________________________________
-## FLAG: uncomment for STANDARD package
-#import vtk
-#from mpl_toolkits import mplot3d
-#from stl import mesh
-#_______________________________________
-
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
 from ReplaceProperties import ReplacePropertiesPopup
@@ -70,10 +63,6 @@ class TerminalApp:
         # Create a File menu and add it to the menu bar
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New", command=file_new)
-        #________________________________________________________________________
-        ## FLAG: uncomment the following line for STANDARD package
-        #file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl)
-        #________________________________________________________________________
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
@@ -177,11 +166,6 @@ class TerminalApp:
         # Allow the button to expand horizontally with the window
         #root.columnconfigure(0, weight=1)   
         
-        ## Create a button to open a directory dialog
-        #self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
-        #self.browse_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
-        #self.add_tooltip(self.browse_button, "Click to change the physical properties of your fluid")
-        
         # Create a mesh type variable (set it so "Cartesian" as a default)
         self.mesh_type_var = tk.StringVar(value="Cartesian")
         self.mesh_type = None
@@ -278,12 +262,7 @@ class TerminalApp:
         self.monitor_simulation_var = tk.BooleanVar()
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
         monitor_simulation_checkbutton.grid(row=13, column=4, pady=1, padx=7, sticky="w")        
-        
-##        # This can be enabled or disabled (according to the customer) STANDARD Package 
-##        report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
-##        report_bug_label.grid(row=14, column=0, sticky="w")
-##        report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
-
+      
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
         checkMesh_button.grid(row=1, column=4, pady=1, padx=10, sticky="ew")
@@ -316,10 +295,6 @@ class TerminalApp:
         
         # Initialize the available fuels to choose from
         self.fuels = ["Propane", "Gasoline", "Ethanol" , "Hydrogen", "Methanol", "Ammonia", "Dodecane", "Heptane"]
-        
-        ## Create a label for the "Fuel Selector" dropdown
-        #self.fuel_selector_label = ttk.Label(self.root, text="Fuel selector ▼", font=("TkDefaultFont", 12), background="white") # , foreground="green")
-        #self.fuel_selector_label.grid(row=0, column=1, pady=1, padx=10, sticky="w") # can be shown when needed! FLAG
 
         # Define the fuel options
         fuels = ["Methanol", "Ammonia", "Dodecane"]
@@ -1618,14 +1593,6 @@ _____________________________________________________
             
             "10": "/opt/openfoam10/etc/bashrc",
             "2306": "/usr/lib/openfoam/openfoam2306/etc/bashrc",
-            #______________________________________________________
-            ## Uncomment the following block for STANDARD package
-            #"8": "/opt/openfoam8/etc/bashrc",
-            #"9": "/opt/openfoam9/etc/bashrc",
-            #"11": "/opt/openfoam11/etc/bashrc",
-            #"2212": "/usr/lib/openfoam/openfoam2212/etc/bashrc",
-            #"2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc"
-            #______________________________________________________
         }
         bashrc_path = paths.get(version)
         if not bashrc_path:
@@ -1684,17 +1651,13 @@ _____________________________________________________
         foundation_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
 
         foundation_versions = [("v11", "11")]
-        # FLAG: Uncomment line below for STANDARD package
-        # foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11")]
         for text, version in foundation_versions:
             ttk.Radiobutton(foundation_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
         # OpenFOAM Extended Versions
         extended_frame = ttk.LabelFrame(popup, text="OpenFOAM ESI", padding=(10, 5))
         extended_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
-        extended_versions = [("v2306", "2306")]
-        # FLAG: Uncomment line below for STANDARD package
-        #extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312")]
+        extended_versions = [("v2306", "2306")] 
         for text, version in extended_versions:
             ttk.Radiobutton(extended_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
@@ -1705,9 +1668,6 @@ _____________________________________________________
                 popup.destroy()
 
         ttk.Button(popup, text="Activate", command=activate_and_close).pack(pady=10)
-    
-#        # Confirm button calls source_openfoam with the selected version and closes the popup
-#        ttk.Button(popup, text="Activate", command=lambda: self.source_openfoam(selected_version.get(), popup)).pack(pady=10)
     #____________________________________________ sourcing OF __________________________________________________    
              
     def open_contact_page(self, event=None):
