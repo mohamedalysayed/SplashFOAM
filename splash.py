@@ -279,7 +279,7 @@ class TerminalApp:
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
         monitor_simulation_checkbutton.grid(row=13, column=4, pady=1, padx=7, sticky="w")        
         
-##        # This can be enabled or disabled (according to the customer)
+##        # This can be enabled or disabled (according to the customer) STANDARD Package 
 ##        report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
 ##        report_bug_label.grid(row=14, column=0, sticky="w")
 ##        report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
@@ -792,7 +792,6 @@ class TerminalApp:
             ReplaceMeshParameters(self, self.mesh_params, old_values_mesh)
         else:
             tk.messagebox.showerror("Error", "No mesh parameters found in the 'meshDict' file!")
-
 
     def start_meshing(self):
     
