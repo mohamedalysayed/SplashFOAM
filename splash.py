@@ -101,7 +101,7 @@ class TerminalApp:
         help_menu.add_command(label="About", command=self.show_about_message)
         help_menu.add_command(label="Manual", command=show_help)
         
-##        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
+        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
         menubar.add_cascade(label="Help", menu=help_menu)
         
@@ -272,9 +272,9 @@ class TerminalApp:
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
         monitor_simulation_checkbutton.grid(row=13, column=4, pady=1, padx=7, sticky="w")        
         
-        report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
-        report_bug_label.grid(row=14, column=0, sticky="w")
-        report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
+        ##report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
+        ##report_bug_label.grid(row=14, column=0, sticky="w")
+        ##report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
 
         #----------Text Widget with Scrollbar-----------       
         checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
