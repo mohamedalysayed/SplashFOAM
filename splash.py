@@ -110,7 +110,8 @@ class TerminalApp:
         #---------------------
         self.start_time = time.time()
         self.license_start_date_file = "license_start_date.txt"  # File to store the start date
-        self.license_duration = 182 * 24 * 3600  # 6 months in seconds
+        self.license_duration = 14 * 24 * 3600  # 2 weekss in seconds
+        #self.license_duration = 182 * 24 * 3600  # 6 months in seconds
         #self.license_duration = 365 * 24 * 3600  # 1 year in seconds
         self.notice_period_before_end = 30 * 24 * 3600  # Notify 30 days before the license expires
         self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
