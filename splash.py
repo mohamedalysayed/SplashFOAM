@@ -1640,10 +1640,6 @@ _____________________________________________________
             return
         else: 
             self.selected_openfoam_path = bashrc_path  # Update the path
-
-
-        ##print("Command:", command) #FLAG! DEBUGGING
-        ##print("Output:", output.decode())
         
         # Decode the output and split it into lines
         env_vars = output.decode().split('\n')
@@ -1695,7 +1691,7 @@ _____________________________________________________
                 popup.destroy()
 
         ttk.Button(popup, text="Activate", command=activate_and_close).pack(pady=10)
-    
+        
     #____________________________________________ sourcing OF __________________________________________________    
              
     def open_contact_page(self, event=None):
@@ -1876,11 +1872,9 @@ _____________________________________________________
         elif key == '2':  # Front view
             self.set_camera_view("front")
         elif key == '3':  # Top view
-            self.set_camera_view("top")
-        
+            self.set_camera_view("top")  
         
 # --- Timer UNLIMITED version --- 
-
 
 ###    def update_timer(self):
 ###        elapsed_time = time.time() - self.start_time
@@ -2021,24 +2015,3 @@ if __name__ == "__main__":
     root.wm_title("Splash v1.0")  # Set window manager title
     app = TerminalApp(root)
     root.mainloop()
-    
-    
-#                        __        __   _                            _        
-#                        \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___  
-#                         \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \ 
-#                          \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |
-#                           \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/ 
-#                                                                             
-#                                 ____        _           _                           
-#                                / ___| _ __ | | __ _ ___| |__                        
-#                                \___ \| '_ \| |/ _` / __| '_ \                       
-#                                 ___) | |_) | | (_| \__ \ | | |                      
-#                                |____/| .__/|_|\__,_|___/_| |_|                      
-#                                      |_|                                            
-#                          ___                   _____ ___    _    __  __     
-#                         / _ \ _ __   ___ _ __ |  ___/ _ \  / \  |  \/  |    
-#                        | | | | '_ \ / _ \ '_ \| |_ | | | |/ _ \ | |\/| |    
-#                        | |_| | |_) |  __/ | | |  _|| |_| / ___ \| |  | |    
-#                         \___/| .__/ \___|_| |_|_|   \___/_/   \_\_|  |_|    
-#                              |_|
-        
