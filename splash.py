@@ -19,9 +19,11 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 from tkinter.colorchooser import askcolor
 from tkinter.font import Font
 
-import vtk
-from mpl_toolkits import mplot3d
-from stl import mesh
+# DONOT REMOVE: visualizing stl natively in Splash! 
+###import vtk
+###from mpl_toolkits import mplot3d
+###from stl import mesh
+# -------------------------------------------------
 
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
@@ -67,7 +69,7 @@ class TerminalApp:
         # Create a File menu and add it to the menu bar
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New", command=file_new)
-        file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl)
+        #file_menu.add_command(label="Load Geometry", command=self.load_and_display_stl)
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
@@ -138,7 +140,6 @@ class TerminalApp:
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         
         # ============= Time Recorder ====================
-        
         # Display a welcome message
         self.show_welcome_message()
         
@@ -215,17 +216,18 @@ class TerminalApp:
         self.plot_results_xmgrace_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
 
-        # Create a button to execute the command
-        self.execute_button = ttk.Button(self.root, text="Execute Command", command=self.execute_command)
-        self.execute_button.grid(row=11, column=4, pady=1, padx=10, sticky="ew")
+        # Create a button to execute commands to the terminal kernel 
+        self.execute_button = tk.Button(root, text="Execute Command", command=self.execute_command)
+        self.execute_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
+        self.execute_button.grid(row=11, column=4, pady=10, padx=7, sticky="nw") 
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
-        # Create an entry field for entering the commands by user
-        default_sentence =  "top" # Or "htop"
-        self.entry = ttk.Entry(self.root, width=10)
-        self.entry.grid(row=11, column=5, pady=1, padx=10, sticky="ew")        
-        self.entry.insert(0, default_sentence) 
-        self.entry.configure(foreground="blue", background="black")
+        # Create an entry field for entering the commands by the user
+        default_sentence = "top"  # Or "htop"
+        self.entry = ttk.Entry(self.root, width=18)
+        self.entry.grid(row=11, column=4, pady=50, padx=7, sticky="nw")  
+        self.entry.insert(0, default_sentence)
+        self.entry.configure(foreground="lightblue", font=("TkDefaultFont", 11, "bold"), background="black")
 
         # Create a ttk.Style to configure the progress bar
         self.style = ttk.Style()
@@ -240,7 +242,7 @@ class TerminalApp:
         style = ttk.Style()
         style.configure("Custom.TCheckbutton", foreground="black", background="white")
         toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Elapsed Time", command=self.toggle_results_panel, style="Custom.TCheckbutton")
-        toggle_visibility_button.grid(row=14, column=4, pady=1, padx=7, sticky="w")        
+        toggle_visibility_button.grid(row=14, column=4, pady=1, padx=7, sticky="w") 
         
         # _____________________________Profile Theme_____________________________________
         
@@ -1240,8 +1242,6 @@ _____________________________________________________
             try:
                 self.start_progress_bar()
 
-                
-                
                 # Initiate the text_box with a nice mesh representation! 
                 self.generate_run_visual()
 
@@ -1699,183 +1699,191 @@ _____________________________________________________
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
 
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++
+    # DONOT REMOVE: visualizing stl natively in Splash! 
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+###    # This function is good for quick and dirty 2D/3D stl files!
+###    def load_and_display_stl(self):
+###        # Hide the root Tkinter window
+###        root = tk.Tk()
+###        root.withdraw()
 
-    # This function is good for quick and dirty 2D/3D stl files!
-    def load_and_display_stl(self):
-        # Hide the root Tkinter window
-        root = tk.Tk()
-        root.withdraw()
+###        # Open file dialog to select a file
+###        file_path = filedialog.askopenfilename(
+###            title="Select File",
+###            filetypes=[
+###                ("STL files", "*.stl"),
+###                ("OBJ files", "*.obj"),
+###                ("STEP files", "*.step;*.STEP;*.stp"),
+###                ("All Files", "*.*")  # Add this line
+###            ]
+###        )
 
-        # Open file dialog to select a file
-        file_path = filedialog.askopenfilename(
-            title="Select File",
-            filetypes=[
-                ("STL files", "*.stl"),
-                ("OBJ files", "*.obj"),
-                ("STEP files", "*.step;*.STEP;*.stp"),
-                ("All Files", "*.*")  # Add this line
-            ]
-        )
+###        if not file_path:
+###            print("No file selected.")
+###            return
 
-        if not file_path:
-            print("No file selected.")
-            return
+###        # Determine the file extension
+###        ext = os.path.splitext(file_path)[1].lower()
 
-        # Determine the file extension
-        ext = os.path.splitext(file_path)[1].lower()
+###        # Initialize the reader based on the file extension
+###        try:
+###            if ext in [".step", ".stp"]:
+###                reader = vtk.vtkSTEPReader()
+###            elif ext == ".stl":
+###                reader = vtk.vtkSTLReader()
+###            elif ext == ".obj":
+###                reader = vtk.vtkOBJReader()
+###            else:
+###                print(f"Unsupported file format: {ext}")
+###                return
+###        except AttributeError:
+###            print("STEP file support is not available in the installed VTK version.")
+###            return
 
-        # Initialize the reader based on the file extension
-        try:
-            if ext in [".step", ".stp"]:
-                reader = vtk.vtkSTEPReader()
-            elif ext == ".stl":
-                reader = vtk.vtkSTLReader()
-            elif ext == ".obj":
-                reader = vtk.vtkOBJReader()
-            else:
-                print(f"Unsupported file format: {ext}")
-                return
-        except AttributeError:
-            print("STEP file support is not available in the installed VTK version.")
-            return
+###        reader.SetFileName(file_path)
 
-        reader.SetFileName(file_path)
+###        # Create a mapper
+###        mapper = vtk.vtkPolyDataMapper()
+###        if ext in [".step", ".stp"]:
+###            # For STEP files, we need to update and get the output differently
+###            reader.Update()
+###            mapper.SetInputData(reader.GetOutput().GetBlock(0))
+###        else:
+###            # For STL and OBJ
+###            mapper.SetInputConnection(reader.GetOutputPort())
 
-        # Create a mapper
-        mapper = vtk.vtkPolyDataMapper()
-        if ext in [".step", ".stp"]:
-            # For STEP files, we need to update and get the output differently
-            reader.Update()
-            mapper.SetInputData(reader.GetOutput().GetBlock(0))
-        else:
-            # For STL and OBJ
-            mapper.SetInputConnection(reader.GetOutputPort())
+###        # Create an actor
+###        actor = vtk.vtkActor()
+###        actor.SetMapper(mapper)
 
-        # Create an actor
-        actor = vtk.vtkActor()
-        actor.SetMapper(mapper)
+###        # A renderer and render window
+###        self.renderer = vtk.vtkRenderer()
+###        self.renderWindow = vtk.vtkRenderWindow()
+###        self.renderWindow.AddRenderer(self.renderer)
+###        
+###        # Add the actor to the scene
+###        self.renderer.AddActor(actor)
+###        self.renderer.SetBackground(0, 0, 0)  # Background color: Black
+###        #self.renderer.SetBackground(1, 1, 1)  # Background color: White
+###        #self.renderer.SetBackground(.1, .2, .3)  # Background color: RGB (Red, Blue, Green)
+###        
+###        # Modify the part where you initialize renderWindowInteractor to add the key press event
+###        renderWindowInteractor = vtk.vtkRenderWindowInteractor()
+###        renderWindowInteractor.SetRenderWindow(self.renderWindow)
+###        
+###        # Add the key press callback
+###        renderWindowInteractor.AddObserver("KeyPressEvent", self.keypress_callback)
 
-        # A renderer and render window
-        self.renderer = vtk.vtkRenderer()
-        self.renderWindow = vtk.vtkRenderWindow()
-        self.renderWindow.AddRenderer(self.renderer)
+###        # Begin interaction
+###        self.renderWindow.Render()
+###        renderWindowInteractor.Initialize()  # Ensure interactor is initialized
+###        renderWindowInteractor.Start()
+###    
+###    # Changing the CAD parser background color and rendering.     
+###    def change_background_color(self):
+###        colors = vtk.vtkNamedColors()
+###        # Cycle through some colors
+###        color_names = ["black", "MidnightBlue", "RoyalBlue", "SkyBlue", "Cyan", "DarkGreen", "LimeGreen", "Yellow", "OrangeRed", "Red", "DeepPink", "white"]
+###        current_color = self.bg_color_counter % len(color_names)  # Use an instance variable for the counter
+###        color = colors.GetColor3d(color_names[current_color])
+###        self.renderer.SetBackground(color)  # Use the renderer stored as an instance variable
+###        self.renderWindow.Render()
+###        self.bg_color_counter += 1  # Increment the counter
+
+###    def save_render_view(self):
+###        root = tk.Tk()
+###        root.withdraw()  # We don't want a full GUI, so keep the root window from appearing
+
+###        # Specify the file types for saving
+###        filetypes = (
+###            ('PNG files', '*.png'),
+###            ('JPEG files', '*.jpeg;*.jpg'),
+###            ('TIFF files', '*.tiff;*.tif'),
+###            ('All files', '*.*')
+###        )
+
+###        # Open the save file dialog
+###        file_path = filedialog.asksaveasfilename(
+###            title='Save Render As',
+###            initialdir=os.path.expanduser("~"),  # Start at user's home directory
+###            initialfile='render_view.png',  # Suggest a file name
+###            defaultextension='.png',  # Default file extension
+###            filetypes=filetypes  # Allow choosing format
+###        )
+
+###        if not file_path:  # Check if the user canceled the dialog
+###            print("Save operation canceled.")
+###            return
+
+###        # Determine the format from the file_path extension
+###        _, ext = os.path.splitext(file_path)
+###        format = ext[1:]  # Remove the dot from the extension
+
+###        # Use the appropriate writer based on the file extension
+###        if format.lower() == "png":
+###            writer = vtk.vtkPNGWriter()
+###        elif format.lower() in ["jpeg", "jpg"]:
+###            writer = vtk.vtkJPEGWriter()
+###        elif format.lower() in ["tiff", "tif"]:
+###            writer = vtk.vtkTIFFWriter()
+###        else:
+###            print(f"Unsupported format: {format}")
+###            return
+
+###        # Set up the window to image filter and writer
+###        window_to_image_filter = vtk.vtkWindowToImageFilter()
+###        window_to_image_filter.SetInput(self.renderWindow)
+###        window_to_image_filter.Update()
+
+###        writer.SetFileName(file_path)
+###        writer.SetInputConnection(window_to_image_filter.GetOutputPort())
+###        writer.Write()
+###        print(f"Render saved to: {file_path}")
+###    
+###        
+###    def reset_camera_view(self):
+###        self.renderer.ResetCamera()
+###        self.renderWindow.Render()
+
+###    def set_camera_view(self, view_orientation):
+###        camera = self.renderer.GetActiveCamera()
+###        if view_orientation == "side":
+###            camera.SetPosition(1, 0, 0)
+###            camera.SetViewUp(0, 0, 1)
+###        elif view_orientation == "front":
+###            camera.SetPosition(0, 1, 0)
+###            camera.SetViewUp(0, 0, 1)
+###        elif view_orientation == "top":
+###            camera.SetPosition(0, 0, 1)
+###            camera.SetViewUp(0, 1, 0)
+###        camera.SetFocalPoint(0, 0, 0)
+###        self.renderer.ResetCameraClippingRange()
+###        self.renderWindow.Render()
+
+###    def keypress_callback(self, obj, event):
+###        key = obj.GetKeySym()
+###        if key == 'b':
+###            self.change_background_color()
+###        elif key == 's':
+###            self.save_render_view()
+###        elif key == 'r':  # Reset view to original position
+###            self.reset_camera_view()
+###        elif key == '1':  # Side view
+###            self.set_camera_view("side")
+###        elif key == '2':  # Front view
+###            self.set_camera_view("front")
+###        elif key == '3':  # Top view
+###            self.set_camera_view("top")  
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
-        # Add the actor to the scene
-        self.renderer.AddActor(actor)
-        self.renderer.SetBackground(0, 0, 0)  # Background color: Black
-        #self.renderer.SetBackground(1, 1, 1)  # Background color: White
-        #self.renderer.SetBackground(.1, .2, .3)  # Background color: RGB (Red, Blue, Green)
         
-        # Modify the part where you initialize renderWindowInteractor to add the key press event
-        renderWindowInteractor = vtk.vtkRenderWindowInteractor()
-        renderWindowInteractor.SetRenderWindow(self.renderWindow)
         
-        # Add the key press callback
-        renderWindowInteractor.AddObserver("KeyPressEvent", self.keypress_callback)
-
-        # Begin interaction
-        self.renderWindow.Render()
-        renderWindowInteractor.Initialize()  # Ensure interactor is initialized
-        renderWindowInteractor.Start()
-    
-    # Changing the CAD parser background color and rendering.     
-    def change_background_color(self):
-        colors = vtk.vtkNamedColors()
-        # Cycle through some colors
-        color_names = ["black", "MidnightBlue", "RoyalBlue", "SkyBlue", "Cyan", "DarkGreen", "LimeGreen", "Yellow", "OrangeRed", "Red", "DeepPink", "white"]
-        current_color = self.bg_color_counter % len(color_names)  # Use an instance variable for the counter
-        color = colors.GetColor3d(color_names[current_color])
-        self.renderer.SetBackground(color)  # Use the renderer stored as an instance variable
-        self.renderWindow.Render()
-        self.bg_color_counter += 1  # Increment the counter
-
-    def save_render_view(self):
-        root = tk.Tk()
-        root.withdraw()  # We don't want a full GUI, so keep the root window from appearing
-
-        # Specify the file types for saving
-        filetypes = (
-            ('PNG files', '*.png'),
-            ('JPEG files', '*.jpeg;*.jpg'),
-            ('TIFF files', '*.tiff;*.tif'),
-            ('All files', '*.*')
-        )
-
-        # Open the save file dialog
-        file_path = filedialog.asksaveasfilename(
-            title='Save Render As',
-            initialdir=os.path.expanduser("~"),  # Start at user's home directory
-            initialfile='render_view.png',  # Suggest a file name
-            defaultextension='.png',  # Default file extension
-            filetypes=filetypes  # Allow choosing format
-        )
-
-        if not file_path:  # Check if the user canceled the dialog
-            print("Save operation canceled.")
-            return
-
-        # Determine the format from the file_path extension
-        _, ext = os.path.splitext(file_path)
-        format = ext[1:]  # Remove the dot from the extension
-
-        # Use the appropriate writer based on the file extension
-        if format.lower() == "png":
-            writer = vtk.vtkPNGWriter()
-        elif format.lower() in ["jpeg", "jpg"]:
-            writer = vtk.vtkJPEGWriter()
-        elif format.lower() in ["tiff", "tif"]:
-            writer = vtk.vtkTIFFWriter()
-        else:
-            print(f"Unsupported format: {format}")
-            return
-
-        # Set up the window to image filter and writer
-        window_to_image_filter = vtk.vtkWindowToImageFilter()
-        window_to_image_filter.SetInput(self.renderWindow)
-        window_to_image_filter.Update()
-
-        writer.SetFileName(file_path)
-        writer.SetInputConnection(window_to_image_filter.GetOutputPort())
-        writer.Write()
-        print(f"Render saved to: {file_path}")
-    
         
-    def reset_camera_view(self):
-        self.renderer.ResetCamera()
-        self.renderWindow.Render()
-
-    def set_camera_view(self, view_orientation):
-        camera = self.renderer.GetActiveCamera()
-        if view_orientation == "side":
-            camera.SetPosition(1, 0, 0)
-            camera.SetViewUp(0, 0, 1)
-        elif view_orientation == "front":
-            camera.SetPosition(0, 1, 0)
-            camera.SetViewUp(0, 0, 1)
-        elif view_orientation == "top":
-            camera.SetPosition(0, 0, 1)
-            camera.SetViewUp(0, 1, 0)
-        camera.SetFocalPoint(0, 0, 0)
-        self.renderer.ResetCameraClippingRange()
-        self.renderWindow.Render()
-
-    def keypress_callback(self, obj, event):
-        key = obj.GetKeySym()
-        if key == 'b':
-            self.change_background_color()
-        elif key == 's':
-            self.save_render_view()
-        elif key == 'r':  # Reset view to original position
-            self.reset_camera_view()
-        elif key == '1':  # Side view
-            self.set_camera_view("side")
-        elif key == '2':  # Front view
-            self.set_camera_view("front")
-        elif key == '3':  # Top view
-            self.set_camera_view("top")  
+        
+        
         
 # --- Timer UNLIMITED version --- 
-
 ###    def update_timer(self):
 ###        elapsed_time = time.time() - self.start_time
 ###        # Extract tenths of a second
