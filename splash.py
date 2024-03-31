@@ -222,12 +222,22 @@ class TerminalApp:
         self.execute_button.grid(row=11, column=4, pady=10, padx=7, sticky="nw") 
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
+        # IMPORTANT FLAG! the two following blocks dictate the buttons style all over. 
+        style.theme_use('default') # classic, default, alt, clam 
+
+        # Configure a custom style for the Entry widget
+        style.configure('Professional.TEntry', 
+                        foreground='lightblue', 
+                        font=('Helvetica', 11, 'bold'), 
+                        borderwidth=2, 
+                        relief='flat',
+                        padding=10)
+
         # Create an entry field for entering the commands by the user
         default_sentence = "top"  # Or "htop"
-        self.entry = ttk.Entry(self.root, width=18)
-        self.entry.grid(row=11, column=4, pady=50, padx=7, sticky="nw")  
+        self.entry = ttk.Entry(root, style='Professional.TEntry', width=18)
+        self.entry.grid(row=11, column=4, pady=50, padx=7, sticky="nw")
         self.entry.insert(0, default_sentence)
-        self.entry.configure(foreground="lightblue", font=("TkDefaultFont", 11, "bold"), background="black")
 
         # Create a ttk.Style to configure the progress bar
         self.style = ttk.Style()
@@ -238,11 +248,7 @@ class TerminalApp:
         self.paraview_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.paraview_button, "Paraview! click here you won't regret it ;)")
 
-        # Create a Checkbutton using the custom style for showing/hiding results section 
-        style = ttk.Style()
-        style.configure("Custom.TCheckbutton", foreground="black", background="white")
-        toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Elapsed Time", command=self.toggle_results_panel, style="Custom.TCheckbutton")
-        toggle_visibility_button.grid(row=14, column=4, pady=1, padx=7, sticky="w") 
+        
         
         # _____________________________Profile Theme_____________________________________
         
@@ -255,8 +261,28 @@ class TerminalApp:
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
         reset_checkbutton = ttk.Checkbutton(self.root, text="Reset Profile Theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
-        reset_checkbutton.grid(row=12, column=4, padx=10, pady=1, sticky="w")
-                
+        reset_checkbutton.grid(row=13, column=4, padx=10, pady=1, sticky="w")
+        
+        # Create a Checkbutton using the custom style for showing/hiding results section 
+        style = ttk.Style()
+        style.configure("Custom.TCheckbutton", foreground="black", background="white")
+        toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Elapsed Time", command=self.toggle_results_panel, style="Custom.TCheckbutton")
+        toggle_visibility_button.grid(row=16, column=4, pady=1, padx=7, sticky="w") 
+        
+        # Create Checkbutton for monitoring simulation
+        self.monitor_simulation_var = tk.BooleanVar()
+        reset_checkbutton_style = ttk.Style()
+        reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
+        monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
+        monitor_simulation_checkbutton.grid(row=14, column=4, pady=1, padx=7, sticky="w")
+        
+        # Create Checkbutton for monitoring simulation
+        self.monitor_simulationLog_var = tk.BooleanVar()
+        reset_checkbutton_style = ttk.Style()
+        reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
+        monitor_simulationLog_checkbutton = ttk.Checkbutton(root, text="Simulation Results", command=self.load_log_file)
+        monitor_simulationLog_checkbutton.grid(row=15, column=4, pady=1, padx=7, sticky="w")
+
         # Store initial profile theme values
         self.initial_font = self.text_box.cget("font")
         self.initial_foreground = self.text_box.cget("foreground")
@@ -265,27 +291,23 @@ class TerminalApp:
         # _____________________________Profile Theme_____________________________________
 
         # Create a progress bar with the custom style
-        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=220, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-        self.progress_bar_canvas.grid(row=12, column=5, padx=50, pady=1)                
+        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=150, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
+        self.progress_bar_canvas.grid(row=12, column=4, padx=10, pady=1, sticky="w")                
         self.progress_bar_canvas_flag=True
 
-        # Create Checkbutton for monitoring simulation
-        self.monitor_simulation_var = tk.BooleanVar()
-        monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
-        monitor_simulation_checkbutton.grid(row=13, column=4, pady=1, padx=7, sticky="w")        
+              
         
         ##report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
         ##report_bug_label.grid(row=14, column=0, sticky="w")
         ##report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
 
         #----------Text Widget with Scrollbar-----------       
-        checkMesh_button = ttk.Button(self.root, text="Load mesh quality", command=self.load_meshChecked)
-        checkMesh_button.grid(row=1, column=4, pady=1, padx=10, sticky="ew")
-        checkMesh_button['width'] = 18  # Adjust the width as needed
-        
-        solverLog_button = ttk.Button(self.root, text="Load log file", command=self.load_log_file)
-        solverLog_button.grid(row=1, column=5, pady=1, padx=1, sticky="ew")
-        solverLog_button['width'] = 9  # Adjust the width as needed
+ 
+#        # Create a button to load solver log 
+#        solverLog_button = tk.Button(root, text="Simulation Log", command=self.load_log_file)
+#        solverLog_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
+#        solverLog_button.grid(row=11, column=5, pady=10, padx=10, sticky="n") 
+#        self.add_tooltip(self.execute_button, "Click to load simulation log file")
         
         # Add the search widget to the main app
         self.search_widget = SearchWidget(root, self.text_box)
@@ -337,8 +359,8 @@ class TerminalApp:
         #default_status = "This field will show the status of your work!" # Start by importing geometry and configuring your case
         default_status = "Start by importing geometry and configuring your case!"
 #        self.status_label.grid(row=0, column=1, columnspan=3, pady=1, padx=10, sticky="w")\
-        self.status_label.grid(row=0, column=4, columnspan=3, pady=1, padx=10, sticky="w")
-        self.status_label.config(text=default_status, font=("TkDefaultFont", 9, "bold"), foreground="lightblue", background="black")
+        self.status_label.grid(row=0, column=4, columnspan=5, pady=1, padx=10, sticky="s")
+        self.status_label.config(text=default_status, font=("TkDefaultFont", 12), foreground="black", background="cyan")
 
         # ... (other initialization code)
         self.selected_file_path = None
@@ -1479,7 +1501,7 @@ _____________________________________________________
     def setup_ui(self):
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
-        self.text_box.grid(row=2, column=4, columnspan=4, padx=10, pady=1, sticky="nsew", rowspan=9)
+        self.text_box.grid(row=1, column=4, columnspan=5, padx=10, pady=1, sticky="nsew", rowspan=10)
         self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
 
         splash_welcome_msg = """
@@ -1514,7 +1536,7 @@ _____________________________________________________
 
         # Create a vertical scrollbar for the Text widget
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=2, column=7, columnspan=1, pady=1, sticky='nse', rowspan=9)
+        self.text_box_scrollbar.grid(row=1, column=8, columnspan=1, pady=1, sticky='nse', rowspan=10)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set      
 
     def change_theme(self):

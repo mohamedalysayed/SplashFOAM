@@ -94,15 +94,42 @@ class ReplaceMeshParameters:
         if existing_stop_after_value in self.workflow_options:
             self.selected_workflow.set(existing_stop_after_value)
 
-        # Buttons with modified padding and placement
-        update_button = ttk.Button(self.frame, text="Update", command=self.update_mesh_parameters, style="My.TButton")
-        update_button.grid(row=98, column=1, pady=10, padx=10)
+#        # Buttons with modified padding and placement
+#        update_button = ttk.Button(self.frame, text="Update", command=self.update_mesh_parameters, style="My.TButton")
+#        update_button.grid(row=98, column=1, pady=10, padx=10)
 
-        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="My.TButton")
-        save_mesh_button.grid(row=98, column=2, pady=10, padx=10)
+#        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="My.TButton")
+#        save_mesh_button.grid(row=98, column=2, pady=10, padx=10)
 
-        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")
-        close_button.grid(row=98, column=3, pady=10, padx=10)
+#        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")
+#        close_button.grid(row=98, column=3, pady=10, padx=10)
+#        
+#        mesh_quality_button = ttk.Button(self.frame, text="Mesh stastistics", command=self.parent.load_meshChecked, style="My.TButton")
+#        mesh_quality_button.grid(row=99, column=3, pady=10, padx=10)
+
+        # Define the style for the buttons
+        style = ttk.Style()
+        style.configure("My.TButton", 
+                        font=12, 
+                        relief="flat", 
+                        background="lightblue", 
+                        foreground="black")
+ 
+
+        # Buttons with modified padding and placement to match the search_button style and vertical alignment
+        update_button = ttk.Button(self.frame, text="Create", command=self.update_mesh_parameters, style="My.TButton")  # Replace lambda with your actual command
+        update_button.grid(row=91, column=1, pady=10, padx=7, sticky="ne")
+
+        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="My.TButton")  # Replace lambda with your actual command
+        save_mesh_button.grid(row=92, column=1, pady=10, padx=7, sticky="ne")
+
+        mesh_quality_button = ttk.Button(self.frame, text="Statistics", command=self.parent.load_meshChecked, style="My.TButton")  # Replace lambda with your actual command
+        mesh_quality_button.grid(row=93, column=1, pady=10, padx=7, sticky="ne")
+        
+        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")  # Replace lambda with your actual command
+        close_button.grid(row=94, column=1, pady=10, padx=7, sticky="ne")
+
+
 
     # ...............................................................................
     # Saving the created mesh (polyMesh dir) to a specific location 
