@@ -4,6 +4,7 @@ import re
 import signal
 import time
 import datetime
+import glob
 import shutil # For file copying
 import threading # Import threading for running simulation in a separate thread
 import tkinter as tk
@@ -165,6 +166,8 @@ class TerminalApp:
         # Create a button to import a geometry
         style = ttk.Style()
         style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
+        
+        # First button of SplashFOAM - Importing a geometry file
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
         self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.import_button, "Click to import the geometry to be simulated")     
@@ -219,7 +222,7 @@ class TerminalApp:
         # Create a button to execute commands to the terminal kernel 
         self.execute_button = tk.Button(root, text="Execute Command", command=self.execute_command)
         self.execute_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
-        self.execute_button.grid(row=11, column=4, pady=10, padx=7, sticky="nw") 
+        self.execute_button.grid(row=13, column=4, pady=10, padx=7, sticky="nw") 
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
 
         # IMPORTANT FLAG! the two following blocks dictate the buttons style all over. 
@@ -236,7 +239,7 @@ class TerminalApp:
         # Create an entry field for entering the commands by the user
         default_sentence = "top"  # Or "htop"
         self.entry = ttk.Entry(root, style='Professional.TEntry', width=18)
-        self.entry.grid(row=11, column=4, pady=50, padx=7, sticky="nw")
+        self.entry.grid(row=13, column=4, pady=50, padx=7, sticky="nw")
         self.entry.insert(0, default_sentence)
 
         # Create a ttk.Style to configure the progress bar
@@ -261,27 +264,27 @@ class TerminalApp:
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
         reset_checkbutton = ttk.Checkbutton(self.root, text="Reset Profile Theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
-        reset_checkbutton.grid(row=13, column=4, padx=10, pady=1, sticky="w")
+        reset_checkbutton.grid(row=14, column=0, padx=10, pady=1, sticky="w")
         
         # Create a Checkbutton using the custom style for showing/hiding results section 
         style = ttk.Style()
         style.configure("Custom.TCheckbutton", foreground="black", background="white")
         toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Elapsed Time", command=self.toggle_results_panel, style="Custom.TCheckbutton")
-        toggle_visibility_button.grid(row=16, column=4, pady=1, padx=7, sticky="w") 
+        toggle_visibility_button.grid(row=17, column=0, pady=1, padx=7, sticky="w") 
         
         # Create Checkbutton for monitoring simulation
         self.monitor_simulation_var = tk.BooleanVar()
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
         monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
-        monitor_simulation_checkbutton.grid(row=14, column=4, pady=1, padx=7, sticky="w")
+        monitor_simulation_checkbutton.grid(row=15, column=0, pady=1, padx=7, sticky="w")
         
         # Create Checkbutton for monitoring simulation
         self.monitor_simulationLog_var = tk.BooleanVar()
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
         monitor_simulationLog_checkbutton = ttk.Checkbutton(root, text="Simulation Results", command=self.load_log_file)
-        monitor_simulationLog_checkbutton.grid(row=15, column=4, pady=1, padx=7, sticky="w")
+        monitor_simulationLog_checkbutton.grid(row=16, column=0, pady=1, padx=7, sticky="w")
 
         # Store initial profile theme values
         self.initial_font = self.text_box.cget("font")
@@ -291,8 +294,8 @@ class TerminalApp:
         # _____________________________Profile Theme_____________________________________
 
         # Create a progress bar with the custom style
-        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=150, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-        self.progress_bar_canvas.grid(row=12, column=4, padx=10, pady=1, sticky="w")                
+        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=280, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
+        self.progress_bar_canvas.grid(row=13, column=0, padx=10, pady=15, sticky="w")                
         self.progress_bar_canvas_flag=True
 
               
@@ -359,8 +362,8 @@ class TerminalApp:
         #default_status = "This field will show the status of your work!" # Start by importing geometry and configuring your case
         default_status = "Start by importing geometry and configuring your case!"
 #        self.status_label.grid(row=0, column=1, columnspan=3, pady=1, padx=10, sticky="w")\
-        self.status_label.grid(row=0, column=4, columnspan=5, pady=1, padx=10, sticky="s")
-        self.status_label.config(text=default_status, font=("TkDefaultFont", 12), foreground="black", background="cyan")
+        self.status_label.grid(row=0, column=4, columnspan=5, pady=1, padx=10, sticky="n")
+        self.status_label.config(text=default_status, font=("TkDefaultFont", 12), foreground="black", background="lightgreen")
 
         # ... (other initialization code)
         self.selected_file_path = None
@@ -416,7 +419,7 @@ class TerminalApp:
 
         # Create a label for copyright text
         self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
-        self.copyright_label.grid(row=12, column=0, pady=1, padx=10, sticky="ew")
+        self.copyright_label.grid(row=12, column=0, pady=1, padx=10, sticky="n")
         self.copyright_label.configure(background="white", font="bold")
     # -------------- Main logos -------------------------- 
     
@@ -772,6 +775,36 @@ class TerminalApp:
 
  
 # -------------------------------- MESH CREATION ------------------------------
+##    def create_mesh(self):
+##        # Check if geometry is loaded
+##        if not self.geometry_loaded:
+##            messagebox.showinfo("Geometry Not Loaded", "Please load a geometry before creating the mesh.")
+##            return
+
+##        # Ask the user for mesh type using clickable buttons
+##        self.mesh_type = self.ask_mesh_type()
+
+##        if self.mesh_type is not None:
+
+##                # Read the content of the "meshDict" file
+##                self.mesh_dict_file_path = os.path.join(self.geometry_dest_path, "system", "meshDict")
+
+##                try:
+##                    with open(self.mesh_dict_file_path, "r") as mesh_dict_file:
+##                        file_content = mesh_dict_file.read()
+##                        self.selected_mesh_file_content = file_content
+
+##                    old_values_mesh = {param: match.group(1) for param in self.mesh_params
+##                                       for match in re.finditer(f'{param}\s+(\S+)(;|;//.*)', file_content)}
+
+##                    # Open a popup to replace mesh parameters
+##                    self.open_replace_mesh_parameters_popup(old_values_mesh)
+
+##                except FileNotFoundError:
+##                    tk.messagebox.showerror("Error", f"File not found - {self.mesh_dict_file_path}")
+##                except Exception as e:
+##                    tk.messagebox.showerror("Error", f"Error reading mesh parameters: {e}")
+
     def create_mesh(self):
         # Check if geometry is loaded
         if not self.geometry_loaded:
@@ -783,24 +816,54 @@ class TerminalApp:
 
         if self.mesh_type is not None:
 
-                # Read the content of the "meshDict" file
-                self.mesh_dict_file_path = os.path.join(self.geometry_dest_path, "system", "meshDict")
+            # Define the source directory for Allmesh* files and "system" directory
+            meshing_directory = os.path.join(os.getcwd(), "Meshing")
 
+            # Check if the destination path is the same as the meshing directory
+            if os.path.normpath(self.geometry_dest_path) != os.path.normpath(meshing_directory):
+                all_mesh_files = glob.glob(os.path.join(meshing_directory, "Allmesh*"))
+                
+                for file_path in all_mesh_files:
+                    try:
+                        # Copy each Allmesh* file to the geometry destination path
+                        shutil.copy(file_path, self.geometry_dest_path)
+                    except Exception as e:
+                        messagebox.showerror("Error", f"Failed to copy {file_path}: {e}")
+                
+                # Define the source and destination paths for the "system" directory
+                source_system_directory = os.path.join(meshing_directory, "system")
+                dest_system_directory = os.path.join(self.geometry_dest_path, "system")
+                
+                # Remove the existing "system" directory in the destination if it exists
+                if os.path.exists(dest_system_directory):
+                    shutil.rmtree(dest_system_directory)
+                
                 try:
-                    with open(self.mesh_dict_file_path, "r") as mesh_dict_file:
-                        file_content = mesh_dict_file.read()
-                        self.selected_mesh_file_content = file_content
-
-                    old_values_mesh = {param: match.group(1) for param in self.mesh_params
-                                       for match in re.finditer(f'{param}\s+(\S+)(;|;//.*)', file_content)}
-
-                    # Open a popup to replace mesh parameters
-                    self.open_replace_mesh_parameters_popup(old_values_mesh)
-
-                except FileNotFoundError:
-                    tk.messagebox.showerror("Error", f"File not found - {self.mesh_dict_file_path}")
+                    # Copy the "system" directory to the geometry destination path
+                    shutil.copytree(source_system_directory, dest_system_directory)
                 except Exception as e:
-                    tk.messagebox.showerror("Error", f"Error reading mesh parameters: {e}")
+                    messagebox.showerror("Error", f"Failed to copy 'system' directory: {e}")
+
+            # Read the content of the "meshDict" file
+            self.mesh_dict_file_path = os.path.join(self.geometry_dest_path, "system", "meshDict")
+
+            try:
+                with open(self.mesh_dict_file_path, "r") as mesh_dict_file:
+                    file_content = mesh_dict_file.read()
+                    self.selected_mesh_file_content = file_content
+
+                old_values_mesh = {param: match.group(1) for param in self.mesh_params
+                                   for match in re.finditer(f'{param}\s+(\S+)(;|;//.*)', file_content)}
+
+                # Open a popup to replace mesh parameters
+                self.open_replace_mesh_parameters_popup(old_values_mesh)
+
+            except FileNotFoundError:
+                tk.messagebox.showerror("Error", f"File not found - {self.mesh_dict_file_path}")
+            except Exception as e:
+                tk.messagebox.showerror("Error", f"Error reading mesh parameters: {e}")
+            
+            
                              
     def open_replace_mesh_parameters_popup(self, old_values_mesh):
         if old_values_mesh:
@@ -1501,34 +1564,39 @@ _____________________________________________________
     def setup_ui(self):
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
-        self.text_box.grid(row=1, column=4, columnspan=5, padx=10, pady=1, sticky="nsew", rowspan=10)
+        self.text_box.grid(row=1, column=4, columnspan=5, padx=10, pady=1, sticky="nsew", rowspan=12)
         self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
 
         splash_welcome_msg = """
         
-                        ___________________________________________________________
+        
+        
+        
+        
+        
+                      ___________________________________________________________
 
                               
                         
-                         __        __   _                            _           
-                         \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___     
-                          \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \    
-                           \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |   
-                            \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/    
+                       __        __   _                            _           
+                       \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___     
+                        \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \    
+                         \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |   
+                          \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/    
                                                                                  
-                          ____        _           _     _____ ___    _    __  __ 
-                         / ___| _ __ | | __ _ ___| |__ |  ___/ _ \  / \  |  \/  |
-                         \___ \| '_ \| |/ _` / __| '_ \| |_ | | | |/ _ \ | |\/| |
-                          ___) | |_) | | (_| \__ \ | | |  _|| |_| / ___ \| |  | |
-                         |____/| .__/|_|\__,_|___/_| |_|_|   \___/_/   \_\_|  |_|
-                               |_|                                               
+                        ____        _           _     _____ ___    _    __  __ 
+                       / ___| _ __ | | __ _ ___| |__ |  ___/ _ \  / \  |  \/  |
+                       \___ \| '_ \| |/ _` / __| '_ \| |_ | | | |/ _ \ | |\/| |
+                        ___) | |_) | | (_| \__ \ | | |  _|| |_| / ___ \| |  | |
+                       |____/| .__/|_|\__,_|___/_| |_|_|   \___/_/   \_\_|  |_|
+                             |_|                                               
                                           
                                           
                                                                                                      
-                        ___________________________________________________________ 
-                             
-                                   Your gate to efficient CFD production! 
-                        ___________________________________________________________
+                      ___________________________________________________________ 
+                            
+                                 Your gate to efficient CFD production! 
+                      ___________________________________________________________
     """
         self.text_box.insert(tk.END, splash_welcome_msg)
         # Make the Text widget read-only
