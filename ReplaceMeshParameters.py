@@ -2,6 +2,7 @@ import tkinter as tk
 import re
 import os
 import shutil
+import subprocess
 from tkinter import ttk, simpledialog, filedialog, messagebox
 
 class ReplaceMeshParameters:
@@ -14,14 +15,14 @@ class ReplaceMeshParameters:
 
         # Create a canvas, a vertical scrollbar, and a horizontal scrollbar
         self.canvas = tk.Canvas(parent.root, bg="#f0f0f0", bd=2, relief="ridge")
-        self.canvas.grid(row=0, column=1, sticky="nsew", rowspan=12)        
+        self.canvas.grid(row=0, column=1, sticky="nsew", rowspan=14)        
         
 
         self.v_scrollbar = tk.Scrollbar(parent.root, orient="vertical", command=self.canvas.yview)
-        self.v_scrollbar.grid(row=0, column=2, sticky='ns', rowspan=12)
+        self.v_scrollbar.grid(row=0, column=2, sticky='ns', rowspan=14)
         
         self.h_scrollbar = tk.Scrollbar(parent.root, orient="horizontal", command=self.canvas.xview)
-        self.h_scrollbar.grid(row=12, column=1, sticky='ew')  # Adjust the grid position
+        self.h_scrollbar.grid(row=14, column=1, sticky='ew')  # Adjust the grid position
         
         self.canvas.configure(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
 
@@ -39,7 +40,7 @@ class ReplaceMeshParameters:
         style.configure("My.TCheckbutton", padding=5)
 
         # Modified to use custom styles and added padding
-        mesh_label = ttk.Label(self.frame, text="Mesh Parameters", style="My.TLabel", foreground="red")
+        mesh_label = ttk.Label(self.frame, text="Mesh Controls", style="My.TLabel", foreground="red")
         mesh_label.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="w")
 
         separator = ttk.Separator(self.frame, orient='horizontal')
@@ -94,42 +95,40 @@ class ReplaceMeshParameters:
         if existing_stop_after_value in self.workflow_options:
             self.selected_workflow.set(existing_stop_after_value)
 
-#        # Buttons with modified padding and placement
-#        update_button = ttk.Button(self.frame, text="Update", command=self.update_mesh_parameters, style="My.TButton")
-#        update_button.grid(row=98, column=1, pady=10, padx=10)
-
-#        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="My.TButton")
-#        save_mesh_button.grid(row=98, column=2, pady=10, padx=10)
-
-#        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")
-#        close_button.grid(row=98, column=3, pady=10, padx=10)
-#        
-#        mesh_quality_button = ttk.Button(self.frame, text="Mesh stastistics", command=self.parent.load_meshChecked, style="My.TButton")
-#        mesh_quality_button.grid(row=99, column=3, pady=10, padx=10)
-
-        # Define the style for the buttons
+        # Stying the meshing buttons!
         style = ttk.Style()
-        style.configure("My.TButton", 
-                        font=12, 
-                        relief="flat", 
-                        background="lightblue", 
-                        foreground="black")
- 
+        # Assuming you have already created a professional style for the buttons
+        style.configure("Professional.TButton", 
+                        font=("Segoe UI", 9, "bold"), 
+                        relief="flat",
+                        padding=(5, 5, 5, 5))
 
-        # Buttons with modified padding and placement to match the search_button style and vertical alignment
-        update_button = ttk.Button(self.frame, text="Create", command=self.update_mesh_parameters, style="My.TButton")  # Replace lambda with your actual command
-        update_button.grid(row=91, column=1, pady=10, padx=7, sticky="ne")
+        # Configure the color scheme, including turning the button black when hovered over
+        style.map("Professional.TButton",
+                  foreground=[('pressed', 'white'), ('active', 'white')],  # Text color
+                  background=[('pressed', 'black'), ('active', 'black')])  # Background color
+                  
+                  
+        update_button = ttk.Button(self.frame, text="Create", command=self.update_mesh_parameters, style="Professional.TButton")
+        update_button.grid(row=91, column=1, pady=5, padx=7, sticky="nw")
 
-        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="My.TButton")  # Replace lambda with your actual command
-        save_mesh_button.grid(row=92, column=1, pady=10, padx=7, sticky="ne")
+        mesh_quality_button = ttk.Button(self.frame, text="Statistics", command=self.parent.load_meshChecked, style="Professional.TButton")
+        mesh_quality_button.grid(row=92, column=1, pady=5, padx=7, sticky="nw")
 
-        mesh_quality_button = ttk.Button(self.frame, text="Statistics", command=self.parent.load_meshChecked, style="My.TButton")  # Replace lambda with your actual command
-        mesh_quality_button.grid(row=93, column=1, pady=10, padx=7, sticky="ne")
+        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="Professional.TButton")
+        save_mesh_button.grid(row=93, column=1, pady=5, padx=7, sticky="nw")
         
-        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")  # Replace lambda with your actual command
-        close_button.grid(row=94, column=1, pady=10, padx=7, sticky="ne")
+        # Create a button for converting the mesh to Fluent mesh
+        convert_button = ttk.Button(self.frame, text="Convert", command=self.convert_to_fluent, style="Professional.TButton")
+        convert_button.grid(row=91, column=2, pady=10, padx=7, sticky="w")
 
+        remove_mesh_button = ttk.Button(self.frame, text="Remove", command=self.remove_mesh, style="Professional.TButton")
+        remove_mesh_button.grid(row=92, column=2, pady=5, padx=7, sticky="w")
 
+        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="Professional.TButton")
+        close_button.grid(row=93, column=2, pady=5, padx=7, sticky="w")
+        
+          
 
     # ...............................................................................
     # Saving the created mesh (polyMesh dir) to a specific location 
@@ -155,7 +154,74 @@ class ReplaceMeshParameters:
                 messagebox.showinfo("Success", "Mesh saved successfully!")
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to save mesh: {e}")
+                
+                
+    def convert_to_fluent(self):
+        # Clear the text_box before displaying new output
+        self.parent.text_box.delete(1.0, tk.END)
+        
+        try:
+            # Specify the working directory for the command
+            working_directory = self.parent.geometry_dest_path
+
+            # Run the foamMeshToFluent command in the specified directory and capture its output
+            process = subprocess.Popen(["foamMeshToFluent"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=working_directory)
+            output, error = process.communicate()
+
+            # Display the command's output and error in the text_box
+            if output:
+                self.parent.text_box.insert(tk.END, "Output:\n" + output)
+            if error:
+                self.parent.text_box.insert(tk.END, "\nError:\n" + error)
+        except Exception as e:
+            self.parent.text_box.insert(tk.END, "Failed to run foamMeshToFluent: " + str(e))
     # ...............................................................................
+    
+    # ........................Remove Mesh.................................
+    def remove_mesh(self):
+        # Ask the user for confirmation before deleting the mesh
+        user_response = messagebox.askyesno("Confirm Deletion", "Are you sure you want to delete the mesh and all associated files?")
+        
+        if user_response:  # If the user clicked 'Yes', proceed with deletion
+            try:
+                # Base directory, assuming self.parent.geometry_dest_path gives a valid path
+                base_directory = os.path.dirname(self.parent.geometry_dest_path)
+
+                # Path to the polyMesh directory
+                polyMesh_directory = os.path.join(base_directory, "constant", "polyMesh")
+                
+                # Delete the polyMesh directory if it exists
+                if os.path.exists(polyMesh_directory):
+                    shutil.rmtree(polyMesh_directory)
+                    
+                # Path to the VTK directory
+                vtk_directory = os.path.join(base_directory, "VTK")
+                
+                # Delete the VTK directory if it exists
+                if os.path.exists(vtk_directory):
+                    shutil.rmtree(vtk_directory)
+                    
+                # Path to the fluentInterface directory
+                fluentInterface_directory = os.path.join(base_directory, "fluentInterface")
+                
+                # Delete the fluentInterface directory if it exists
+                if os.path.exists(fluentInterface_directory):
+                    shutil.rmtree(fluentInterface_directory)
+                    
+                # Delete log files
+                for item in os.listdir(base_directory):
+                    if item.startswith("log."):
+                        log_file_path = os.path.join(base_directory, item)
+                        os.remove(log_file_path)
+
+                messagebox.showinfo("Success", "Mesh, VTK directory, fluentInterface directory, and log files removed successfully!")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to remove mesh and associated files: {e}")
+        else:
+            # If the user clicked 'No', do nothing
+            messagebox.showinfo("Cancelled", "Mesh deletion cancelled.")
+    # ........................Remove Mesh.................................
+        
                         
     def extract_stop_after_value(self, mesh_file_content):
         # Extract the stopAfter value from the workflowControl block in the meshDict file
