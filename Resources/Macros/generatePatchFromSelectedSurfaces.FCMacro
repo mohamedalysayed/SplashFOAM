@@ -1,0 +1,26 @@
+#******************************************************************************
+# macro to collect selected faces into a facebinder (basically group faces into a named patch)
+#******************************************************************************
+import FreeCAD
+import Draft
+import Mesh
+import MeshPart
+from PySide import QtGui
+from PySide.QtGui import QInputDialog
+from PySide.QtGui import *
+#******************************************************************************
+# execution
+#******************************************************************************
+userInput =QtGui.QInputDialog.getText(None,'Enter Patch name','Enter patch name')
+if userInput [1] == True:
+	patchName = userInput[0]
+	print('...generating patch ' + patchName + ' based on selected faces')
+	i=0
+	selectedFaces    = FreeCADGui.Selection.getSelectionEx()
+	facebinder         = Draft.makeFacebinder(selectedFaces)
+	facebinder.Label =patchName
+	Draft.autogroup(facebinder)
+	FreeCAD.ActiveDocument.recompute()
+	print('   ...finished!')
+else:
+	print('   ...patch generation canceled!')

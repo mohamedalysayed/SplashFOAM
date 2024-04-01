@@ -1,0 +1,24 @@
+#******************************************************************************
+# macro to select all faces of an item, e.g. body
+#******************************************************************************
+import FreeCAD
+import Draft
+import Mesh
+import MeshPart
+#******************************************************************************
+# store information, which object (body) is selected
+#******************************************************************************
+chosenObject = Gui.Selection.getSelection()[0].Name
+print('...selecting all faces of Object : '+Gui.Selection.getSelection()[0].Label)
+Gui.Selection.clearSelection()
+#******************************************************************************
+# loop over all faces of selected body and add them to selection
+#******************************************************************************
+i=0
+for x in FreeCAD.ActiveDocument.getObject(chosenObject).Shape.Faces:	
+	i = i + 1
+	faceName='Face'+str(i)
+	Gui.Selection.addSelection(FreeCAD.ActiveDocument.Name,chosenObject,faceName)
+	FreeCAD.Console.PrintMessage('.')
+print('\n')
+print('   ...finished!')
