@@ -1,0 +1,86 @@
+#******************************************************************************
+# macro to export selected facebinders to one concatenated stl-file
+# IMPORTANT: Faces have to collected to facebinders (possibly via dedicated macro) and have to be selected
+#******************************************************************************
+import FreeCAD
+import Draft
+import Mesh
+import MeshPart
+from PySide import QtGui
+from PySide.QtGui import QInputDialog
+from PySide.QtGui import *
+from PySide.QtGui import QMessageBox
+import PySide2
+from PySide2 import (QtWidgets)
+
+FilePathAndName, Filter = PySide2.QtWidgets.QFileDialog.getSaveFileName(None, 'Export *.stl-file',  'CAD', 'stl files  (*.stl);;' )
+if FilePathAndName != '':
+	#******************************************************************************
+	# initialization and variable declaration
+	#******************************************************************************
+	FBLabels      = []
+	MeshNames = []
+	MeshSettingsLinearDeflection   = 0.1 # 0.1
+	MeshSettingsAngularDeflection  = 0.1 # 0.1
+	print('...exporting selected patches to one concatenated *.stl-file')
+	#******************************************************************************
+	# loop over selected facebinders, temporarily rename each, generate mesh from each facebinder with
+	# the original facebinder name (note that names must be unique, therefore the temporary renaming)
+	#******************************************************************************
+	i=0
+	for x in Gui.Selection.getSelection():
+		mesh = FreeCAD.ActiveDocument.addObject('Mesh::Feature','Mesh')
+		part   = FreeCAD.ActiveDocument.getObject(Gui.Selection.getSelection()[i].Name)
+		shape = Part.getShape(part,'')
+		#mesh.Mesh=MeshPart.meshFromShape(Shape=shape,GrowthRate=0.5,SegPerEdge=10,SegPerRadius=10,SecondOrder=0,Optimize=1,AllowQuad=0)
+		mesh.Mesh = MeshPart.meshFromShape(Shape=shape,LinearDeflection=MeshSettingsLinearDeflection, AngularDeflection=MeshSettingsAngularDeflection, Relative=True)
+		FBLabels.append(str(Gui.Selection.getSelection()[i].Label))
+		Gui.Selection.getSelection()[i].Label=str(Gui.Selection.getSelection()[i].Label) + 'FB'
+		mesh.Label = FBLabels[i]
+		MeshNames.append(mesh.Name)
+		i = i + 1
+	del mesh, part, shape
+	#******************************************************************************
+	# export all generated meshes to single *.stl-files, concatenate them to one *.stl-file, remove single files:
+	# loop over meshed features, scale a copy of them and export the copies to *.ast
+	# replace the 'solid Mesh' entries with the right ones and save them to *.stl (remove the *ast afterwards)
+	#******************************************************************************
+	FileNames = list()
+	for x in  App.ActiveDocument.findObjects('Mesh::Feature'):
+		copiedMesh = x.Mesh.copy()
+		mat            = App.Matrix()
+		factor         = 0.001
+		mat.scale(factor,factor,factor)
+		copiedMesh.transform(mat)
+		copiedMesh.write(FilePathAndName+x.Label+'_tmp.ast')# output path
+		FileNames.append(x.Label + '_tmp.stl')
+		# replace the 'solid Mesh' entries with the right ones and save them to *.stl
+		fin    = open(FilePathAndName+x.Label+'_tmp.ast')
+		fout  = open(FilePathAndName+x.Label+'_tmp.stl', 'wt')
+		for line in fin:
+		    fout.write( line.replace('solid Mesh', 'solid '+x.Label) )
+		fin.close()
+		fout.close()
+		# remove the *ast-file
+		os.remove(FilePathAndName+x.Label+'_tmp.ast')
+		del copiedMesh
+	# concatenate the *.stl-files of the faces to one *.stl named by chosen name
+	with open(FilePathAndName, 'w') as outfile:
+		for fname in FileNames:
+			with open(FilePathAndName+fname) as infile:
+			    for line in infile:
+			        outfile.write(line)
+			os.remove(FilePathAndName+fname)
+	print('   ...exported selected patches to ' + FilePathAndName)
+	#******************************************************************************
+	# delete temporary meshes and rename facebinders to original names
+	#******************************************************************************
+	i=0
+	for x in Gui.Selection.getSelection():
+		App.ActiveDocument.removeObject(MeshNames[i])
+		Gui.Selection.getSelection()[i].Label=FBLabels[i].rstrip('FB')
+		i = i + 1
+	App.ActiveDocument.recompute()
+	print('   ...finished!')
+else:
+	print('   ...*.stl-export canceled!')
