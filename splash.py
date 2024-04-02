@@ -298,20 +298,8 @@ class TerminalApp:
         self.progress_bar_canvas.grid(row=13, column=0, padx=10, pady=15, sticky="w")                
         self.progress_bar_canvas_flag=True
 
-              
-        
-        ##report_bug_label = tk.Label(self.root, text="Splash-GPT", fg="darkblue", cursor="hand2")
-        ##report_bug_label.grid(row=14, column=0, sticky="w")
-        ##report_bug_label.bind("<Button-1>", lambda e: self.splash_GPT_page(e))
 
         #----------Text Widget with Scrollbar-----------       
- 
-#        # Create a button to load solver log 
-#        solverLog_button = tk.Button(root, text="Simulation Log", command=self.load_log_file)
-#        solverLog_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
-#        solverLog_button.grid(row=11, column=5, pady=10, padx=10, sticky="n") 
-#        self.add_tooltip(self.execute_button, "Click to load simulation log file")
-        
         # Add the search widget to the main app
         self.search_widget = SearchWidget(root, self.text_box)
         #----------Text Widget with Scrollbar-----------
@@ -358,12 +346,17 @@ class TerminalApp:
         #self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
        
         # Create a label for status messages
+        self.status_label_title = ttk.Label(self.root, text="")
+        status_title = "SplashFOAM v1.0"
+        self.status_label_title.grid(row=15, column=4, columnspan=5, pady=1, padx=10, sticky="n")
+        self.status_label_title.config(text=status_title, font=("Helvetica", 12, "bold"), background="white", foreground="darkblue")
+        
         self.status_label = ttk.Label(self.root, text="")
-        #default_status = "This field will show the status of your work!" # Start by importing geometry and configuring your case
         default_status = "Start by importing geometry and configuring your case!"
-#        self.status_label.grid(row=0, column=1, columnspan=3, pady=1, padx=10, sticky="w")\
-        self.status_label.grid(row=0, column=4, columnspan=5, pady=1, padx=10, sticky="n")
-        self.status_label.config(text=default_status, font=("TkDefaultFont", 12), foreground="black", background="lightgreen")
+        self.status_label.grid(row=16, column=4, columnspan=5, pady=1, padx=10, sticky="n")
+        self.status_label.config(text=default_status, font=("Helvetica", 12), background="white", foreground="darkblue")
+        
+        
 
         # ... (other initialization code)
         self.selected_file_path = None
@@ -425,7 +418,6 @@ class TerminalApp:
     
     def paraview_application(self):
         subprocess.run(["paraview"], check=True)
-
                 
     # Toggle function for action bar visibility
     def toggle_results_panel(self):
@@ -1080,7 +1072,7 @@ _____________________________________________________
             # Monitor residuals using foamMonitor | FLAG - monitoring residuals starts here 
             # self.monitor_simulation()
         else:
-            self.status_label.config(text="No case directory selected.", foreground="red")
+            self.status_label.config(text="No case directory selected!", foreground="darkblue")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
             self.initialize_simulation_button["state"] = tk.DISABLED  # Disable the "Initialize Simulation" button
             
@@ -1564,7 +1556,7 @@ _____________________________________________________
     def setup_ui(self):
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
-        self.text_box.grid(row=1, column=4, columnspan=5, padx=10, pady=1, sticky="nsew", rowspan=12)
+        self.text_box.grid(row=0, column=4, columnspan=5, padx=10, pady=1, sticky="nsew", rowspan=13)
         self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
 
         splash_welcome_msg = """
@@ -1604,7 +1596,7 @@ _____________________________________________________
 
         # Create a vertical scrollbar for the Text widget
         self.text_box_scrollbar = tk.Scrollbar(self.root, command=self.text_box.yview)
-        self.text_box_scrollbar.grid(row=1, column=8, columnspan=1, pady=1, sticky='nse', rowspan=10)
+        self.text_box_scrollbar.grid(row=0, column=8, columnspan=1, pady=1, sticky='nse', rowspan=13)
         self.text_box['yscrollcommand'] = self.text_box_scrollbar.set      
 
     def change_theme(self):
