@@ -252,7 +252,6 @@ class TerminalApp:
         self.add_tooltip(self.paraview_button, "Paraview! click here you won't regret it ;)")
 
         
-        
         # _____________________________Profile Theme_____________________________________
         
         # Configure a smaller style for the button
@@ -297,7 +296,6 @@ class TerminalApp:
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=280, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
         self.progress_bar_canvas.grid(row=13, column=0, padx=10, pady=15, sticky="w")                
         self.progress_bar_canvas_flag=True
-
 
         #----------Text Widget with Scrollbar-----------       
         # Add the search widget to the main app
@@ -587,43 +585,6 @@ class TerminalApp:
      
      # -------------- Splash background image(s) --------------------------  
 
-    # Static bg image (png directly loaded with tk.PhotoImage)
-##    def add_bgImage(self):
-##        # Specify the image path
-##        image_path = "Resources/Images/racing-car.png"
-
-##        # Create a tk.PhotoImage object directly from the file
-##        self.splash_bgImage = tk.PhotoImage(file=image_path)
-
-##        # Resize the image if needed
-##        #self.splash_bgImage = self.splash_bgImage.zoom(2)  # Adjust the zoom factor as needed
-##        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)  # Adjust the subsample as needed
-
-##        # Create a label to display the image
-##        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-###        self.splash_bgImage_label.grid(row=11, column=3, pady=1, padx=10, sticky="ew", rowspan=5)
-##        self.splash_bgImage_label.grid(row=3, column=10, pady=1, padx=10, sticky="ew", rowspan=8)        
-##        self.splash_bgImage_label.configure(background="white")
-    
-#    def add_bgImage(self):
-#        # Specify the image path
-#        image_path = "Resources/Images/racing-car.png"
-
-#        # Create a tk.PhotoImage object directly from the file
-#        self.splash_bgImage = tk.PhotoImage(file=image_path)
-
-#        # Resize the image if needed
-#        #self.splash_bgImage = self.splash_bgImage.zoom(2)  # Adjust the zoom factor as needed
-#        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)  # Adjust the subsample as needed
-
-#        # Create a label to display the image
-#        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage)
-#        self.splash_bgImage_label.grid(row=3, column=10, pady=1, padx=10, sticky="ew", rowspan=8)
-#        self.splash_bgImage_label.configure(background="white")
-
-#        # Make the image clickable
-#        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica"))
-
     def add_bgImage(self):
         # Specify the image path
         image_path = "Resources/Images/racing-car.png"
@@ -767,35 +728,6 @@ class TerminalApp:
 
  
 # -------------------------------- MESH CREATION ------------------------------
-##    def create_mesh(self):
-##        # Check if geometry is loaded
-##        if not self.geometry_loaded:
-##            messagebox.showinfo("Geometry Not Loaded", "Please load a geometry before creating the mesh.")
-##            return
-
-##        # Ask the user for mesh type using clickable buttons
-##        self.mesh_type = self.ask_mesh_type()
-
-##        if self.mesh_type is not None:
-
-##                # Read the content of the "meshDict" file
-##                self.mesh_dict_file_path = os.path.join(self.geometry_dest_path, "system", "meshDict")
-
-##                try:
-##                    with open(self.mesh_dict_file_path, "r") as mesh_dict_file:
-##                        file_content = mesh_dict_file.read()
-##                        self.selected_mesh_file_content = file_content
-
-##                    old_values_mesh = {param: match.group(1) for param in self.mesh_params
-##                                       for match in re.finditer(f'{param}\s+(\S+)(;|;//.*)', file_content)}
-
-##                    # Open a popup to replace mesh parameters
-##                    self.open_replace_mesh_parameters_popup(old_values_mesh)
-
-##                except FileNotFoundError:
-##                    tk.messagebox.showerror("Error", f"File not found - {self.mesh_dict_file_path}")
-##                except Exception as e:
-##                    tk.messagebox.showerror("Error", f"Error reading mesh parameters: {e}")
 
     def create_mesh(self):
         # Check if geometry is loaded
@@ -853,9 +785,7 @@ class TerminalApp:
             except FileNotFoundError:
                 tk.messagebox.showerror("Error", f"File not found - {self.mesh_dict_file_path}")
             except Exception as e:
-                tk.messagebox.showerror("Error", f"Error reading mesh parameters: {e}")
-            
-            
+                tk.messagebox.showerror("Error", f"Error reading mesh parameters: {e}")  
                              
     def open_replace_mesh_parameters_popup(self, old_values_mesh):
         if old_values_mesh:
@@ -1958,10 +1888,6 @@ _____________________________________________________
 ###        elif key == '3':  # Top view
 ###            self.set_camera_view("top")  
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        
-        
-        
-        
         
         
         
