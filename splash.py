@@ -64,7 +64,7 @@ class TerminalApp:
         icon_image = tk.PhotoImage(file=icon_path)
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
         
-        # Create a menu bar ------------------>
+        # Create a menu bar ----------------->
         menubar = tk.Menu(root)
 
         # Create a File menu and add it to the menu bar
@@ -106,6 +106,7 @@ class TerminalApp:
         
         help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
+        help_menu.add_command(label="Support SplashFOAM", command=self.support_SplashFOAM, foreground="green")
         menubar.add_cascade(label="Help", menu=help_menu)
         
         # Display the menu bar
@@ -604,8 +605,10 @@ class TerminalApp:
         self.splash_bgImage_label.bind("<Leave>", self.off_hover)
 
         # Make the image clickable
-        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
+        ##self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
+        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.skool.com/cfd-dose-5227/about"))
 
+        
     def on_hover(self, event):
         # Change the label appearance to simulate a frame around it on hover
         event.widget.config(bg="lightgrey", bd=2, relief="groove")
@@ -1708,6 +1711,8 @@ _____________________________________________________
              
     def open_contact_page(self, event=None):
         webbrowser.open_new("https://www.simulitica.com/contact")
+    def support_SplashFOAM(self, event=None):
+        webbrowser.open_new("https://www.buymeacoffee.com/simulitica")
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
 
