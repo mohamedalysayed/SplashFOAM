@@ -251,7 +251,6 @@ class TerminalApp:
         self.paraview_button = ttk.Button(self.root, text="Paraview", command=self.paraview_application)
         self.paraview_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.paraview_button, "Paraview! click here you won't regret it ;)")
-
         
         # _____________________________Profile Theme_____________________________________
         
@@ -354,8 +353,6 @@ class TerminalApp:
         default_status = "Start by importing geometry and configuring your case!"
         self.status_label.grid(row=16, column=4, columnspan=5, pady=1, padx=10, sticky="n")
         self.status_label.config(text=default_status, font=("Helvetica", 12), background="white", foreground="darkblue")
-        
-        
 
         # ... (other initialization code)
         self.selected_file_path = None
@@ -434,7 +431,6 @@ class TerminalApp:
             self.timer_label.grid_remove()
             self.splash_bgImage_label.grid_remove()
 
-    
     def browse_directory(self):
         selected_file = filedialog.askopenfilename()
 
@@ -501,7 +497,6 @@ class TerminalApp:
             
         
         # Use find and exec to run sed on all files under the 'constant' directory
-        #sed_command = f"sed -i 's/{current_fuel}/{selected_fuel}/g' {self.selected_file_path}" 
         sed_command = f"find {case_directory}/constant -type f -exec sed -i 's/{current_fuel}/{selected_fuel}/g' {{}} +"
         
         # Execute the sed command
@@ -570,9 +565,6 @@ class TerminalApp:
         popup.geometry("750x700")  # Adjust the size as needed
 
         # Create a Label in the Toplevel window to display the welcome message
-        #welcome_label = tk.Label(popup, text=welcome_message, font=("Helvetica", 14, "bold"), fg="darkblue", justify='center')
-        #welcome_label.pack(padx=10, pady=10)
-            
         welcome_label = ttk.Label(popup, text=welcome_message, font=("TkDefaultFont", 12), justify='center')
         welcome_label.pack(padx=10, pady=10)
 
@@ -653,7 +645,6 @@ class TerminalApp:
             gmsh_logo_path = os.path.join("Resources", "Logos", "gmsh_logo.png")
             blender_logo_path = os.path.join("Resources", "Logos", "blender_logo.png")
             paraview_logo_path = os.path.join("Resources", "Logos", "paraview_logo.png")
-
 
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
@@ -816,7 +807,6 @@ class TerminalApp:
         # Initiate the text_box with a nice mesh representation! 
         self.generate_mesh_visual()
 
-
         # Running mesh script 
         if os.path.exists(cartMesh_script):
             chmod_command = ["chmod", "+x", cartMesh_script]
@@ -865,8 +855,7 @@ class TerminalApp:
                 self.progress_bar_canvas_flag = False
         else:
             tk.messagebox.showerror("Error", "AllmeshCartesian script not found!")
-            
-            
+
     # ______Craft your own mesh with teh desired type _______
 
     def ask_mesh_type(self):
@@ -1315,7 +1304,6 @@ _____________________________________________________
                 tk.messagebox.showinfo("Stop Simulation", "Simulation stopped successfully.")
             except subprocess.CalledProcessError as e:
                 tk.messagebox.showerror("Error", f"Error stopping simulation: {e.stderr}")
-
         else:
             tk.messagebox.showerror("Error", "controlDict file not found!")
 
@@ -1893,9 +1881,7 @@ _____________________________________________________
 ###        elif key == '3':  # Top view
 ###            self.set_camera_view("top")  
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        
-        
-        
+         
 # --- Timer UNLIMITED version --- 
 ###    def update_timer(self):
 ###        elapsed_time = time.time() - self.start_time
