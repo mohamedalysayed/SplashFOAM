@@ -60,7 +60,7 @@ class TerminalApp:
         self.root.title("Splash - OpenFOAM")
         
         # Set the window icon using a PhotoImage
-        icon_path = "Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
+        icon_path = "../Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
         icon_image = tk.PhotoImage(file=icon_path)
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
         
@@ -389,8 +389,8 @@ class TerminalApp:
     def add_logos(self):
 
         # Create PhotoImage objects directly from image files
-        self.logo_openfoam = tk.PhotoImage(file="Resources/Logos/openfoam_logo.png")
-        self.logo_simulitica = tk.PhotoImage(file="Resources/Logos/simulitica_logo.png")
+        self.logo_openfoam = tk.PhotoImage(file="../Resources/Logos/openfoam_logo.png")
+        self.logo_simulitica = tk.PhotoImage(file="../Resources/Logos/simulitica_logo.png")
 
         # Resize images if needed
         self.logo_openfoam = self.logo_openfoam.subsample(2, 2)  # Adjust the subsample as needed
@@ -537,7 +537,7 @@ class TerminalApp:
 
         # Create a PhotoImage object and set it to the Label
         ##welcome_image = tk.PhotoImage(file="Resources/Images/watermeloni.png")
-        welcome_image = tk.PhotoImage(file="Resources/Images/racing-car.png")
+        welcome_image = tk.PhotoImage(file="../Resources/Images/racing-car.png")
         welcome_image = welcome_image.subsample(4, 4)
         welcome_label.config(image=welcome_image, compound="top")
 
@@ -569,7 +569,7 @@ class TerminalApp:
         welcome_label.pack(padx=10, pady=10)
 
         # Create a PhotoImage object and set it to the Label
-        welcome_image = tk.PhotoImage(file="Resources/Images/racing-car.png")  # Adjust the path as needed
+        welcome_image = tk.PhotoImage(file="../Resources/Images/racing-car.png")  # Adjust the path as needed
         welcome_image = welcome_image.subsample(4, 4)  # Adjust subsampling as needed
         welcome_label.config(image=welcome_image, compound="top")
         welcome_label.image = welcome_image  # Keep a reference
@@ -580,7 +580,7 @@ class TerminalApp:
 
     def add_bgImage(self):
         # Specify the image path
-        image_path = "Resources/Images/racing-car.png"
+        image_path = "../Resources/Images/racing-car.png"
 
         # Create a tk.PhotoImage object directly from the file
         self.splash_bgImage = tk.PhotoImage(file=image_path)
@@ -639,12 +639,23 @@ class TerminalApp:
             self.geometry_dest_path = os.path.join(geometry_dest.split('CAD')[0])
             #print({self.geometry_dest_path})
             shutil.copyfile(self.selected_file_path, geometry_dest)
-            
+
+            # Assuming 'current_path' is the path of the current working directory or a known path within your project
+            current_path = os.getcwd()  # or a specific path where you know "Resources" is a subdirectory
+
+            # Find the path to the directory just before "Resources"
+            index = current_path.find("Source")
+            if index != -1:
+                base_path = current_path[:index]
+            else:
+                base_path = current_path  # Fallback to current path if "Resources" not found
+
             # CAD programs logo paths 
-            freecad_logo_path = os.path.join("Resources", "Logos", "freecad_logo.png")
-            gmsh_logo_path = os.path.join("Resources", "Logos", "gmsh_logo.png")
-            blender_logo_path = os.path.join("Resources", "Logos", "blender_logo.png")
-            paraview_logo_path = os.path.join("Resources", "Logos", "paraview_logo.png")
+            freecad_logo_path = os.path.join(base_path, "Resources", "Logos", "freecad_logo.png")
+            gmsh_logo_path = os.path.join(base_path, "Resources", "Logos", "gmsh_logo.png")
+            blender_logo_path = os.path.join(base_path, "Resources", "Logos", "blender_logo.png")
+            paraview_logo_path = os.path.join(base_path, "Resources", "Logos", "paraview_logo.png")
+
 
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
@@ -735,7 +746,9 @@ class TerminalApp:
         if self.mesh_type is not None:
 
             # Define the source directory for Allmesh* files and "system" directory
-            meshing_directory = os.path.join(os.getcwd(), "Meshing")
+##            meshing_directory = os.path.join(os.getcwd(), "Meshing")
+            meshing_directory = os.path.join(os.path.dirname(os.getcwd()), "Meshing")
+
 
             # Check if the destination path is the same as the meshing directory
             if os.path.normpath(self.geometry_dest_path) != os.path.normpath(meshing_directory):
@@ -1580,7 +1593,7 @@ _____________________________________________________
             return
         
         # Get the absolute path to the SplashMonitor binary
-        splash_monitor_path = os.path.abspath("./Resources/Utilities/SplashMonitor")
+        splash_monitor_path = os.path.abspath("../Resources/Utilities/SplashMonitor")
 
         # Construct the SplashMonitor command with the given arguments
         splash_monitor_command = [splash_monitor_path, "-l", "-i", "2", "-r", "1", solver_info_file]
@@ -1974,7 +1987,7 @@ _____________________________________________________
             license_message_label.pack(padx=10, pady=10)
 
             # Create a PhotoImage object and set it to the Label
-            welcome_image = tk.PhotoImage(file="Resources/Logos/simulitica_icon_logo.png")  # Adjust the path as needed
+            welcome_image = tk.PhotoImage(file="../Resources/Logos/simulitica_icon_logo.png")  # Adjust the path as needed
             welcome_image = welcome_image.subsample(4, 4)  # Adjust subsampling as needed
             license_message_label.config(image=welcome_image, compound="top")
             license_message_label.image = welcome_image  # Keep a reference
