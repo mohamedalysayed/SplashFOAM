@@ -1708,7 +1708,7 @@ _____________________________________________________
 
         ttk.Button(popup, text="Activate", command=activate_and_close).pack(pady=10)
         
-    #____________________________________________ sourcing OF __________________________________________________    
+    #____________________________________________ sourcing OF ____________________________________________    
              
     def open_contact_page(self, event=None):
         webbrowser.open_new("https://www.simulitica.com/contact")
