@@ -1708,7 +1708,7 @@ _____________________________________________________
 
         ttk.Button(popup, text="Activate", command=activate_and_close).pack(pady=10)
         
-    #____________________________________________ sourcing OF __________________________________________________    
+    #____________________________________________ sourcing OF ____________________________________________    
              
     def open_contact_page(self, event=None):
         webbrowser.open_new("https://www.simulitica.com/contact")
@@ -1995,7 +1995,6 @@ _____________________________________________________
             # Create a "Renew License Now" button inside the popup
             renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/splash-v1"))
             renew_button.pack(pady=20)  # Adjust padding as needed
-        
   
 # https://www.simulitica.com/splash-v10
 # https://www.buymeacoffee.com/simulitica
@@ -2026,7 +2025,6 @@ _____________________________________________________
     def on_closing(self):
         self.save_elapsed_time()
         self.root.destroy()
-        
     
 if __name__ == "__main__":
     root = tk.Tk()
