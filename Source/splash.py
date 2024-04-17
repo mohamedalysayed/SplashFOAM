@@ -543,7 +543,7 @@ class TerminalApp:
 
         # Update the main loop to display the image for 2 seconds
         self.root.update()
-        time.sleep(2)  # Sleep for 2 seconds
+        time.sleep(3)  # Sleep for 2 seconds
         welcome_label.destroy()  # Destroy the Label to collapse the popup
         
     def show_about_message(self):
