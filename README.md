@@ -1,11 +1,11 @@
 # Splash-OpenFOAM
 A simple GUI-based program for OpenFOAM cases
+![SplashFOAM-ss](https://github.com/mohamedalysayed/Splash-OpenFOAM/assets/11530653/524fba49-24b4-49d9-940d-dd4566e7cd33)
 
 # Currently SplashFOAM manual is in the works..
 In the meantime, here are the steps to run the software: 
 
 Before you begin using Splash, it's important to ensure that all necessary dependencies and packages are installedon your system. You are provided with a "pre-installation.sh" script, to automate this process for you.
-
 
 Step 1: 
 =======
@@ -23,7 +23,7 @@ Step 3:
 Run the pre-installation script
 
 Now, you can run the script to install all necessary dependencies. Execute the following command in the terminal:
->> ./pre-installation.sh
+>> ./pre-installation
 
 Enter your password if prompted to allow the installation of packages.
 
