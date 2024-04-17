@@ -216,7 +216,7 @@ class TerminalApp:
         #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
         
         # Create a button to plot results using xmgrace
-        self.plot_results_xmgrace_button = ttk.Button(self.root, text="Xmgrace", command=self.plot_results_xmgrace)
+        self.plot_results_xmgrace_button = ttk.Button(self.root, text="2D Plotting", command=self.plot_results_xmgrace)
         self.plot_results_xmgrace_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
 
@@ -248,7 +248,7 @@ class TerminalApp:
         self.style.configure("Custom.Horizontal.TProgressbar", thickness=20, troughcolor="lightgray", background="lightblue")
         
         # Test button [10-12 taken!]
-        self.paraview_button = ttk.Button(self.root, text="Paraview", command=self.paraview_application)
+        self.paraview_button = ttk.Button(self.root, text="Post-processing", command=self.paraview_application)
         self.paraview_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
         self.add_tooltip(self.paraview_button, "Paraview! click here you won't regret it ;)")
         
@@ -1708,7 +1708,7 @@ _____________________________________________________
 
         ttk.Button(popup, text="Activate", command=activate_and_close).pack(pady=10)
         
-    #____________________________________________ sourcing OF ____________________________________________    
+    #____________________________________________ sourcing OF __________________________________________________    
              
     def open_contact_page(self, event=None):
         webbrowser.open_new("https://www.simulitica.com/contact")
@@ -1995,6 +1995,7 @@ _____________________________________________________
             # Create a "Renew License Now" button inside the popup
             renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/splash-v1"))
             renew_button.pack(pady=20)  # Adjust padding as needed
+        
   
 # https://www.simulitica.com/splash-v10
 # https://www.buymeacoffee.com/simulitica
@@ -2025,6 +2026,7 @@ _____________________________________________________
     def on_closing(self):
         self.save_elapsed_time()
         self.root.destroy()
+        
     
 if __name__ == "__main__":
     root = tk.Tk()
