@@ -1,5 +1,5 @@
 # Splash-OpenFOAM
-A simple GUI-based program for OpenFOAM cases
+A dynamic GUI-based program for OpenFOAM.
 
 ![SplashFOAM-ss](https://github.com/mohamedalysayed/Splash-OpenFOAM/assets/11530653/524fba49-24b4-49d9-940d-dd4566e7cd33)
 
