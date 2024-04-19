@@ -31,7 +31,6 @@ class ReplaceMeshParameters:
 
         self.frame.bind("<Configure>", self.on_frame_configure)
         
-        
         # Style configuration (optional)
         style = ttk.Style()
         style.configure("My.TLabel", font=("TkDefaultFont", 10, "bold"), padding=5)
@@ -154,26 +153,6 @@ class ReplaceMeshParameters:
                 messagebox.showinfo("Success", "Mesh saved successfully!")
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to save mesh: {e}")
-                
-#    def convert_to_fluent(self):
-#        # Clear the text_box before displaying new output
-#        self.parent.text_box.delete(1.0, tk.END)
-#        
-#        try:
-#            # Specify the working directory for the command
-#            working_directory = self.parent.geometry_dest_path
-
-#            # Run the foamMeshToFluent command in the specified directory and capture its output
-#            process = subprocess.Popen(["foamMeshToFluent"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=working_directory)
-#            output, error = process.communicate()
-
-#            # Display the command's output and error in the text_box
-#            if output:
-#                self.parent.text_box.insert(tk.END, "Output:\n" + output)
-#            if error:
-#                self.parent.text_box.insert(tk.END, "\nError:\n" + error)
-#        except Exception as e:
-#            self.parent.text_box.insert(tk.END, "Failed to run foamMeshToFluent: " + str(e))
 
     def convert_to_fluent(self):
         self.parent.text_box.delete(1.0, tk.END)  # Clear the text_box before displaying new output
@@ -368,7 +347,6 @@ class ReplaceMeshParameters:
             self.parent.start_meshing()   # Start the meshing process
         else:
             tk.messagebox.showinfo("Meshing Canceled", "No mesh will be created.")
-            
             
     def close_replace_mesh_parameters(self):
         # Functionality to close/hide the ReplaceMeshParameters frame

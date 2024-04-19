@@ -57,7 +57,7 @@ class TerminalApp:
     def __init__(self, root):
         self.root = root
         self.root.config(background="white") # black
-        self.root.title("Splash - OpenFOAM")
+        self.root.title("SplashFOAM - v1.0")
         
         # Set the window icon using a PhotoImage
         icon_path = "../Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
@@ -561,7 +561,7 @@ class TerminalApp:
 
         # Create a Toplevel window for the welcome message
         popup = tk.Toplevel(self.root)
-        popup.title("Splash v1.0")
+        popup.title("SplashFOAM v1.0")
         popup.geometry("750x700")  # Adjust the size as needed
 
         # Create a Label in the Toplevel window to display the welcome message
@@ -656,7 +656,6 @@ class TerminalApp:
             blender_logo_path = os.path.join(base_path, "Resources", "Logos", "blender_logo.png")
             paraview_logo_path = os.path.join(base_path, "Resources", "Logos", "paraview_logo.png")
 
-
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
             popup.title("Choose CAD Viewer")
@@ -731,7 +730,6 @@ class TerminalApp:
             tk.messagebox.showerror("Error", "No file selected for import")
         # -------------- importing the geometry --------------------------------------------------------------------    
 
- 
 # -------------------------------- MESH CREATION ------------------------------
 
     def create_mesh(self):
@@ -1979,7 +1977,7 @@ _____________________________________________________
 
             # Create a Toplevel window for the message
             popup = tk.Toplevel(self.root)
-            popup.title("Splash v1.0")
+            popup.title("SplashFOAM v1.0")
             popup.geometry("800x600")  # Adjust the size as needed
 
             # Create a Label in the Toplevel window to display the message
@@ -2031,7 +2029,7 @@ _____________________________________________________
 if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', False)  # Disable menu tear-off
-    root.title("Splash v1.0")
-    root.wm_title("Splash v1.0")  # Set window manager title
+    root.title("SplashFOAM v1.0")
+    root.wm_title("SplashFOAM v1.0")  # Set window manager title
     app = TerminalApp(root)
     root.mainloop()
