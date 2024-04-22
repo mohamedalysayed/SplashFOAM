@@ -744,7 +744,7 @@ class TerminalApp:
         if self.mesh_type is not None:
 
             # Define the source directory for Allmesh* files and "system" directory
-##            meshing_directory = os.path.join(os.getcwd(), "Meshing")
+            ##meshing_directory = os.path.join(os.getcwd(), "Meshing")
             meshing_directory = os.path.join(os.path.dirname(os.getcwd()), "Meshing")
 
 
@@ -1161,7 +1161,7 @@ _____________________________________________________
         # Open a popup to replace simulation setup parameters
         ReplaceSimulationSetupParameters(self, constant_params, system_params, existing_values)
 
-# ++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++
+    # ++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++
 
     #+++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++           
     def update_control_dict_parameters(self):
@@ -1300,7 +1300,7 @@ _____________________________________________________
         subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
         time.sleep(0.1)  # Add a 100ms delay if needed
         
-# --------------------- running the simulation ---------------------------------------
+    # --------------------- running the simulation ---------------------------------------
         
     def stop_simulation(self): # FLAG! at the moment, the controlDict file needs to be open and saved and closed, for the function to work :/
         if not self.simulation_running:
@@ -1353,7 +1353,7 @@ _____________________________________________________
         self.progress_bar_canvas.configure(mode="determinate")
         self.progress_bar_canvas["value"] = 0
 #______________________________________________________________________
-# FLAG: essentially intended to be dedicated for checkMesh script****
+    # FLAG: essentially intended to be dedicated for checkMesh script****
     def load_meshChecked(self): # Important, implement an error handling mechanism where the it spits useful info in case no mesh was created yet!
    
         # Check if the file exists
@@ -2025,7 +2025,6 @@ _____________________________________________________
         self.save_elapsed_time()
         self.root.destroy()
         
-    
 if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', False)  # Disable menu tear-off
