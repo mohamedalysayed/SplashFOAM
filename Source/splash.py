@@ -119,7 +119,7 @@ class TerminalApp:
         #---------------------
         self.start_time = time.time()
         self.license_start_date_file = "license_start_date.txt"  # File to store the start date
-        self.license_duration = 2 * 365 * 24 * 3600  # 2 years in seconds
+        self.license_duration = 1 * 365 * 24 * 3600  # 1 year in seconds
         self.notice_period_before_end = 30 * 24 * 3600  # Notify 30 days before the license expires
         self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
         
@@ -744,7 +744,6 @@ class TerminalApp:
         if self.mesh_type is not None:
 
             # Define the source directory for Allmesh* files and "system" directory
-            ##meshing_directory = os.path.join(os.getcwd(), "Meshing")
             meshing_directory = os.path.join(os.path.dirname(os.getcwd()), "Meshing")
 
 
@@ -1053,7 +1052,7 @@ _____________________________________________________
             finally:
                 self.stop_progress_bar()
         else:
-#            tk.messagebox.showerror("Error", "Allclean script not found!")
+        # tk.messagebox.showerror("Error", "Allclean script not found!")
             # Allclean script not found, creating a temporary script to clean the case
             temp_clean_script_path = os.path.join(self.selected_file_path, "temp_clean.sh")
             try:
