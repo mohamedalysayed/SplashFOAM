@@ -64,7 +64,7 @@ class TerminalApp:
         icon_image = tk.PhotoImage(file=icon_path)
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
         
-        # Create a menu bar ----------------->
+        # ======================= Create a menu bar ----------------------------->
         menubar = tk.Menu(root)
 
         # Create a File menu and add it to the menu bar
@@ -111,7 +111,8 @@ class TerminalApp:
         
         # Display the menu bar
         root.config(menu=menubar)
-        # Create a menu bar -----------------<
+        
+        # ======================= Create a menu bar -----------------------------<
         
         # ============= Time Recorder ====================
         #---------------------
