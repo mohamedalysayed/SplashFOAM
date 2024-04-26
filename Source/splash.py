@@ -529,7 +529,6 @@ class TerminalApp:
         "Unauthorized copying of this file, via any medium, is strictly prohibited.\n"
         "Written by Mohamed SAYED (mohamed.sayed@simulitica.com), November 2023.\n"
         "Proprietary and confidential!\n"
-#        "_____________________________________________________________________________"
         )
 
         # Create a Label to display the welcome message
@@ -537,7 +536,6 @@ class TerminalApp:
         welcome_label.grid(row=0, column=0, columnspan=3, pady=10, padx=10, sticky="nsew")
 
         # Create a PhotoImage object and set it to the Label
-        ##welcome_image = tk.PhotoImage(file="Resources/Images/watermeloni.png")
         welcome_image = tk.PhotoImage(file="../Resources/Images/racing-car.png")
         welcome_image = welcome_image.subsample(4, 4)
         welcome_label.config(image=welcome_image, compound="top")
@@ -601,7 +599,6 @@ class TerminalApp:
         ##self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
         self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.skool.com/cfd-dose-5227/about"))
 
-        
     def on_hover(self, event):
         # Change the label appearance to simulate a frame around it on hover
         event.widget.config(bg="lightgrey", bd=2, relief="groove")
@@ -1464,7 +1461,7 @@ _____________________________________________________
                 self.status_label.config(text="Command executed successfully")
                 #self.status_label.delete(0, END)
                 
-# ===================Tool tip (hover over the button)=============================================
+    # ===================Tool tip (hover over the button)=============================================
     def add_tooltip(self, widget, text):
         widget.bind("<Enter>", lambda event: self.show_tooltip_right(widget, text))
         widget.bind("<Leave>", lambda event: self.hide_tooltip())
@@ -1638,7 +1635,6 @@ _____________________________________________________
             messagebox.showerror("Error", "Unsupported OpenFOAM version specified.")
             popup.destroy()
             return  
-
 
         command = f'source {bashrc_path}'
         #command = f'source {bashrc_path} && env'
@@ -1891,9 +1887,8 @@ _____________________________________________________
 ###            self.set_camera_view("front")
 ###        elif key == '3':  # Top view
 ###            self.set_camera_view("top")  
-    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-         
-# --- Timer UNLIMITED version --- 
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+    # --- Timer UNLIMITED version --- 
 ###    def update_timer(self):
 ###        elapsed_time = time.time() - self.start_time
 ###        # Extract tenths of a second
@@ -1902,8 +1897,7 @@ _____________________________________________________
 ###        hours, minutes = divmod(minutes, 60)
 ###        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
 ###        self.root.after(100, self.update_timer)  # Update the timer every 100 milliseconds to match the tenths of a second
-
-# --- Timer UNLIMITED version --- 
+    # --- Timer UNLIMITED version --- 
 # ------------------------------- 2.03.2024 --------------------------------
 
     def update_timer(self):
@@ -1994,7 +1988,6 @@ _____________________________________________________
             renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/splash-v1"))
             renew_button.pack(pady=20)  # Adjust padding as needed
         
-  
 # https://www.simulitica.com/splash-v10
 # https://www.buymeacoffee.com/simulitica
             
@@ -2010,6 +2003,7 @@ _____________________________________________________
                     return time.time()
         else:
             return time.time()
+
 
     def save_elapsed_time(self):
         with open(self.elapsed_time_file, "w") as file:
