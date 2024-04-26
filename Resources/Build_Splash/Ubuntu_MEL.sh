@@ -1,6 +1,16 @@
 #!/bin/bash
 # Script to install required packages on Ubuntu
 
+echo "_________________________________________________________________________________"
+echo " 									 	       "
+echo ".%%...%%..%%%%%%..%%...............%%%%....%%%%...%%%%%...%%%%%%..%%%%%...%%%%%%."
+echo ".%%%.%%%..%%......%%..............%%......%%..%%..%%..%%....%%....%%..%%....%%..."
+echo ".%%.%.%%..%%%%....%%...............%%%%...%%......%%%%%.....%%....%%%%%.....%%..."
+echo ".%%...%%..%%......%%..................%%..%%..%%..%%..%%....%%....%%........%%..."
+echo ".%%...%%..%%%%%%..%%%%%%...........%%%%....%%%%...%%..%%..%%%%%%..%%........%%..."
+echo "................................................................................."
+echo "_________________________________________________________________________________"
+
 # Install curl if not already installed
 echo "Checking if curl is installed..."
 if ! [ -x "$(command -v curl)" ]; then
@@ -9,6 +19,16 @@ if ! [ -x "$(command -v curl)" ]; then
   sudo apt-get install -y curl
 else
   echo "curl is already installed."
+fi
+
+# Install Git if not already installed
+echo "Checking if Git is installed..."
+if ! [ -x "$(command -v git)" ]; then
+  echo "Git is not installed. Installing..."
+  sudo apt-get update
+  sudo apt-get install -y git
+else
+  echo "Git is already installed."
 fi
 
 # Add OpenFOAM ESI repository and update packages
@@ -30,7 +50,7 @@ sudo apt-get update
 
 # Install OpenFOAM Foundation versions
 echo "Installing OpenFOAM Foundation versions..."
-sudo apt-get install -y openfoam9 openfoam10 openfoam11
+sudo apt-get install -y openfoam8 openfoam9 openfoam10 openfoam11
 
 # Install other required packages
 echo "Installing FreeCAD..."
@@ -52,32 +72,55 @@ sudo apt-get install -y python3-tk
 echo "Installing pip..."
 sudo apt-get install -y python3-pip
 
+# Install gedit plugins
+echo "Installing gedit plugins..."
+sudo apt-get install -y gedit-plugins
 
-# Install VirtualBox Guest Additions if running on VirtualBox | FLAG! us that username-dependent?!
-if [ -n "$(which dmidecode)" ] && [ "$(sudo dmidecode -s system-product-name)" == "VirtualBox" ]; then
-  echo "Installing VirtualBox Guest Additions..."
-  sudo apt-get install -y virtualbox-guest-utils virtualbox-guest-x11
-  echo "Rebooting system..."
-  sudo reboot
-fi
+# Install custom tkinter using pip3
+echo "Installing custom tkinter using pip3..."
+pip3 install customtkinter
+pip3 install customtkinter --upgrade
+
+### Install VirtualBox Guest Additions if running on VirtualBox
+##if [ -n "$(which dmidecode)" ] && sudo dmidecode -s system-product-name | grep -q "VirtualBox"; then
+##  echo "Installing VirtualBox Guest Additions..."
+##  sudo apt-get install -y virtualbox-guest-utils virtualbox-guest-x11
+##  echo "Rebooting system..."
+##  sudo reboot
+##fi
 
 # Add aliases for OpenFOAM versions in .bashrc
 echo "Adding aliases for OpenFOAM versions in .bashrc..."
-echo "alias of9='source /opt/openfoam9/etc/bashrc'" >> ~/.bashrc
-echo "alias of10='source /opt/openfoam10/etc/bashrc'" >> ~/.bashrc
-echo "alias of11='source /opt/openfoam11/etc/bashrc'" >> ~/.bashrc
-echo "alias of2206='source /usr/lib/openfoam/openfoam2206/etc/bashrc'" >> ~/.bashrc
-echo "alias of2212='source /usr/lib/openfoam/openfoam2212/etc/bashrc'" >> ~/.bashrc
-echo "alias of2306='source /usr/lib/openfoam/openfoam2306/etc/bashrc'" >> ~/.bashrc
-echo "alias of2312='source /usr/lib/openfoam/openfoam2312/etc/bashrc'" >> ~/.bashrc
+echo "alias of9='source /opt/openfoam9/etc/bashrc'" >> "$HOME/.bashrc"
+echo "alias of10='source /opt/openfoam10/etc/bashrc'" >> "$HOME/.bashrc"
+echo "alias of11='source /opt/openfoam11/etc/bashrc'" >> "$HOME/.bashrc"
+echo "alias of2206='source /usr/lib/openfoam/openfoam2206/etc/bashrc'" >> "$HOME/.bashrc"
+echo "alias of2212='source /usr/lib/openfoam/openfoam2212/etc/bashrc'" >> "$HOME/.bashrc"
+echo "alias of2306='source /usr/lib/openfoam/openfoam2306/etc/bashrc'" >> "$HOME/.bashrc"
+echo "alias of2312='source /usr/lib/openfoam/openfoam2312/etc/bashrc'" >> "$HOME/.bashrc"
 
 # Reload .bashrc to apply changes
-source ~/.bashrc
+source "$HOME/.bashrc" 2>/dev/null || . "$HOME/.bashrc"
 
-echo "All packages installed successfully!"
+echo "______________________________________________________________________________________________"
+echo " 												    "
+echo "	  	 ..%%%%...%%%%%%..%%%%%...........%%%%%....%%%%....%%%%...%%%%%%."
+echo "		 .%%..%%..%%......%%..%%..........%%..%%..%%..%%..%%......%%....."
+echo "		 .%%......%%%%....%%..%%..........%%..%%..%%..%%...%%%%...%%%%..."
+echo "		 .%%..%%..%%......%%..%%..........%%..%%..%%..%%......%%..%%....."
+echo "		 ..%%%%...%%......%%%%%...........%%%%%....%%%%....%%%%...%%%%%%."
+echo "		 ................................................................"
 
-
-## nounting a shared folder to transfer files from and to the host (e.g. Windows)
-#sudo mkdir /mnt/shared
-#sudo mount -t vboxsf Shared /mnt/shared
-
+echo "     _____                                                                                    "
+echo "    (, /  |   /) /)               /)                     /)                 /)                "
+echo "      /---|  // //    __   _   _ (/_  _   _    _  _     (/   _  _ _   _    (/_  _   _ __      "
+echo "   ) /    |_(/_(/_    /_)_(_(_(__/(__(_(_(_/__(/_/_)_   / )_(_(_(/___(/_  /_) _(/__(/_/ (_    "
+echo "  (_/              .-/                  .-/                                                    "
+echo "                  (_/                  (_/                                                     "
+echo "                                                                                     /          "
+echo "    ,                 /) /)      /)                              /)     /) /)       /           "
+echo "     __   _  _/_ _   // //  _  _(/    _       _  _   _  _   _   //     // //       /            "
+echo "  _(_/ (_/_)_(__(_(_(/_(/__(/_(_(_   /_)_(_(_(__(___(/_/_)_/_)_/(_(_(_(/_(/_ (_/_ o             "
+echo "                                                              /)            .-/               "
+echo "                                                             (/            (_/                "
+echo "______________________________________________________________________________________________"
