@@ -1852,7 +1852,6 @@ _____________________________________________________
 ###        writer.SetInputConnection(window_to_image_filter.GetOutputPort())
 ###        writer.Write()
 ###        print(f"Render saved to: {file_path}")
-###    
 ###        
 ###    def reset_camera_view(self):
 ###        self.renderer.ResetCamera()
