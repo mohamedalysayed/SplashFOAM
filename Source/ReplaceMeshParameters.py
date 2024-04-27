@@ -193,12 +193,12 @@ class ReplaceMeshParameters:
                 if os.path.exists(polyMesh_directory):
                     shutil.rmtree(polyMesh_directory)
                     
-                # Path to the VTK directory
-                vtk_directory = os.path.join(base_directory, "VTK")
-                
-                # Delete the VTK directory if it exists
-                if os.path.exists(vtk_directory):
-                    shutil.rmtree(vtk_directory)
+##                # Path to the VTK directory
+##                vtk_directory = os.path.join(base_directory, "VTK")
+##                
+##                # Delete the VTK directory if it exists
+##                if os.path.exists(vtk_directory):
+##                    shutil.rmtree(vtk_directory)
                     
                 # Path to the fluentInterface directory
                 fluentInterface_directory = os.path.join(base_directory, "fluentInterface")
@@ -213,7 +213,7 @@ class ReplaceMeshParameters:
                         log_file_path = os.path.join(base_directory, item)
                         os.remove(log_file_path)
 
-                messagebox.showinfo("Success", "Mesh, VTK directory, fluentInterface directory, and log files removed successfully!")
+                messagebox.showinfo("Success", "Mesh, VTK files, fluentInterface directory, and log files removed successfully!")
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to remove mesh and associated files: {e}")
         else:

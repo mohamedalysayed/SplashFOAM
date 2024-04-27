@@ -37,8 +37,8 @@ sleep_time=$((clock_time + 1))
 sleep $sleep_time # FLAG! hard coded: that needs to be read from the mesh file as time_mesh + 2s 
 
 # Saving the mesh in VTK format (for CAD viewers)
-wait
-runApplication foamToVTK 
+##wait
+##runApplication foamToVTK 
 wait
 runApplication paraFoam   
 
