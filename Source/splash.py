@@ -1887,7 +1887,7 @@ _____________________________________________________
 ###        elif key == '3':  # Top view
 ###            self.set_camera_view("top")  
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
-    # --- Timer UNLIMITED version --- 
+        # --- Timer UNLIMITED version --- 
 ###    def update_timer(self):
 ###        elapsed_time = time.time() - self.start_time
 ###        # Extract tenths of a second
@@ -1896,7 +1896,7 @@ _____________________________________________________
 ###        hours, minutes = divmod(minutes, 60)
 ###        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
 ###        self.root.after(100, self.update_timer)  # Update the timer every 100 milliseconds to match the tenths of a second
-    # --- Timer UNLIMITED version --- 
+        # --- Timer UNLIMITED version --- 
 # ------------------------------- 2.03.2024 --------------------------------
 
     def update_timer(self):
