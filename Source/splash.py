@@ -1897,7 +1897,7 @@ _____________________________________________________
 ###        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
 ###        self.root.after(100, self.update_timer)  # Update the timer every 100 milliseconds to match the tenths of a second
         # --- Timer UNLIMITED version --- 
-# ------------------------------- 2.03.2024 --------------------------------
+# ---------------------------------------------------------------
 
     def update_timer(self):
         current_time = time.time()
