@@ -16,7 +16,6 @@ class ReplaceMeshParameters:
         # Create a canvas, a vertical scrollbar, and a horizontal scrollbar
         self.canvas = tk.Canvas(parent.root, bg="#f0f0f0", bd=2, relief="ridge")
         self.canvas.grid(row=0, column=1, sticky="nsew", rowspan=14)        
-        
 
         self.v_scrollbar = tk.Scrollbar(parent.root, orient="vertical", command=self.canvas.yview)
         self.v_scrollbar.grid(row=0, column=2, sticky='ns', rowspan=14)
@@ -192,13 +191,6 @@ class ReplaceMeshParameters:
                 # Delete the polyMesh directory if it exists
                 if os.path.exists(polyMesh_directory):
                     shutil.rmtree(polyMesh_directory)
-                    
-##                # Path to the VTK directory
-##                vtk_directory = os.path.join(base_directory, "VTK")
-##                
-##                # Delete the VTK directory if it exists
-##                if os.path.exists(vtk_directory):
-##                    shutil.rmtree(vtk_directory)
                     
                 # Path to the fluentInterface directory
                 fluentInterface_directory = os.path.join(base_directory, "fluentInterface")
