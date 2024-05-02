@@ -4,6 +4,7 @@ import sys
 
 # Get the CLI arguments
 args = sys.argv
+
 # Find the "--" which separates Blender args from the script args
 idx = args.index("--") + 1 if "--" in args else 0
 stl_path = args[idx] if idx < len(args) else ""

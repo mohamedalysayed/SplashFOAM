@@ -4,7 +4,6 @@ import os
 import re
 from tkinter import ttk, simpledialog, messagebox
 
-
 class ReplaceSimulationSetupParameters:
     def __init__(self, parent, constant_params, system_params, existing_values):
         self.parent = parent
@@ -27,8 +26,6 @@ class ReplaceSimulationSetupParameters:
 
         system_frame = ttk.LabelFrame(self.main_frame, text="System Parameters", padding=(10, 5))
         system_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
-
-        
 
         # Create entry fields for each parameter in the "Constant Parameters" group
         self.create_label_and_entry_widgets(constant_frame, self.constant_params, "constant")
