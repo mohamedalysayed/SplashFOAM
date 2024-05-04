@@ -20,6 +20,7 @@ from collections import defaultdict # Import defaultdict | for mesh parameters
 from tkinter.colorchooser import askcolor
 from tkinter.font import Font
 
+# -------------------------------------------------
 # DONOT REMOVE: visualizing stl natively in Splash! 
 ###import vtk
 ###from mpl_toolkits import mplot3d
