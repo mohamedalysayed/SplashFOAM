@@ -22,6 +22,7 @@ rm -rf VTK
 
 # Update the user with the status - spinner goes after 
 echo "===========================================================>>>"
+echo 
 echo "Mesh is being crafted, please hang on... " & 
 echo
 # build the mesh in polyhedral mode 

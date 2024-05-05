@@ -27,7 +27,7 @@ echo
 # build the mesh in tetrahedral mode 
 tetMesh > log.tetrahedralMesh & 
 wait
-echo "Mesh is successfully generated! Now creating the vtk files for you..." &
+echo "Mesh is successfully generated!" &
 
 # Extract ClockTime value from log.tetrahedralMesh
 clock_time=$(grep "ClockTime =" log.tetrahedralMesh | awk '{print $7}' | tr -d '[:alpha:]')
