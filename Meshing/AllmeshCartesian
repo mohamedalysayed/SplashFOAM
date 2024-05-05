@@ -24,12 +24,13 @@ rm -rf VTK
 
 # Update the user with the status - spinner goes after 
 echo "===========================================================>>>"
+echo 
 echo "Mesh is being crafted, please hang on... " & 
 echo
 # build the mesh in cartesian mode 
 cartesianMesh > log.cartesianMesh & 
 wait
-echo "Mesh is successfully generated! Now creating the vtk files for you..." &
+echo "Mesh is successfully generated!" &
 
 # Extract ClockTime value from log.cartesianMesh
 clock_time=$(grep "ClockTime =" log.cartesianMesh | awk '{print $7}' | tr -d '[:alpha:]')
