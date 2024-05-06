@@ -1423,7 +1423,7 @@ _____________________________________________________
         except subprocess.CalledProcessError:
             tk.messagebox.showerror("Error", "xmgrace is not installed or not in the system's PATH.")
 # -------------------------------- Plot results ------------------------------  
-     #=============================================================================
+    #=============================================================================
     def execute_command(self):
         #command = "source ~/.bashrc"; self.entry.get()
         command = self.entry.get()
@@ -1712,9 +1712,9 @@ _____________________________________________________
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++
-    # DONOT REMOVE: visualizing stl natively in Splash! 
-    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ++++++++++++++++++++++++++++++++++++++++++++++++++
+# DONOT REMOVE: visualizing stl natively in Splash! 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++>
 ###    # This function is good for quick and dirty 2D/3D stl files!
 ###    def load_and_display_stl(self):
 ###        # Hide the root Tkinter window
@@ -1990,7 +1990,6 @@ _____________________________________________________
         
 # https://www.simulitica.com/splash-v10
 # https://www.buymeacoffee.com/simulitica
-            
 # ---------------------------------------------<
 
     def load_last_recorded_time(self):
