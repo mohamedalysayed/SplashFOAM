@@ -22,9 +22,9 @@ from tkinter.font import Font
 
 # -------------------------------------------------
 # DONOT REMOVE: visualizing stl natively in Splash! 
-###import vtk
-###from mpl_toolkits import mplot3d
-###from stl import mesh
+#import vtk
+#from mpl_toolkits import mplot3d
+#from stl import mesh
 # -------------------------------------------------
 
 # Importing local classes
@@ -54,7 +54,7 @@ def view_toolbar():
 # TERMINAL APP 
 #______________           
 
-class TerminalApp:  
+class SplashFOAM:  
     def __init__(self, root):
         self.root = root
         self.root.config(background="white") # black
@@ -65,7 +65,7 @@ class TerminalApp:
         icon_image = tk.PhotoImage(file=icon_path)
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
         
-        # ======================= Create a menu bar ----------------------------->
+        # ======================= Create a menubar ----------------------------->
         menubar = tk.Menu(root)
 
         # Create a File menu and add it to the menu bar
@@ -112,7 +112,6 @@ class TerminalApp:
         
         # Display the menu bar
         root.config(menu=menubar)
-        
         # ======================= Create a menubar -----------------------------<
         
         # ============= Time Recorder ====================
@@ -265,7 +264,7 @@ class TerminalApp:
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
         reset_checkbutton = ttk.Checkbutton(self.root, text="Reset Profile Theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
-        reset_checkbutton.grid(row=14, column=0, padx=10, pady=1, sticky="w")
+        reset_checkbutton.grid(row=14, column=0, padx=7, pady=1, sticky="w")
         
         # Create a Checkbutton using the custom style for showing/hiding results section 
         style = ttk.Style()
@@ -277,14 +276,14 @@ class TerminalApp:
         self.monitor_simulation_var = tk.BooleanVar()
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
-        monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation)
+        monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation, style="Custom.TCheckbutton")
         monitor_simulation_checkbutton.grid(row=15, column=0, pady=1, padx=7, sticky="w")
         
         # Create Checkbutton for monitoring simulation
         self.monitor_simulationLog_var = tk.BooleanVar()
         reset_checkbutton_style = ttk.Style()
         reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
-        monitor_simulationLog_checkbutton = ttk.Checkbutton(root, text="Simulation Results", command=self.load_log_file)
+        monitor_simulationLog_checkbutton = ttk.Checkbutton(root, text="Simulation Results", variable=self.monitor_simulationLog_var, command=self.toggle_simulation_results, style="Custom.TCheckbutton")
         monitor_simulationLog_checkbutton.grid(row=16, column=0, pady=1, padx=7, sticky="w")
 
         # Store initial profile theme values
@@ -1384,6 +1383,10 @@ _____________________________________________________
             messagebox.showinfo("No Mesh Log-File Found!", "Please make sure a mesh is generated first then load its log file.")
 #__________________________________________________________________           
     def load_log_file(self):
+    
+        if self.selected_file_path is None:
+            tk.messagebox.showerror("Error", "No case was found to be tracked. Please make sure your case is loaded/run properly.")
+            return
 
         # List of identifiable "solver" names 
         solver_names = ["simpleFoam", "pimpleFoam", "icoFoam", "sonicFoam", "compressibleInterFoam", "foamRun"]  # Add more solver names...
@@ -1572,6 +1575,16 @@ _____________________________________________________
         else:
             # Handle the case when the Checkbutton is unchecked (if needed)
             pass
+            
+    def toggle_simulation_results(self):
+        if self.monitor_simulationLog_var.get():
+            # Call your simulation_results function here [showing the log file - no more.]
+            self.load_log_file()
+        else:
+            # Handle the case when the Checkbutton is unchecked (if needed)
+            pass
+                    
+            
 
     def monitor_simulation(self):
     
@@ -2003,7 +2016,6 @@ _____________________________________________________
         else:
             return time.time()
 
-
     def save_elapsed_time(self):
         with open(self.elapsed_time_file, "w") as file:
             elapsed_time = time.time() - self.start_time
@@ -2023,5 +2035,5 @@ if __name__ == "__main__":
     root.option_add('*tearOff', False)  # Disable menu tear-off
     root.title("SplashFOAM v1.0")
     root.wm_title("SplashFOAM v1.0")  # Set window manager title
-    app = TerminalApp(root)
+    app = SplashFOAM(root)
     root.mainloop()
