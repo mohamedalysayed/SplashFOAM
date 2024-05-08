@@ -164,7 +164,6 @@ class SplashFOAM:
         "maxCellSize": "maxCellSize:\nSpecify the maximum cell size [in meters]. As a first guess you might take divide the size of the smallest element in your geometry!",
         "boundaryCellSize": "boundaryCellSize:\nSpecify the cell size near boundaries. As a first guess you might take divide the size of the smallest element in your geometry divided by 5!"}
         
-
         # Create a button to import a geometry
         style = ttk.Style()
         style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
@@ -729,7 +728,6 @@ class SplashFOAM:
         # -------------- importing the geometry --------------------------------------------------------------------    
 
 # -------------------------------- MESH CREATION ------------------------------
-
     def create_mesh(self):
         # Check if geometry is loaded
         if not self.geometry_loaded:
@@ -1005,7 +1003,6 @@ _____________________________________________________
             self.status_label.config(text="No case directory selected!", foreground="darkblue")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
             self.initialize_simulation_button["state"] = tk.DISABLED  # Disable the "Initialize Simulation" button
-            
                 
     def initialize_simulation(self):
         if self.selected_file_path is None:
@@ -1584,8 +1581,6 @@ _____________________________________________________
             # Handle the case when the Checkbutton is unchecked (if needed)
             pass
                     
-            
-
     def monitor_simulation(self):
     
         if self.selected_file_path is None:
@@ -1951,7 +1946,6 @@ _____________________________________________________
         else:
             # Optionally delay closing to allow the user to read the message
             self.root.after(10000, self.root.destroy)  # Closes the app after 10 seconds
-            
 
     def notify_license_expiration(self, remaining_time, expiring_soon=True):
         # Prevent multiple notifications
