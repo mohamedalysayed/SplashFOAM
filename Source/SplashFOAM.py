@@ -61,7 +61,7 @@ class SplashFOAM:
         self.root.title("SplashFOAM - v1.0")
         
         # Set the window icon using a PhotoImage
-        icon_path = "../Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
+        icon_path = "/Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
         icon_image = tk.PhotoImage(file=icon_path)
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
         

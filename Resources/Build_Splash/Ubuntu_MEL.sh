@@ -73,6 +73,8 @@ echo "Installing pip..."
 sudo apt-get install -y python3-pip
 echo "Installing or upgrading VTK via pip..."
 pip3 install vtk --upgrade 
+echo "Installing or pyinstaller, Pillow and matplotlib via pip3..."
+pip3 install Pillow==9.5.0 matplotlib pyinstaller --upgrade
 
 # Install gedit plugins
 echo "Installing gedit plugins..."
