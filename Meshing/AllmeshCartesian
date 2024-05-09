@@ -23,7 +23,8 @@ rm -rf constant/polyMesh
 rm -rf VTK
 
 # Update the user with the status - spinner goes after 
-echo "===========================================================>>>"
+echo
+echo "__________________________________________________________________"
 echo 
 echo "Mesh is being crafted, please hang on... " & 
 echo
@@ -50,5 +51,5 @@ wait
 runApplication checkMesh 
 echo "Mesh quality checked! Click on 'Load mesh quality' to view the report."
 echo
-echo "===========================================================<<<"
+echo "__________________________________________________________________"
 #------------------------------------------------------------------------------

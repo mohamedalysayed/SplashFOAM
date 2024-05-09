@@ -894,7 +894,7 @@ class SplashFOAM:
         mesh += "+---+---+---+\n"
         mesh += f"| 1 | 2 | 3 |\n"
         mesh += "+---+---+---+\n"
-        mesh += f"| 4 | 5 | 6 |\n"
+        mesh += f"| 6 | 5 | 4 |\n"
         mesh += "+---+---+---+\n"
         mesh += f"| 7 | 8 | 9 |\n"
         mesh += "+---+---+---+\n"
@@ -993,7 +993,7 @@ _____________________________________________________
             polyMesh_path = os.path.join(selected_directory, "constant", "polyMesh")
             if os.path.isdir(polyMesh_path):
                 # Prompt the user
-                response = messagebox.askyesno("Mesh Confirmation", "This case might have a ready mesh, do you want to load it?")
+                response = messagebox.askyesno("Mesh Confirmation", "This case seems to have a mesh, do you want to load it?")
                 if response:
                     self.paraview_application()  # Call the function to load the mesh
             
