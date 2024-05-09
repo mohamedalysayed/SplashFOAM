@@ -65,12 +65,14 @@ echo "Installing ShellCheck..."
 sudo apt-get install -y shellcheck
 echo "Installing cloc..."
 sudo apt-get install -y cloc
-echo "Installing ParaView..."
-sudo apt-get install -y paraview
+#echo "Installing ParaView..."
+#sudo apt-get install -y paraview
 echo "Installing python tkinter libraries..."
 sudo apt-get install -y python3-tk
 echo "Installing pip..."
 sudo apt-get install -y python3-pip
+echo "Installing or upgrading VTK via pip..."
+pip3 install vtk --upgrade 
 
 # Install gedit plugins
 echo "Installing gedit plugins..."
@@ -91,6 +93,7 @@ pip3 install customtkinter --upgrade
 
 # Add aliases for OpenFOAM versions in .bashrc
 echo "Adding aliases for OpenFOAM versions in .bashrc..."
+echo "alias of8='source /opt/openfoam8/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of9='source /opt/openfoam9/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of10='source /opt/openfoam10/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of11='source /opt/openfoam11/etc/bashrc'" >> "$HOME/.bashrc"
