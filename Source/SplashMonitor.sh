@@ -3,7 +3,7 @@
 # =========                 |
 # \\      /  F ield         | Splash: Your Application Name
 #  \\    /   O peration     |
-#   \\  /    A nd           | www.yourapplication.com
+#   \\  /    A nd           | www.simulitica.com
 #    \\/     M anipulation  |
 #-------------------------------------------------------------------------------
 #    Copyright (C) [2023] Splash by Simulitica Ltd.
