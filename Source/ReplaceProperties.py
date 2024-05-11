@@ -106,7 +106,6 @@ class ReplacePropertiesPopup:
 
             self.status_label.config(text="Parameters added successfully")
 
-
 if __name__ == "__main__":
     # Code to instantiate and run the ReplacePropertiesPopup class if this script is run 
     pass

@@ -46,7 +46,6 @@ class ReplaceMeshParameters:
                 
         # Dictionary to store references to checkbutton variables
         self.comment_vars = {}
-        
 
         for index, param in enumerate(mesh_params):
             # Prepend a bullet point to the parameter name
@@ -65,8 +64,6 @@ class ReplaceMeshParameters:
             checkbutton = ttk.Checkbutton(self.frame, text="Disable", variable=comment_var, style="My.TCheckbutton")
             checkbutton.grid(row=index+9, column=3, padx=10)
             self.comment_vars[param] = comment_var
-
-
         
         # Workflow Control Frame
         workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control", padding=10)
@@ -126,8 +123,6 @@ class ReplaceMeshParameters:
         close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="Professional.TButton")
         close_button.grid(row=93, column=2, pady=5, padx=7, sticky="w")
         
-          
-
     # ...............................................................................
     # Saving the created mesh (polyMesh dir) to a specific location 
     def save_mesh(self):
@@ -212,7 +207,6 @@ class ReplaceMeshParameters:
             # If the user clicked 'No', do nothing
             messagebox.showinfo("Cancelled", "Mesh deletion cancelled.")
     # ........................Remove Mesh.................................
-        
                         
     def extract_stop_after_value(self, mesh_file_content):
         # Extract the stopAfter value from the workflowControl block in the meshDict file
