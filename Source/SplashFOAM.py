@@ -239,7 +239,7 @@ class SplashFOAM:
 
         # Create an entry field for entering the commands by the user
         default_sentence = "top"  # Or "htop"
-        self.entry = ttk.Entry(root, style='Professional.TEntry', width=18)
+        self.entry = ttk.Entry(root, style='Professional.TEntry', width=18, foreground="black")
         self.entry.grid(row=13, column=4, pady=50, padx=7, sticky="nw")
         self.entry.insert(0, default_sentence)
 

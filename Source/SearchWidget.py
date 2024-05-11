@@ -13,8 +13,8 @@ class SearchWidget:
         search_button.grid(row=13, column=8, pady=10, padx=7, sticky="ne") 
         
         # Create an entry field for entering the commands by the user
-        default_sentence = "Search here!"  # Or "htop"
-        self.search_entry = ttk.Entry(root, style='Professional.TEntry', width=18)
+        default_sentence = "Search here!" 
+        self.search_entry = ttk.Entry(root, style='Professional.TEntry', width=18, background="lightblue", foreground="black")
         self.search_entry.grid(row=13, column=8, pady=50, padx=7, sticky="ne")
         self.search_entry.insert(0, default_sentence)
         #                    --------------<
