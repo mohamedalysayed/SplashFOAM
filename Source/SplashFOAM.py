@@ -221,7 +221,7 @@ class SplashFOAM:
         self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
 
         # Create a button to execute commands to the terminal kernel 
-        self.execute_button = tk.Button(root, text="Execute Command", command=self.execute_command)
+        self.execute_button = tk.Button(root, text="CLI", command=self.execute_command)
         self.execute_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
         self.execute_button.grid(row=13, column=4, pady=10, padx=7, sticky="nw") 
         self.add_tooltip(self.execute_button, "Click to run a terminal command")

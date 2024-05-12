@@ -8,13 +8,13 @@ class SearchWidget:
 
         # Create a search bar -------------->
         # Create a find a keyword
-        search_button = tk.Button(root, text="Find a keyword", command=self.search_text)
+        search_button = tk.Button(root, text="Find", command=self.search_text)
         search_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
         search_button.grid(row=13, column=8, pady=10, padx=7, sticky="ne") 
         
         # Create an entry field for entering the commands by the user
         default_sentence = "Search here!" 
-        self.search_entry = ttk.Entry(root, style='Professional.TEntry', width=18, background="lightblue", foreground="black")
+        self.search_entry = ttk.Entry(root, style='Professional.TEntry', width=18, foreground="black")
         self.search_entry.grid(row=13, column=8, pady=50, padx=7, sticky="ne")
         self.search_entry.insert(0, default_sentence)
         #                    --------------<
