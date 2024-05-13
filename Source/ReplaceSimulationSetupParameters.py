@@ -1,4 +1,3 @@
-# replace_simulation_setup_parameters.py
 import tkinter as tk
 import os
 import re
