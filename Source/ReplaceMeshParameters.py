@@ -167,7 +167,6 @@ class ReplaceMeshParameters:
                 self.parent.text_box.insert(tk.END, "\nError:\n" + error)
         except Exception as e:
             self.parent.text_box.insert(tk.END, "Failed to run foamMeshToFluent: " + str(e))
-        
     # ...............................................................................
     
     # ........................Remove Mesh.................................

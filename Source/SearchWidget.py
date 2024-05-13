@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-
 class SearchWidget:
     def __init__(self, root, text_widget):
         self.text_widget = text_widget
@@ -17,7 +16,7 @@ class SearchWidget:
         self.search_entry = ttk.Entry(root, style='Professional.TEntry', width=18, foreground="black")
         self.search_entry.grid(row=13, column=8, pady=50, padx=7, sticky="ne")
         self.search_entry.insert(0, default_sentence)
-        #                    --------------<
+        # --------------<
         
         self.result_label = tk.Label(root, text="")
         self.result_label.grid(row=14, column=8, pady=(0, 5))
