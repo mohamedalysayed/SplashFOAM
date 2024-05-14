@@ -114,7 +114,7 @@ class SplashFOAM:
         root.config(menu=menubar)
         # ======================= Create a menubar -----------------------------<
         
-        # ============= Time Recorder ====================
+        # ============= Time Recorder =============
         #---------------------
         # License parameters #
         #---------------------
@@ -142,7 +142,7 @@ class SplashFOAM:
         # Bind the window close event
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         
-        # ============= Time Recorder ====================
+        # ============= Time Recorder ===============
         # Display a welcome message
         self.show_welcome_message()
         
