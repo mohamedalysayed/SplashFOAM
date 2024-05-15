@@ -2000,7 +2000,7 @@ _____________________________________________________
 # https://www.buymeacoffee.com/simulitica
 # https://gofund.me/b151a012 # Gofundme link 
 # https://www.paypal.com/paypalme/MohamedSayed314 # Paypal link 
-# ---------------------------------------------<
+# -------------------------------------------------------------<
 
     def load_last_recorded_time(self):
         if os.path.exists(self.elapsed_time_file):
