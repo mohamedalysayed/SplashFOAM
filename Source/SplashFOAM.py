@@ -1896,7 +1896,7 @@ _____________________________________________________
 ###        elif key == '3':  # Top view
 ###            self.set_camera_view("top")  
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
-## --- Timer UNLIMITED version --- 
+### --- Timer UNLIMITED version --- 
 ###    def update_timer(self):
 ###        elapsed_time = time.time() - self.start_time
 ###        # Extract tenths of a second
@@ -1905,7 +1905,7 @@ _____________________________________________________
 ###        hours, minutes = divmod(minutes, 60)
 ###        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
 ###        self.root.after(100, self.update_timer)  # Update the timer every 100 milliseconds to match the tenths of a second
-## --- Timer UNLIMITED version --- 
+### --- Timer UNLIMITED version --- 
 # ---------------------------------------------------------------
 
     def update_timer(self):
@@ -1919,7 +1919,6 @@ _____________________________________________________
 
         # Update the elapsed time label
         self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
-    
     
         # Load or set the license start date
         if not os.path.exists(self.license_start_date_file):
@@ -1998,9 +1997,8 @@ _____________________________________________________
 # Important links [donation keys]
 # https://www.simulitica.com/splash-v10
 # https://www.buymeacoffee.com/simulitica
-# https://gofund.me/b151a012 # Gofundme link 
 # https://www.paypal.com/paypalme/MohamedSayed314 # Paypal link 
-# -------------------------------------------------------------<
+# --------------------------------------------------------------<
 
     def load_last_recorded_time(self):
         if os.path.exists(self.elapsed_time_file):
