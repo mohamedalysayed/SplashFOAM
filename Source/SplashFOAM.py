@@ -121,7 +121,7 @@ class SplashFOAM:
         self.start_time = time.time()
         self.license_start_date_file = "license_start_date.txt"  # File to store the start date
         self.license_duration = 1 * 365 * 24 * 3600  # 1 year in seconds
-        self.notice_period_before_end = 30 * 24 * 3600  # Notify 30 days before the license expires
+        self.notice_period_before_end = 15 * 24 * 3600  # Notify 15 days before the license expires
         self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
         
         # Create a label for the "Elapsed time:" text
@@ -1485,7 +1485,7 @@ _____________________________________________________
                 
     def setup_ui(self):
         # Create the Text widget
-        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=31, width=100)
+        self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)
         self.text_box.grid(row=0, column=4, columnspan=5, padx=10, pady=1, sticky="nsew", rowspan=13)
         self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
 
