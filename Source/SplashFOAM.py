@@ -6,7 +6,7 @@ import time
 import datetime
 import glob
 import shutil # For file copying
-import threading # For running a process in a separate thread
+import threading # For running in a separate thread
 import tkinter as tk
 import webbrowser
 from tkinter import ttk, filedialog, font, messagebox, simpledialog, colorchooser
