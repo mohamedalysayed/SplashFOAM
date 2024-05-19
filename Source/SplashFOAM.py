@@ -6,7 +6,7 @@ import time
 import datetime
 import glob
 import shutil # For file copying
-import threading # For running in a separate thread
+import threading # For running a process in a separate thread
 import tkinter as tk
 import webbrowser
 from tkinter import ttk, filedialog, font, messagebox, simpledialog, colorchooser
@@ -1994,7 +1994,7 @@ _____________________________________________________
             renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/splash-v1"))
             renew_button.pack(pady=20)  # Adjust padding as needed
         
-# Important links [donation keys]
+# Hot links
 # https://www.simulitica.com/splash-v10
 # https://www.buymeacoffee.com/simulitica
 # https://www.paypal.com/paypalme/MohamedSayed314 # Paypal link 
