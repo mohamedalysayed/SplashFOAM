@@ -1720,9 +1720,9 @@ _____________________________________________________
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++
-# DONOT REMOVE: visualizing stl natively in Splash! 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++>
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# DONOT REMOVE: visualizing stl natively in Splash! Do we even need this?! 
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------------------------------------>
 ###    # This function is good for quick and dirty 2D/3D stl files!
 ###    def load_and_display_stl(self):
 ###        # Hide the root Tkinter window
