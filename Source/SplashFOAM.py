@@ -6,7 +6,7 @@ import time
 import datetime
 import glob
 import shutil # For file copying
-import threading # For running in a separate thread
+import threading # For running a process in a separate thread
 import tkinter as tk
 import webbrowser
 from tkinter import ttk, filedialog, font, messagebox, simpledialog, colorchooser
@@ -106,6 +106,7 @@ class SplashFOAM:
         help_menu.add_command(label="Manual", command=show_help)
         
         help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
+        help_menu.add_command(label="Cloud HPC", command=self.cloud_HPC, background= "black", foreground="white")
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
         help_menu.add_command(label="Support SplashFOAM", command=self.support_SplashFOAM, foreground="green")
         menubar.add_cascade(label="Help", menu=help_menu)
@@ -1189,9 +1190,10 @@ _____________________________________________________
 
     # --------------------- running the simulation ---------------------------
     def run_simulation(self):
-        if not self.openfoam_sourced:
-            tk.messagebox.showerror("Error", "OpenFOAM is not sourced. Please source matching OpenFOAM version first.")
-            return
+    ## The following two lines were moved to ReplaceControlDictParameters to allow the user to change parameters before sourcing OF env
+##        if not self.openfoam_sourced:
+##            tk.messagebox.showerror("Error", "OpenFOAM is not sourced. Please source matching OpenFOAM version first.")
+##            return
         if self.selected_file_path is None:
             tk.messagebox.showerror("Error", "No case was identified. Please make sure your case is loaded properly.")
             return
@@ -1291,8 +1293,8 @@ _____________________________________________________
             tk.messagebox.showerror("Error", "Allrun script not found!")
             
         # Now, update the modification timestamp of the controlDict file | FLAG, maybe not needed anymore! 
-        subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
-        time.sleep(0.1)  # Add a 100ms delay if needed
+        ##subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
+        ##time.sleep(0.1)  # Add a 100ms delay if needed
         
     # --------------------- running the simulation ---------------------------------------
         
@@ -1413,7 +1415,7 @@ _____________________________________________________
     # Function to plot results using xmgrace
     def plot_results_xmgrace(self):
     
-        xmgrace_sample_file = os.path.join("Resources", "Sample_Results", "stresses.agr")
+        xmgrace_sample_file = os.path.join(os.path.pardir, "Resources", "Sample_Results", "stresses.agr")
         try:
             # Check if xmgrace is installed
             subprocess.run(["xmgrace", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -1719,10 +1721,12 @@ _____________________________________________________
         webbrowser.open_new("https://www.buymeacoffee.com/simulitica")
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
+    def cloud_HPC(self, event=None):
+        webbrowser.open_new("https://cfddose.substack.com/p/cfd-free-from-complexity")
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# DONOT REMOVE: visualizing stl natively in Splash! Do we even need this?! 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------------------------------------>
+# ++++++++++++++++++++++++++++++++++++++++++++++++++
+# DONOT REMOVE: visualizing stl natively in Splash! 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++>
 ###    # This function is good for quick and dirty 2D/3D stl files!
 ###    def load_and_display_stl(self):
 ###        # Hide the root Tkinter window
@@ -1994,7 +1998,7 @@ _____________________________________________________
             renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/splash-v1"))
             renew_button.pack(pady=20)  # Adjust padding as needed
         
-# Important links [donation keys]
+# Hot links
 # https://www.simulitica.com/splash-v10
 # https://www.buymeacoffee.com/simulitica
 # https://www.paypal.com/paypalme/MohamedSayed314 # Paypal link 
