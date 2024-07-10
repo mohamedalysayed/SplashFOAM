@@ -1,23 +1,83 @@
 # Grace project file
 #
-@version 50121
+@version 50125
 @page size 792, 612
 @page scroll 5%
 @page inout 5%
 @link page off
-@map font 0 to "Times-Roman", "Times-Roman"
-@map font 1 to "Times-Italic", "Times-Italic"
-@map font 2 to "Times-Bold", "Times-Bold"
-@map font 3 to "Times-BoldItalic", "Times-BoldItalic"
-@map font 4 to "Helvetica", "Helvetica"
-@map font 5 to "Helvetica-Oblique", "Helvetica-Oblique"
-@map font 6 to "Helvetica-Bold", "Helvetica-Bold"
-@map font 7 to "Helvetica-BoldOblique", "Helvetica-BoldOblique"
 @map font 8 to "Courier", "Courier"
-@map font 9 to "Courier-Oblique", "Courier-Oblique"
 @map font 10 to "Courier-Bold", "Courier-Bold"
 @map font 11 to "Courier-BoldOblique", "Courier-BoldOblique"
+@map font 9 to "Courier-Oblique", "Courier-Oblique"
+@map font 4 to "Helvetica", "Helvetica"
+@map font 6 to "Helvetica-Bold", "Helvetica-Bold"
+@map font 7 to "Helvetica-BoldOblique", "Helvetica-BoldOblique"
+@map font 5 to "Helvetica-Oblique", "Helvetica-Oblique"
+@map font 18 to "NimbusMonoL-Bold", "NimbusMonoL-Bold"
+@map font 19 to "NimbusMonoL-BoldOblique", "NimbusMonoL-BoldOblique"
+@map font 20 to "NimbusMonoL-Regular", "NimbusMonoL-Regular"
+@map font 21 to "NimbusMonoL-RegularOblique", "NimbusMonoL-RegularOblique"
+@map font 22 to "NimbusMonoPS-Bold", "NimbusMonoPS-Bold"
+@map font 23 to "NimbusMonoPS-BoldItalic", "NimbusMonoPS-BoldItalic"
+@map font 24 to "NimbusMonoPS-Italic", "NimbusMonoPS-Italic"
+@map font 25 to "NimbusMonoPS-Regular", "NimbusMonoPS-Regular"
+@map font 26 to "NimbusRoman-Bold", "NimbusRoman-Bold"
+@map font 27 to "NimbusRoman-BoldItalic", "NimbusRoman-BoldItalic"
+@map font 28 to "NimbusRoman-Italic", "NimbusRoman-Italic"
+@map font 29 to "NimbusRoman-Regular", "NimbusRoman-Regular"
+@map font 30 to "NimbusRomanNo9L-Medium", "NimbusRomanNo9L-Medium"
+@map font 31 to "NimbusRomanNo9L-MediumItalic", "NimbusRomanNo9L-MediumItalic"
+@map font 32 to "NimbusRomanNo9L-Regular", "NimbusRomanNo9L-Regular"
+@map font 33 to "NimbusRomanNo9L-RegularItalic", "NimbusRomanNo9L-RegularItalic"
+@map font 34 to "NimbusSans-Bold", "NimbusSans-Bold"
+@map font 35 to "NimbusSans-BoldItalic", "NimbusSans-BoldItalic"
+@map font 36 to "NimbusSans-Italic", "NimbusSans-Italic"
+@map font 37 to "NimbusSans-Regular", "NimbusSans-Regular"
+@map font 38 to "NimbusSansL-Bold", "NimbusSansL-Bold"
+@map font 39 to "NimbusSansL-BoldCondensed", "NimbusSansL-BoldCondensed"
+@map font 40 to "NimbusSansL-BoldCondensedItalic", "NimbusSansL-BoldCondensedItalic"
+@map font 41 to "NimbusSansL-BoldItalic", "NimbusSansL-BoldItalic"
+@map font 42 to "NimbusSansL-Regular", "NimbusSansL-Regular"
+@map font 43 to "NimbusSansL-RegularCondensed", "NimbusSansL-RegularCondensed"
+@map font 44 to "NimbusSansL-RegularCondensedItalic", "NimbusSansL-RegularCondensedItalic"
+@map font 45 to "NimbusSansL-RegularItalic", "NimbusSansL-RegularItalic"
+@map font 46 to "NimbusSansNarrow-Bold", "NimbusSansNarrow-Bold"
+@map font 47 to "NimbusSansNarrow-BoldOblique", "NimbusSansNarrow-BoldOblique"
+@map font 48 to "NimbusSansNarrow-Oblique", "NimbusSansNarrow-Oblique"
+@map font 49 to "NimbusSansNarrow-Regular", "NimbusSansNarrow-Regular"
+@map font 50 to "P052-Bold", "P052-Bold"
+@map font 51 to "P052-BoldItalic", "P052-BoldItalic"
+@map font 52 to "P052-Italic", "P052-Italic"
+@map font 53 to "P052-Roman", "P052-Roman"
+@map font 54 to "StandardSymbolsL-Regular", "StandardSymbolsL-Regular"
+@map font 55 to "StandardSymbolsPS-Regular", "StandardSymbolsPS-Regular"
 @map font 12 to "Symbol", "Symbol"
+@map font 2 to "Times-Bold", "Times-Bold"
+@map font 3 to "Times-BoldItalic", "Times-BoldItalic"
+@map font 1 to "Times-Italic", "Times-Italic"
+@map font 0 to "Times-Roman", "Times-Roman"
+@map font 61 to "URWBookman-Demi", "URWBookman-Demi"
+@map font 62 to "URWBookman-DemiItalic", "URWBookman-DemiItalic"
+@map font 63 to "URWBookman-Light", "URWBookman-Light"
+@map font 64 to "URWBookman-LightItalic", "URWBookman-LightItalic"
+@map font 65 to "URWBookmanL-DemiBold", "URWBookmanL-DemiBold"
+@map font 66 to "URWBookmanL-DemiBoldItalic", "URWBookmanL-DemiBoldItalic"
+@map font 67 to "URWBookmanL-Light", "URWBookmanL-Light"
+@map font 68 to "URWBookmanL-LightItalic", "URWBookmanL-LightItalic"
+@map font 69 to "URWChanceryL-MediumItalic", "URWChanceryL-MediumItalic"
+@map font 70 to "URWGothic-Book", "URWGothic-Book"
+@map font 71 to "URWGothic-BookOblique", "URWGothic-BookOblique"
+@map font 72 to "URWGothic-Demi", "URWGothic-Demi"
+@map font 73 to "URWGothic-DemiOblique", "URWGothic-DemiOblique"
+@map font 74 to "URWGothicL-Book", "URWGothicL-Book"
+@map font 75 to "URWGothicL-BookOblique", "URWGothicL-BookOblique"
+@map font 76 to "URWGothicL-Demi", "URWGothicL-Demi"
+@map font 77 to "URWGothicL-DemiOblique", "URWGothicL-DemiOblique"
+@map font 78 to "URWPalladioL-Bold", "URWPalladioL-Bold"
+@map font 79 to "URWPalladioL-BoldItalic", "URWPalladioL-BoldItalic"
+@map font 80 to "URWPalladioL-Italic", "URWPalladioL-Italic"
+@map font 81 to "URWPalladioL-Roman", "URWPalladioL-Roman"
+@map font 82 to "Z003-MediumItalic", "Z003-MediumItalic"
 @map font 13 to "ZapfDingbats", "ZapfDingbats"
 @map color 0 to (255, 255, 255), "white"
 @map color 1 to (0, 0, 0), "black"
@@ -54,7 +114,7 @@
 @timestamp rot 0
 @timestamp font 0
 @timestamp char size 1.000000
-@timestamp def "Mon Jan 21 10:17:32 2008"
+@timestamp def "Wed Jul 10 19:40:41 2024"
 @r0 off
 @link r0 to g0
 @r0 type above
@@ -101,15 +161,15 @@
 @g0 fixedpoint format general general
 @g0 fixedpoint prec 6, 6
 @with g0
-@    world 0, 0, 200, 8
+@    world 0, 0, 180, 8
 @    stack world 0, 0, 0, 0
 @    znorm 1
 @    view 0.150000, 0.150000, 1.150000, 0.850000
-@    title "Reynolds stresses"
+@    title "Reynolds stresses - Periodic Channel"
 @    title font 0
 @    title size 1.500000
 @    title color 1
-@    subtitle "Re=180"
+@    subtitle "Re_tau=180"
 @    subtitle font 0
 @    subtitle size 1.000000
 @    subtitle color 1
@@ -225,7 +285,7 @@
 @    altyaxis  off
 @    legend on
 @    legend loctype view
-@    legend 0.85, 0.8
+@    legend 0.88, 0.85
 @    legend box color 1
 @    legend box pattern 1
 @    legend box linewidth 1.0
@@ -249,19 +309,19 @@
 @    s0 hidden false
 @    s0 type xy
 @    s0 symbol 1
-@    s0 symbol size 0.490000
+@    s0 symbol size 0.990000
 @    s0 symbol color 1
 @    s0 symbol pattern 1
 @    s0 symbol fill color 1
 @    s0 symbol fill pattern 0
-@    s0 symbol linewidth 1.0
+@    s0 symbol linewidth 2.0
 @    s0 symbol linestyle 1
 @    s0 symbol char 65
 @    s0 symbol char font 0
 @    s0 symbol skip 0
 @    s0 line type 0
 @    s0 line linestyle 1
-@    s0 line linewidth 1.0
+@    s0 line linewidth 1.5
 @    s0 line color 1
 @    s0 line pattern 1
 @    s0 baseline type 0
@@ -298,19 +358,19 @@
 @    s1 hidden false
 @    s1 type xy
 @    s1 symbol 2
-@    s1 symbol size 0.490000
+@    s1 symbol size 0.990000
 @    s1 symbol color 2
 @    s1 symbol pattern 1
 @    s1 symbol fill color 2
 @    s1 symbol fill pattern 0
-@    s1 symbol linewidth 1.0
+@    s1 symbol linewidth 2.0
 @    s1 symbol linestyle 1
 @    s1 symbol char 65
 @    s1 symbol char font 0
 @    s1 symbol skip 0
 @    s1 line type 0
 @    s1 line linestyle 1
-@    s1 line linewidth 1.0
+@    s1 line linewidth 2.0
 @    s1 line color 2
 @    s1 line pattern 1
 @    s1 baseline type 0
@@ -347,12 +407,12 @@
 @    s2 hidden false
 @    s2 type xy
 @    s2 symbol 3
-@    s2 symbol size 0.490000
+@    s2 symbol size 0.990000
 @    s2 symbol color 4
 @    s2 symbol pattern 1
 @    s2 symbol fill color 4
 @    s2 symbol fill pattern 0
-@    s2 symbol linewidth 1.0
+@    s2 symbol linewidth 2.0
 @    s2 symbol linestyle 1
 @    s2 symbol char 65
 @    s2 symbol char font 0
@@ -397,9 +457,9 @@
 @    s3 type xy
 @    s3 symbol 0
 @    s3 symbol size 0.490000
-@    s3 symbol color 4
+@    s3 symbol color 2
 @    s3 symbol pattern 1
-@    s3 symbol fill color 4
+@    s3 symbol fill color 2
 @    s3 symbol fill pattern 0
 @    s3 symbol linewidth 1.0
 @    s3 symbol linestyle 1
@@ -408,8 +468,8 @@
 @    s3 symbol skip 0
 @    s3 line type 1
 @    s3 line linestyle 1
-@    s3 line linewidth 1.0
-@    s3 line color 4
+@    s3 line linewidth 2.0
+@    s3 line color 2
 @    s3 line pattern 1
 @    s3 baseline type 0
 @    s3 baseline off
@@ -431,7 +491,7 @@
 @    s3 avalue offset 0.000000 , 0.000000
 @    s3 errorbar on
 @    s3 errorbar place normal
-@    s3 errorbar color 4
+@    s3 errorbar color 2
 @    s3 errorbar pattern 1
 @    s3 errorbar size 1.000000
 @    s3 errorbar linewidth 1.0
@@ -457,7 +517,7 @@
 @    s4 symbol skip 0
 @    s4 line type 1
 @    s4 line linestyle 1
-@    s4 line linewidth 1.0
+@    s4 line linewidth 2.0
 @    s4 line color 4
 @    s4 line pattern 1
 @    s4 baseline type 0
@@ -495,9 +555,9 @@
 @    s5 type xy
 @    s5 symbol 0
 @    s5 symbol size 0.490000
-@    s5 symbol color 4
+@    s5 symbol color 1
 @    s5 symbol pattern 1
-@    s5 symbol fill color 4
+@    s5 symbol fill color 1
 @    s5 symbol fill pattern 0
 @    s5 symbol linewidth 1.0
 @    s5 symbol linestyle 1
@@ -506,8 +566,8 @@
 @    s5 symbol skip 0
 @    s5 line type 1
 @    s5 line linestyle 1
-@    s5 line linewidth 1.0
-@    s5 line color 4
+@    s5 line linewidth 2.0
+@    s5 line color 1
 @    s5 line pattern 1
 @    s5 baseline type 0
 @    s5 baseline off
@@ -529,7 +589,7 @@
 @    s5 avalue offset 0.000000 , 0.000000
 @    s5 errorbar on
 @    s5 errorbar place normal
-@    s5 errorbar color 4
+@    s5 errorbar color 1
 @    s5 errorbar pattern 1
 @    s5 errorbar size 1.000000
 @    s5 errorbar linewidth 1.0
