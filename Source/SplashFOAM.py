@@ -1999,9 +1999,9 @@ _____________________________________________________
             renew_button.pack(pady=20)  # Adjust padding as needed
         
 # Hot links
-# https://www.simulitica.com/splash-v10
-# https://www.buymeacoffee.com/simulitica
-# https://www.paypal.com/paypalme/MohamedSayed314 # Paypal link 
+# https://www.simulitica.com/splash-v10            # Download SplashFOAM
+# https://www.buymeacoffee.com/simulitica          # Support Simulitica 
+# https://www.paypal.com/paypalme/MohamedSayed314  # Paypal link 
 # --------------------------------------------------------------<
 
     def load_last_recorded_time(self):
