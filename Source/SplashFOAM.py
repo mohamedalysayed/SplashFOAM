@@ -58,7 +58,7 @@ class SplashFOAM:
     def __init__(self, root):
         self.root = root
         self.root.config(background="white") # black
-        self.root.title("SplashFOAM - v1.0")
+        self.root.title("SplashFOAM - v0.1")
         
         # Set the window icon using a PhotoImage
         icon_path = "../Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
@@ -106,9 +106,9 @@ class SplashFOAM:
         help_menu.add_command(label="Manual", command=show_help)
         
         help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
-        help_menu.add_command(label="Cloud HPC", command=self.cloud_HPC, background= "black", foreground="white")
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
         help_menu.add_command(label="Support SplashFOAM", command=self.support_SplashFOAM, foreground="green")
+        help_menu.add_command(label="Cloud HPC", command=self.cloud_HPC, background= "black", foreground="white")
         menubar.add_cascade(label="Help", menu=help_menu)
         
         # Display the menu bar
@@ -1632,14 +1632,15 @@ _____________________________________________________
     # Sourcing openfoam (version option)
     def source_openfoam(self, version, popup):
         paths = {
-            
-            "10": "/opt/openfoam10/etc/bashrc",
-            "2306": "/usr/lib/openfoam/openfoam2306/etc/bashrc",
             "8": "/opt/openfoam8/etc/bashrc",
             "9": "/opt/openfoam9/etc/bashrc",
+            "10": "/opt/openfoam10/etc/bashrc",
             "11": "/opt/openfoam11/etc/bashrc",
+            "12": "/opt/openfoam11/etc/bashrc",
             "2212": "/usr/lib/openfoam/openfoam2212/etc/bashrc",
-            "2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc"
+            "2306": "/usr/lib/openfoam/openfoam2306/etc/bashrc",
+            "2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc",
+            "2406": "/usr/lib/openfoam/openfoam2406/etc/bashrc"
         }
         bashrc_path = paths.get(version)
         if not bashrc_path:
@@ -1693,7 +1694,7 @@ _____________________________________________________
         foundation_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
 
         foundation_versions = [("v11", "11")]
-        foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11")]
+        foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11"), ("v12", "12")]
         for text, version in foundation_versions:
             ttk.Radiobutton(foundation_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
@@ -1701,7 +1702,7 @@ _____________________________________________________
         extended_frame = ttk.LabelFrame(popup, text="OpenFOAM ESI", padding=(10, 5))
         extended_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
         extended_versions = [("v2306", "2306")]
-        extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312")]
+        extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312"), ("v2406", "2406")]
         for text, version in extended_versions:
             ttk.Radiobutton(extended_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
@@ -1981,7 +1982,7 @@ _____________________________________________________
 
             # Create a Toplevel window for the message
             popup = tk.Toplevel(self.root)
-            popup.title("SplashFOAM v1.0")
+            popup.title("SplashFOAM v0.1")
             popup.geometry("800x600")  # Adjust the size as needed
 
             # Create a Label in the Toplevel window to display the message
@@ -2032,7 +2033,7 @@ _____________________________________________________
 if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', False)  # Disable menu tear-off
-    root.title("SplashFOAM v1.0")
-    root.wm_title("SplashFOAM v1.0")  # Set window manager title
+    root.title("SplashFOAM v0.1")
+    root.wm_title("SplashFOAM v0.1")  # Window manager title
     app = SplashFOAM(root)
     root.mainloop()

@@ -39,7 +39,7 @@ sudo apt-get update
 
 # Install OpenFOAM ESI versions
 echo "Installing OpenFOAM ESI versions..."
-sudo apt-get install -y openfoam2206-default openfoam2212-default openfoam2306-default openfoam2312-default
+sudo apt-get install -y openfoam2206-default openfoam2212-default openfoam2306-default openfoam2312-default openfoam2406-default
 
 # Add OpenFOAM Foundation repository and update packages
 echo "Adding OpenFOAM Foundation repository..."
@@ -50,7 +50,7 @@ sudo apt-get update
 
 # Install OpenFOAM Foundation versions
 echo "Installing OpenFOAM Foundation versions..."
-sudo apt-get install -y openfoam8 openfoam9 openfoam10 openfoam11
+sudo apt-get install -y openfoam8 openfoam9 openfoam10 openfoam11 openfoam12
 
 # Install other required packages
 echo "Installing FreeCAD..."
@@ -99,10 +99,12 @@ echo "alias of8='source /opt/openfoam8/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of9='source /opt/openfoam9/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of10='source /opt/openfoam10/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of11='source /opt/openfoam11/etc/bashrc'" >> "$HOME/.bashrc"
+echo "alias of12='source /opt/openfoam12/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of2206='source /usr/lib/openfoam/openfoam2206/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of2212='source /usr/lib/openfoam/openfoam2212/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of2306='source /usr/lib/openfoam/openfoam2306/etc/bashrc'" >> "$HOME/.bashrc"
 echo "alias of2312='source /usr/lib/openfoam/openfoam2312/etc/bashrc'" >> "$HOME/.bashrc"
+echo "alias of2406='source /usr/lib/openfoam/openfoam2406/etc/bashrc'" >> "$HOME/.bashrc"
 
 # Reload .bashrc to apply changes
 source "$HOME/.bashrc" 2>/dev/null || . "$HOME/.bashrc"
