@@ -17,14 +17,14 @@ Step 2:
 Make the script executable
 
 Before running the script, you need to make it executable. Open a terminal in the directory where pre-installation.sh is located and run the following command: 
->> chmod +x pre-installation.py
+> chmod +x pre-installation.py
 
 Step 3:
 =======
 Run the pre-installation script
 
 Now, you can run the script to install all necessary dependencies. Execute the following command in the terminal:
->> ./pre-installation
+> ./pre-installation
 
 Enter your password if prompted to allow the installation of packages.
 
