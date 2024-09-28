@@ -251,7 +251,7 @@ class SplashFOAM:
         # Test button [10-12 taken!]
         self.paraview_button = ttk.Button(self.root, text="Post-processing", command=self.paraview_application)
         self.paraview_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
-        self.add_tooltip(self.paraview_button, "Paraview! click here you won't regret it ;)")
+        self.add_tooltip(self.paraview_button, "Click to open Paraview")
         
         # _____________________________Profile Theme_____________________________________
         
@@ -412,9 +412,26 @@ class SplashFOAM:
         self.copyright_label.grid(row=12, column=0, pady=1, padx=10, sticky="n")
         self.copyright_label.configure(background="white", font="bold")
     # -------------- Main logos -------------------------- 
-    
+
     def paraview_application(self):
-        subprocess.run(["paraview"], check=True)
+        # This function will be executed in a separate thread to avoid blocking the main GUI thread
+        def run_paraview():
+            try:
+                # Launch ParaView in a non-blocking way using Popen
+                subprocess.Popen(["paraview"])
+            except Exception as e:
+                # Handle errors if ParaView fails to launch
+                print(f"Error running ParaView: {e}")
+
+        # Create a new thread to run the ParaView process
+        paraview_thread = threading.Thread(target=run_paraview)
+
+        # Set daemon to True so the thread will not block the application from closing
+        paraview_thread.daemon = True
+
+        # Start the thread, which will run ParaView in the background without blocking the main UI
+        paraview_thread.start()
+    
                 
     # Toggle function for action bar visibility
     def toggle_results_panel(self):
@@ -610,10 +627,127 @@ class SplashFOAM:
         # -------------- Splash background image(s) -------------------------- 
             
     # -------------- importing the geometry --------------------------------------------------------------------    
+##    def import_geometry(self):
+##        file_path = filedialog.askopenfilename(
+##            title="Select Geometry File",
+##            filetypes=[("STL Files", "*.stl"), ("OBJ Files", "*.obj"), ("STEP Files", "*.stp"), ("All Files", "*.*")],
+##            initialdir=os.path.dirname(self.selected_file_path) if self.selected_file_path else None
+##        )
+
+##        if file_path:
+##            self.selected_file_path = file_path
+##            meshing_folder = os.path.join(os.path.dirname(self.selected_file_path), "Meshing")
+##            self.status_label.config(text="The geometry file is successfully imported!")
+##            # To enable meshing to start
+##            self.geometry_loaded = True
+
+##            # Create the Meshing folder if it doesn't exist
+##            if not os.path.exists(meshing_folder):
+##                os.makedirs(meshing_folder)
+##                
+##            # Initiate the text_box with a simple CAD representation! 
+##            self.generate_cad_visual()
+
+##            # Copy and rename the geometry file
+##            geometry_filename = f"CAD.{file_path.split('.')[-1].lower()}"
+##            geometry_dest = os.path.join(meshing_folder, geometry_filename)
+##            self.geometry_dest_path = os.path.join(geometry_dest.split('CAD')[0])
+##            #print({self.geometry_dest_path})
+##            shutil.copyfile(self.selected_file_path, geometry_dest)
+
+##            # Assuming 'current_path' is the path of the current working directory or a known path within your project
+##            current_path = os.getcwd()  # or a specific path where you know "Resources" is a subdirectory
+
+##            # Find the path to the directory just before "Resources"
+##            index = current_path.find("Source")
+##            if index != -1:
+##                base_path = current_path[:index]
+##            else:
+##                base_path = current_path  # Fallback to current path if "Resources" not found
+
+##            # CAD programs logo paths 
+##            freecad_logo_path = os.path.join(base_path, "Resources", "Logos", "freecad_logo.png")
+##            gmsh_logo_path = os.path.join(base_path, "Resources", "Logos", "gmsh_logo.png")
+##            blender_logo_path = os.path.join(base_path, "Resources", "Logos", "blender_logo.png")
+##            paraview_logo_path = os.path.join(base_path, "Resources", "Logos", "paraview_logo.png")
+
+##            # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
+##            popup = tk.Toplevel(self.root)
+##            popup.title("Choose CAD Viewer")
+##            popup.geometry("400x660")
+
+##            def open_freecad():
+##                subprocess.run(["freecad", geometry_dest, "&"], check=True)
+##                # Zoom to fit
+##                try:
+##                    doc = FreeCAD.ActiveDocument
+##                    doc.getObject(geometry_filename).ViewObject.Proxy.fit()
+##                except Exception as e:
+##                    print(f"Error zooming to fit in FreeCAD: {e}")
+##                popup.destroy()
+
+##            def open_gmsh():
+##                subprocess.run(["gmsh", geometry_dest, "&"], check=True)
+##                popup.destroy()
+##    
+##            def open_blender():
+##                # Adjust this to the actual location of the script
+##                ### FLAG: absolute paths should be avoided (move from current better)
+##                ##script_path = "/home/mo/Development/Simulitica/Splash/github/test/import_stl_to_blender.py"  
+##                
+##                # Get the directory of the currently running script
+##                current_dir = os.path.dirname(os.path.abspath(__file__))
+##                # Construct the full path to the Blender Python import script
+##                script_path = os.path.join(current_dir, "import_stl_to_blender.py")
+
+##                try:
+##                    # Run Blender with the script and the path to the STL file
+##                    subprocess.run(["blender", "--python", script_path, "--", geometry_dest], check=True)
+##                except subprocess.CalledProcessError as e:
+##                    print(f"Failed to open Blender: {e}")
+##                finally:
+##                    popup.destroy()
+
+##            def open_paraview():
+##                subprocess.run(["paraview", geometry_dest], check=True)
+##                popup.destroy()
+## 
+##            # Load logos
+##            freecad_logo = tk.PhotoImage(file=freecad_logo_path)
+##            freecad_logo = freecad_logo.subsample(4, 4)
+##            gmsh_logo = tk.PhotoImage(file=gmsh_logo_path)
+##            gmsh_logo = gmsh_logo.subsample(9, 9)
+##            blender_logo = tk.PhotoImage(file=blender_logo_path)
+##            blender_logo = blender_logo.subsample(9, 9)
+##            paraview_logo = tk.PhotoImage(file=paraview_logo_path)
+##            paraview_logo = paraview_logo.subsample(9, 9)
+
+##            # Create buttons with logos for the CAD viewers
+##            freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
+##            freecad_button.image = freecad_logo
+##            freecad_button.pack(side=tk.TOP, padx=30, pady=1)
+
+##            gmsh_button = ttk.Button(popup, text="Open in Gmsh", command=open_gmsh, image=gmsh_logo, compound="top")
+##            gmsh_button.image = gmsh_logo
+##            gmsh_button.pack(side=tk.TOP, padx=20, pady=1)
+
+##            blender_button = ttk.Button(popup, text="Open in Blender", command=open_blender, image=blender_logo, compound="top")
+##            blender_button.image = blender_logo
+##            blender_button.pack(side=tk.TOP, padx=20, pady=1)
+
+##            paraview_button = ttk.Button(popup, text="Open in ParaView", command=open_paraview, image=paraview_logo, compound="top")
+##            paraview_button.image = paraview_logo
+##            paraview_button.pack(side=tk.TOP, padx=30, pady=1)
+
+##            popup.mainloop()
+##    
+##        else:
+##            tk.messagebox.showerror("Error", "No file selected for import")
+
     def import_geometry(self):
         file_path = filedialog.askopenfilename(
             title="Select Geometry File",
-            filetypes=[("STL Files", "*.stl"), ("OBJ Files", "*.obj"), ("All Files", "*.*")],
+            filetypes=[("STL Files", "*.stl"), ("OBJ Files", "*.obj"), ("STEP Files", "*.stp"), ("All Files", "*.*")],
             initialdir=os.path.dirname(self.selected_file_path) if self.selected_file_path else None
         )
 
@@ -635,18 +769,12 @@ class SplashFOAM:
             geometry_filename = f"CAD.{file_path.split('.')[-1].lower()}"
             geometry_dest = os.path.join(meshing_folder, geometry_filename)
             self.geometry_dest_path = os.path.join(geometry_dest.split('CAD')[0])
-            #print({self.geometry_dest_path})
             shutil.copyfile(self.selected_file_path, geometry_dest)
 
-            # Assuming 'current_path' is the path of the current working directory or a known path within your project
-            current_path = os.getcwd()  # or a specific path where you know "Resources" is a subdirectory
-
             # Find the path to the directory just before "Resources"
+            current_path = os.getcwd()
             index = current_path.find("Source")
-            if index != -1:
-                base_path = current_path[:index]
-            else:
-                base_path = current_path  # Fallback to current path if "Resources" not found
+            base_path = current_path[:index] if index != -1 else current_path  # Fallback to current path if "Source" not found
 
             # CAD programs logo paths 
             freecad_logo_path = os.path.join(base_path, "Resources", "Logos", "freecad_logo.png")
@@ -672,15 +800,10 @@ class SplashFOAM:
             def open_gmsh():
                 subprocess.run(["gmsh", geometry_dest, "&"], check=True)
                 popup.destroy()
-    
+
             def open_blender():
-                # Adjust this to the actual location of the script
-                ### FLAG: absolute paths should be avoided (move from current better)
-                ##script_path = "/home/mo/Development/Simulitica/Splash/github/test/import_stl_to_blender.py"  
-                
                 # Get the directory of the currently running script
                 current_dir = os.path.dirname(os.path.abspath(__file__))
-                # Construct the full path to the Blender Python import script
                 script_path = os.path.join(current_dir, "import_stl_to_blender.py")
 
                 try:
@@ -692,18 +815,26 @@ class SplashFOAM:
                     popup.destroy()
 
             def open_paraview():
-                subprocess.run(["paraview", geometry_dest], check=True)
-                popup.destroy()
- 
+                # This function runs ParaView in a separate thread to avoid blocking the main UI
+                def run_paraview():
+                    try:
+                        # Launch ParaView without blocking the main UI
+                        subprocess.Popen(["paraview", geometry_dest])
+                    except Exception as e:
+                        print(f"Error running ParaView: {e}")
+                    finally:
+                        popup.destroy()
+
+                # Start ParaView in a new thread
+                paraview_thread = threading.Thread(target=run_paraview)
+                paraview_thread.daemon = True
+                paraview_thread.start()
+
             # Load logos
-            freecad_logo = tk.PhotoImage(file=freecad_logo_path)
-            freecad_logo = freecad_logo.subsample(4, 4)
-            gmsh_logo = tk.PhotoImage(file=gmsh_logo_path)
-            gmsh_logo = gmsh_logo.subsample(9, 9)
-            blender_logo = tk.PhotoImage(file=blender_logo_path)
-            blender_logo = blender_logo.subsample(9, 9)
-            paraview_logo = tk.PhotoImage(file=paraview_logo_path)
-            paraview_logo = paraview_logo.subsample(9, 9)
+            freecad_logo = tk.PhotoImage(file=freecad_logo_path).subsample(4, 4)
+            gmsh_logo = tk.PhotoImage(file=gmsh_logo_path).subsample(9, 9)
+            blender_logo = tk.PhotoImage(file=blender_logo_path).subsample(9, 9)
+            paraview_logo = tk.PhotoImage(file=paraview_logo_path).subsample(9, 9)
 
             # Create buttons with logos for the CAD viewers
             freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
@@ -723,9 +854,10 @@ class SplashFOAM:
             paraview_button.pack(side=tk.TOP, padx=30, pady=1)
 
             popup.mainloop()
-    
+
         else:
             tk.messagebox.showerror("Error", "No file selected for import")
+        
         # -------------- importing the geometry --------------------------------------------------------------------    
 
 # -------------------------------- MESH CREATION ------------------------------
@@ -1900,18 +2032,7 @@ _____________________________________________________
 ###            self.set_camera_view("front")
 ###        elif key == '3':  # Top view
 ###            self.set_camera_view("top")  
-    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
-### --- Timer UNLIMITED version --- 
-###    def update_timer(self):
-###        elapsed_time = time.time() - self.start_time
-###        # Extract tenths of a second
-###        tenths_of_second = int((elapsed_time - int(elapsed_time)) * 10)
-###        minutes, seconds = divmod(int(elapsed_time), 60)
-###        hours, minutes = divmod(minutes, 60)
-###        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths_of_second}")
-###        self.root.after(100, self.update_timer)  # Update the timer every 100 milliseconds to match the tenths of a second
-### --- Timer UNLIMITED version --- 
-# ---------------------------------------------------------------
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     def update_timer(self):
         current_time = time.time()
