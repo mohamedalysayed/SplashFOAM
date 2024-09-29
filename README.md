@@ -9,6 +9,7 @@ To get started with SplashFOAM, follow the steps below:
 
 Step 1: Clone the Repository
 Clone the SplashFOAM repository to your local machine by running:
+
 git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git
 
 Step 2: Switch to the Correct Branch
