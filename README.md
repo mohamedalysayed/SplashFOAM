@@ -1,4 +1,4 @@
-# Splash-OpenFOAM
+# SplashFOAM
 A dynamic GUI-based program for OpenFOAM.
 
 ![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
@@ -17,7 +17,7 @@ Clone the SplashFOAM repository to your local machine by running:
 - Step 2: Switch to the Correct Branch
 Ensure you are on the Standard-release branch to access the latest stable version:
 
-``` cd Splash-OpenFOAM ```
+``` cd SplashFOAM ```
 ``` git checkout Standard-release ```
 
 
