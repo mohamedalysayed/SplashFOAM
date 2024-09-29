@@ -9,25 +9,24 @@ To get started with SplashFOAM, follow the steps below:
 
 Step 1: Clone the Repository
 Clone the SplashFOAM repository to your local machine by running:
-
-''' git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git '''
+``` git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git ```
 
 Step 2: Switch to the Correct Branch
 Ensure you are on the Standard-release branch to access the latest stable version:
-cd Splash-OpenFOAM
-git checkout Standard-release
+``` cd Splash-OpenFOAM ```
+``` git checkout Standard-release ```
 
 Step 3: Install Necessary Packages
 Navigate to the SplashFOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
-cd SplashFOAM/Resources/Build_Splash/
-chmod +x Ubuntu_MEL.sh
-./Ubuntu_MEL.sh
+``` cd SplashFOAM/Resources/Build_Splash/ ```
+``` chmod +x Ubuntu_MEL.sh ```
+``` ./Ubuntu_MEL.sh ```
 This will ensure that all required packages are installed.
 
 Step 4: Launch SplashFOAM
 After installing the necessary packages, navigate to the Sources directory and launch SplashFOAM using Python 3:
-cd ../../Sources/
-python3 SplashFOAM.py
+``` cd ../../Sources/ ```
+``` python3 SplashFOAM.py ```
 
 That's It!
 You are now ready to use SplashFOAM with OpenFOAM. Enjoy exploring all the features and streamlining your CFD workflow!
