@@ -1,32 +1,45 @@
-# Splash-OpenFOAM
-A simple GUI-based program for OpenFOAM cases
+# SplashFOAM
+A dynamic GUI-based program for OpenFOAM.
 
-# Currently SplashFOAM manual is in the works..
-In the meantime, here are the steps to run the software: 
+![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
 
-Before you begin using Splash, it's important to ensure that all necessary dependencies and packages are installedon your system. You are provided with a "pre-installation.sh" script, to automate this process for you.
+# Overview
+SplashFOAM is an intuitive GUI pre-processor designed to simplify the use of OpenFOAM. It provides users with a streamlined interface to set up their CFD simulations.
+
+# Quick Start Guide
+To get started with SplashFOAM, follow the steps below:
+
+- Step 1: Clone the Repository
+Clone the SplashFOAM repository to your local machine by running:
+
+``` git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git ```
+
+- Step 2: Switch to the Correct Branch
+Ensure you are on the Standard-release branch to access the latest stable version:
+
+``` cd SplashFOAM ```
+``` git checkout Standard-release ```
 
 
-Step 1: 
-=======
-Download the pre-installation script
+- Step 3: Install Necessary Packages
+Navigate to the SplashFOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
 
-Step 2: 
-=======
-Make the script executable
+``` cd SplashFOAM/Resources/Build_Splash/ ```
+``` chmod +x Ubuntu_MEL.sh ```
+``` ./Ubuntu_MEL.sh ```
+This will ensure that all required packages are installed.
 
-Before running the script, you need to make it executable. Open a terminal in the directory where pre-installation.sh is located and run the following command: 
->> chmod +x pre-installation.sh
+- Step 4: Launch SplashFOAM
+After installing the necessary packages, navigate to the Sources directory and launch SplashFOAM using Python 3:
 
-Step 3:
-=======
-Run the pre-installation script
+``` cd ../../Sources/ ```
+``` python3 SplashFOAM.py ```
 
-Now, you can run the script to install all necessary dependencies. Execute the following command in the terminal:
->> ./pre-installation.sh
+That's It!
+You are now ready to use SplashFOAM with OpenFOAM. Enjoy exploring all the features and streamlining your CFD workflow!
 
-Enter your password if prompted to allow the installation of packages.
+# Documentation
+The SplashFOAM manual is currently under development. In the meantime, please refer to the repository for updates, or feel free to explore the code and get in touch with the community for assistance.
 
-Step 4:
-======= 
-Enjoy SplashFOAM and thank me later ;)
+# Contributing
+Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Contributions are always welcome!
