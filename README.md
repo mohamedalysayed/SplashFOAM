@@ -1,5 +1,6 @@
 # Splash-OpenFOAM
 A dynamic GUI-based program for OpenFOAM.
+
 ![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
 
 # Overview
