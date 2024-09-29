@@ -18,6 +18,7 @@ Clone the SplashFOAM repository to your local machine by running:
 Ensure you are on the Standard-release branch to access the latest stable version:
 
 ``` cd SplashFOAM ```
+
 ``` git checkout Standard-release ```
 
 
@@ -25,14 +26,18 @@ Ensure you are on the Standard-release branch to access the latest stable versio
 Navigate to the SplashFOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
 
 ``` cd SplashFOAM/Resources/Build_Splash/ ```
+
 ``` chmod +x Ubuntu_MEL.sh ```
+
 ``` ./Ubuntu_MEL.sh ```
+
 This will ensure that all required packages are installed.
 
 - Step 4: Launch SplashFOAM
 After installing the necessary packages, navigate to the Sources directory and launch SplashFOAM using Python 3:
 
 ``` cd ../../Sources/ ```
+
 ``` python3 SplashFOAM.py ```
 
 That's It!
