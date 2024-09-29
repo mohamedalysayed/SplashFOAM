@@ -1,5 +1,6 @@
 # Splash-OpenFOAM
 A dynamic GUI-based program for OpenFOAM.
+![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
 
 # Overview
 SplashFOAM is an intuitive GUI pre-processor designed to simplify the use of OpenFOAM. It provides users with a streamlined interface to set up their CFD simulations.
