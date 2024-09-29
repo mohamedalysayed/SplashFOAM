@@ -1,10 +1,10 @@
-Splash-OpenFOAM
+# Splash-OpenFOAM
 A dynamic GUI-based program for OpenFOAM.
 
-Overview
+# Overview
 SplashFOAM is an intuitive GUI pre-processor designed to simplify the use of OpenFOAM. It provides users with a streamlined interface to set up their CFD simulations.
 
-Quick Start Guide
+# Quick Start Guide
 To get started with SplashFOAM, follow the steps below:
 
 Step 1: Clone the Repository
@@ -31,8 +31,8 @@ python3 SplashFOAM.py
 That's It!
 You are now ready to use SplashFOAM with OpenFOAM. Enjoy exploring all the features and streamlining your CFD workflow!
 
-Documentation
+# Documentation
 The SplashFOAM manual is currently under development. In the meantime, please refer to the repository for updates, or feel free to explore the code and get in touch with the community for assistance.
 
-Contributing
+# Contributing
 Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Contributions are always welcome!
