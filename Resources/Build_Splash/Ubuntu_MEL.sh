@@ -83,6 +83,14 @@ echo "Installing custom tkinter using pip3..."
 pip3 install customtkinter
 pip3 install customtkinter --upgrade
 
+### Install VirtualBox Guest Additions if running on VirtualBox
+##if [ -n "$(which dmidecode)" ] && sudo dmidecode -s system-product-name | grep -q "VirtualBox"; then
+##  echo "Installing VirtualBox Guest Additions..."
+##  sudo apt-get install -y virtualbox-guest-utils virtualbox-guest-x11
+##  echo "Rebooting system..."
+##  sudo reboot
+##fi
+
 # Install X11 apps for GUI support
 echo "Installing X11 apps for GUI testing (xeyes)..."
 sudo apt-get install -y x11-apps
