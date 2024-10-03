@@ -65,8 +65,6 @@ echo "Installing ShellCheck..."
 sudo apt-get install -y shellcheck
 echo "Installing cloc..."
 sudo apt-get install -y cloc
-#echo "Installing ParaView..."
-#sudo apt-get install -y paraview
 echo "Installing python tkinter libraries..."
 sudo apt-get install -y python3-tk
 echo "Installing pip..."
@@ -93,6 +91,34 @@ pip3 install customtkinter --upgrade
 ##  sudo reboot
 ##fi
 
+# Install X11 apps for GUI support
+echo "Installing X11 apps for GUI testing (xeyes)..."
+sudo apt-get install -y x11-apps
+
+# Check if running in WSL and prompt for VcXsrv installation
+if grep -q Microsoft /proc/version; then
+    echo "It appears you're running WSL. Please ensure VcXsrv is installed and running on Windows:"
+    echo "1. Download and install VcXsrv from: https://sourceforge.net/projects/vcxsrv/"
+    echo "2. Start VcXsrv with 'Multiple Windows' and 'Disable access control'."
+fi
+
+# Install matplotlib and numpy through pip if not already installed
+echo "Installing Python dependencies (matplotlib, numpy)..."
+pip3 install matplotlib numpy
+
+# Configure DISPLAY variable for WSL or native Linux
+echo "Configuring DISPLAY variable..."
+if grep -q Microsoft /proc/version; then
+    # WSL-specific configuration
+    echo "Detected WSL environment."
+    export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
+    echo "export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0" >> "$HOME/.bashrc"
+else
+    # Native Linux
+    export DISPLAY=localhost:0
+    echo "export DISPLAY=localhost:0" >> "$HOME/.bashrc"
+fi
+
 # Add aliases for OpenFOAM versions in .bashrc
 echo "Adding aliases for OpenFOAM versions in .bashrc..."
 echo "alias of8='source /opt/openfoam8/etc/bashrc'" >> "$HOME/.bashrc"
@@ -117,7 +143,7 @@ echo "		 .%%......%%%%....%%..%%..........%%..%%..%%..%%...%%%%...%%%%..."
 echo "		 .%%..%%..%%......%%..%%..........%%..%%..%%..%%......%%..%%....."
 echo "		 ..%%%%...%%......%%%%%...........%%%%%....%%%%....%%%%...%%%%%%."
 echo "		 ................................................................"
-
+echo "______________________________________________________________________________________________"
 echo "     _____                                                                                    "
 echo "    (, /  |   /) /)               /)                     /)                 /)                "
 echo "      /---|  // //    __   _   _ (/_  _   _    _  _     (/   _  _ _   _    (/_  _   _ __      "
