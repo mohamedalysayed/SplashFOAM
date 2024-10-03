@@ -7,25 +7,25 @@ A dynamic GUI-based program for OpenFOAM.
 SplashFOAM is an intuitive GUI pre-processor designed to simplify the use of OpenFOAM. It provides users with a streamlined interface to set up their CFD simulations.
 
 # Quick Start Guide
-To get started with SplashFOAM, follow the steps below:
+To get started with Splash-FOAM, follow the steps below:
 
 - Step 1: Clone the Repository
-Clone the SplashFOAM repository to your local machine by running:
+Clone the Splash-FOAM repository to your local machine by running:
 
 ``` git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git ```
 
 - Step 2: Switch to the Correct Branch
 Ensure you are on the Standard-release branch to access the latest stable version:
 
-``` cd SplashFOAM ```
+``` cd Splash-FOAM ```
 
 ``` git checkout Standard-release ```
 
 
 - Step 3: Install Necessary Packages
-Navigate to the SplashFOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
+Navigate to the Splash-FOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
 
-``` cd SplashFOAM/Resources/Build_Splash/ ```
+``` cd Splash-FOAM/Resources/Build_Splash/ ```
 
 ``` chmod +x Ubuntu_MEL.sh ```
 
