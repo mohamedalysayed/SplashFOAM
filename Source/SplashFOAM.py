@@ -1,6 +1,7 @@
-# Standard library imports come first, followed by third-party libraries, and then local imports
+# Standard library imports 
 import os
 import re
+import vtk
 import signal
 import time
 import datetime
@@ -9,13 +10,14 @@ import shutil # For file copying
 import threading # For running a process in a separate thread
 import tkinter as tk
 import webbrowser
-from tkinter import ttk, filedialog, font, messagebox, simpledialog, colorchooser
-import tkinter.simpledialog 
-from PIL import Image, ImageTk
-import subprocess
-from tkinter import scrolledtext
-#import matplotlib.pyplot as plt
 import matplotlib
+import subprocess
+import tkinter.simpledialog 
+
+# Importing third-party libs 
+from tkinter import ttk, filedialog, font, messagebox, simpledialog, colorchooser
+from PIL import Image, ImageTk
+from tkinter import scrolledtext
 from tkinter import Listbox
 from collections import defaultdict # Import defaultdict | for mesh parameters 
 from tkinter.colorchooser import askcolor
@@ -30,10 +32,10 @@ from ReplaceSimulationSetupParameters import ReplaceSimulationSetupParameters
 
 # Define menu functions
 def file_new():
-    print("New File")
+    print("In the work")
 
 def edit_undo():
-    print("Undo Edit")
+    print("In the works")
 
 def show_help():
     print("Show Help")
@@ -447,10 +449,10 @@ class SplashFOAM:
         # Help menu
         help_menu = tk.Menu(menubar, tearoff=0)
         help_menu.add_command(label="About", command=self.show_about_message)
-        help_menu.add_command(label="Manual", command=show_help)
-        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
-        help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
-        help_menu.add_command(label="Support SplashFOAM", command=self.support_SplashFOAM, foreground="green")
+        help_menu.add_command(label="Manual", command=self.splash_online_manual, background="black", foreground="cyan")
+        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, background="black", foreground="pink")
+        help_menu.add_command(label="Report an issue", command=self.open_contact_page, background="black", foreground="red")
+        help_menu.add_command(label="Support SplashFOAM", command=self.support_SplashFOAM, background="black", foreground="lightgreen")
         help_menu.add_command(label="Cloud HPC", command=self.cloud_HPC, background="black", foreground="white")
         menubar.add_cascade(label="Help", menu=help_menu)
         
@@ -463,6 +465,7 @@ class SplashFOAM:
         self.start_time = time.time()
         self.license_start_date_file = "license_start_date.txt"  # File to store the start date
         self.license_duration = 1 * 365 * 24 * 3600  # 1 year in seconds
+        #self.license_duration = 14 * 24 * 3600  # 1 year in seconds
         self.notice_period_before_end = 15 * 24 * 3600  # Notify 15 days before the license expires
         self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
         
@@ -471,7 +474,7 @@ class SplashFOAM:
         self.elapsed_time_label.grid(row=0, column=7, sticky="nsew")  # Updated to sticky="nsew" for dynamic resizing
         
         # Create a label for the timer
-        self.timer_label = tk.Label(root, text="00:00:00.0", font=("Helvetica", 30, "bold"), bg="white", fg="darkblue")
+        self.timer_label = tk.Label(root, text="00:00:00.0", font=("Helvetica", 35, "bold"), bg="white", fg="darkblue")
         self.timer_label.grid(row=1, column=7, sticky="nsew")  # Updated to sticky="nsew" for dynamic resizing
         
         # Start updating the timer
@@ -506,9 +509,17 @@ class SplashFOAM:
         # ----------------------
         # Style of Action Panel 
         # ----------------------
+
         # Create a ttk.Style to configure buttons
         style = ttk.Style()
-        style.configure("TButton", padding=5, relief="flat", background="lightblue", foreground="black", font=(12))
+        style.configure(
+            "TButton",
+            padding=5,
+            relief="flat",
+            background="lightblue",
+            foreground="black",
+            font=("Arial", 12, "bold")  
+        )
 
         # Create a button to import a geometry file
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
@@ -563,19 +574,11 @@ class SplashFOAM:
 
         for i in range(no_global_columns):
             self.root.columnconfigure(i, weight=1, uniform="columns")
-
-        # Fullscreen or maximized by default
-        #self.root.state('zoomed')
-        # Maximize window in a cross-platform way
-        #if self.root.tk.call('tk', 'windowingsystem') == 'win32':
-        #    self.root.state('zoomed')  # For Windows
-        #else:
-        #    self.root.attributes('-zoomed', True)  # For Linux (X11)
         
         # Set the initial size of the window to fit a small monitor
         self.root.geometry("1400x1000")  # Example size for small monitor
 
-        # Optionally, you can also center the window on the screen:
+        # Centering the window on the screen:
         self.root.update_idletasks()  # Ensure window has been drawn
         width = self.root.winfo_width()
         height = self.root.winfo_height()
@@ -954,7 +957,7 @@ class SplashFOAM:
         self.splash_bgImage = tk.PhotoImage(file=image_path)
 
         # Adjust the subsample as needed
-        self.splash_bgImage = self.splash_bgImage.subsample(7, 7)
+        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
 
         # Create a label to display the image, initially without the frame effect
         self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white", cursor="hand2")
@@ -1014,6 +1017,7 @@ class SplashFOAM:
             base_path = current_path[:index] if index != -1 else current_path  # Fallback to current path if "Source" not found
 
             # CAD programs logo paths 
+            splash_logo_path = os.path.join(base_path, "Resources", "Logos", "simulitica_icon_logo.png")
             freecad_logo_path = os.path.join(base_path, "Resources", "Logos", "freecad_logo.png")
             gmsh_logo_path = os.path.join(base_path, "Resources", "Logos", "gmsh_logo.png")
             blender_logo_path = os.path.join(base_path, "Resources", "Logos", "blender_logo.png")
@@ -1022,7 +1026,9 @@ class SplashFOAM:
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
             popup.title("Choose CAD Viewer")
-            popup.geometry("400x660")
+            popup.geometry("400x800")
+            popup.configure(bg="white")
+
 
             def open_freecad():
                 subprocess.run(["freecad", geometry_dest, "&"], check=True)
@@ -1068,25 +1074,38 @@ class SplashFOAM:
                 paraview_thread.start()
 
             # Load logos
+            splash_logo = tk.PhotoImage(file=splash_logo_path).subsample(6, 6)
             freecad_logo = tk.PhotoImage(file=freecad_logo_path).subsample(4, 4)
             gmsh_logo = tk.PhotoImage(file=gmsh_logo_path).subsample(9, 9)
             blender_logo = tk.PhotoImage(file=blender_logo_path).subsample(9, 9)
             paraview_logo = tk.PhotoImage(file=paraview_logo_path).subsample(9, 9)
-
+            
+            # ---------------------------------------------
             # Create buttons with logos for the CAD viewers
-            freecad_button = ttk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top")
-            freecad_button.image = freecad_logo
-            freecad_button.pack(side=tk.TOP, padx=30, pady=1)
+            # ---------------------------------------------
+            # Splash Visualizer button
+            splash_button = tk.Button(popup, text="Open in Splash Visualizer", command=self.open_splash_visualizer, image=splash_logo, compound="top", bg="white", highlightbackground="white")
+            splash_button.image = splash_logo
+            splash_button.pack(side=tk.TOP, padx=30, pady=1)
 
-            gmsh_button = ttk.Button(popup, text="Open in Gmsh", command=open_gmsh, image=gmsh_logo, compound="top")
+            
+            # Gmsh Visualizer button
+            gmsh_button = tk.Button(popup, text="Open in Gmsh", command=open_gmsh, image=gmsh_logo, compound="top", bg="white", highlightbackground="white")
             gmsh_button.image = gmsh_logo
             gmsh_button.pack(side=tk.TOP, padx=20, pady=1)
 
-            blender_button = ttk.Button(popup, text="Open in Blender", command=open_blender, image=blender_logo, compound="top")
+            # Blender Visualizer button
+            blender_button = tk.Button(popup, text="Open in Blender", command=open_blender, image=blender_logo, compound="top", bg="white", highlightbackground="white")
             blender_button.image = blender_logo
             blender_button.pack(side=tk.TOP, padx=20, pady=1)
 
-            paraview_button = ttk.Button(popup, text="Open in ParaView", command=open_paraview, image=paraview_logo, compound="top")
+            # FreeCAD Visualizer button
+            freecad_button = tk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top", bg="white", highlightbackground="white")
+            freecad_button.image = freecad_logo
+            freecad_button.pack(side=tk.TOP, padx=30, pady=1)
+
+            # Paraview Visualizer button
+            paraview_button = tk.Button(popup, text="Open in ParaView", command=open_paraview, image=paraview_logo, compound="top", bg="white", highlightbackground="white")
             paraview_button.image = paraview_logo
             paraview_button.pack(side=tk.TOP, padx=30, pady=1)
 
@@ -1097,6 +1116,50 @@ class SplashFOAM:
         
         # -------------- importing the geometry --------------------------------------------------------------------    
 
+        
+    def visualize_stl(self, file_path):
+        # Read the STL file
+        reader = vtk.vtkSTLReader()
+        reader.SetFileName(file_path)
+
+        # Create a mapper
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+        # Create an actor
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+
+        # Create a renderer, render window, and interactor
+        renderer = vtk.vtkRenderer()
+        render_window = vtk.vtkRenderWindow()
+        render_window.AddRenderer(renderer)
+        interactor = vtk.vtkRenderWindowInteractor()
+        interactor.SetRenderWindow(render_window)
+
+        # Add the actor to the scene
+        renderer.AddActor(actor)
+        renderer.SetBackground(0.1, 0.1, 0.1)  # Background color
+
+        # Render and interact
+        render_window.Render()
+        interactor.Start()
+        
+    def open_splash_visualizer(self):
+        """
+        Function to open the imported geometry in the Splash Visualizer.
+        """
+        if not hasattr(self, 'selected_file_path') or not self.selected_file_path:
+            tk.messagebox.showerror("Error", "No geometry file selected for visualization.")
+            return
+
+        # Visualize the imported STL file using the existing functionality
+        if self.selected_file_path.lower().endswith(".stl"):
+            self.visualize_stl(self.selected_file_path)
+        else:
+            tk.messagebox.showerror("Error", "Splash Visualizer currently supports only STL files.")
+
+            
 # -------------------------------- MESH CREATION ------------------------------
     def create_mesh(self):
         # Check if geometry is loaded
@@ -2087,6 +2150,8 @@ _____________________________________________________
         webbrowser.open_new("https://www.simulitica.com/contact")
     def support_SplashFOAM(self, event=None):
         webbrowser.open_new("https://www.buymeacoffee.com/simulitica")
+    def splash_online_manual(self, event=None):
+        webbrowser.open_new("https://github.com/mohamedalysayed/SplashFOAM/tree/main")
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
     def cloud_HPC(self, event=None):
