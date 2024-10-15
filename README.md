@@ -3,8 +3,6 @@ A dynamic GUI-based program for OpenFOAM.
 
 ![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
 
-![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
-
 ## Table of Contents
 - [Overview](#overview)
 - [Quick Start Guide](#quick-start-guide)
@@ -70,7 +68,7 @@ SplashFOAM includes a pre-installation script to ensure your system is ready:
 - **Automated Dependency Installation**: The script checks for required packages and installs them if missing, including OpenFOAM, FreeCAD, Gmsh, and more.
 - **WSL Compatibility**: Special considerations for users running SplashFOAM on Windows Subsystem for Linux (WSL), including setting up display configurations.
 ## Documentation
-The SplashFOAM manual is currently under development. In the meantime, please refer to the repository for updates, or feel free to explore the code and get in touch with the community for assistance.
+The SplashFOAM manual is currently under development. In the meantime, please take a look at the repository for updates, or feel free to explore the code and get in touch with the [CFD Dose]([url](https://cfddose.substack.com/)) community for help.
 
 ## Contributing
 Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Contributions are always welcome!
