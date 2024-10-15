@@ -102,7 +102,7 @@ Easily manage configuration files for different versions of OpenFOAM:
 SplashFOAM can launch a simulation locally or on a remote HPC cluster (Cloud HPC):
 
 - **Local Execution**: Run your simulations directly on your local machine.
-- **Remote Execution**: Configure SplashFOAM to submit jobs to a remote HPC environment for more computational power. More information on setting up remote HPC access can be found here.
+- **Remote Execution**: Configure SplashFOAM to submit jobs to a remote HPC environment for more computational power. More information on setting up remote HPC access [can be found here](https://cfddose.substack.com/p/how-to-run-your-cfd-simulations-on).
 
 ## Post-Processing
 SplashFOAM integrates with popular post-processing tools to streamline analysis:
