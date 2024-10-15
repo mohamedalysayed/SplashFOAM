@@ -5,7 +5,11 @@ A dynamic GUI-based program for OpenFOAM.
 
 ## Table of Contents
 - [Overview](#overview)
-- [Quick Start Guide](#quick-start-guide)
+- [Installation](#installation)
+  - [Step 1: Clone the Repository](#step-1-clone-the-repository)
+  - [Step 2: Switch to the Correct Branch](#step-2-switch-to-the-correct-branch)
+  - [Step 3: Install Necessary Packages](#step-3-install-necessary-packages)
+  - [Step 4: Launch SplashFOAM](#step-4-launch-splashfoam)
 - [Features](#features)
   - [Geometry Import](#geometry-import)
   - [Meshing Tools](#meshing-tools)
@@ -14,16 +18,46 @@ A dynamic GUI-based program for OpenFOAM.
   - [Post-Processing](#post-processing)
   - [Custom Scripting](#custom-scripting)
   - [Integrated Pre-Installation Script](#integrated-pre-installation-script)
-- [Installation](#installation)
-  - [Step 1: Clone the Repository](#step-1-clone-the-repository)
-  - [Step 2: Switch to the Correct Branch](#step-2-switch-to-the-correct-branch)
-  - [Step 3: Install Necessary Packages](#step-3-install-necessary-packages)
-  - [Step 4: Launch SplashFOAM](#step-4-launch-splashfoam)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 
 ## Overview
 SplashFOAM is an intuitive GUI pre-processor designed to simplify the use of OpenFOAM. It provides users with a streamlined interface to set up their CFD simulations.
+
+## Installation
+To get started with SplashFOAM, follow the steps below:
+
+- Step 1: Clone the Repository
+Clone the SplashFOAM repository to your local machine by running:
+
+``` git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git ```
+
+- Step 2: Switch to the Correct Branch
+Ensure you are on the Standard-release branch to access the latest stable version:
+
+``` cd SplashFOAM ```
+
+``` git checkout Standard-release ```
+
+
+- Step 3: Install Necessary Packages
+Navigate to the SplashFOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
+
+``` cd SplashFOAM/Resources/Build_Splash/ ```
+
+``` chmod +x Ubuntu_MEL.sh ```
+
+``` ./Ubuntu_MEL.sh ```
+
+This will ensure that all required packages are installed.
+
+- Step 4: Launch SplashFOAM
+After installing the necessary packages, navigate to the Sources directory and launch SplashFOAM using Python 3:
+
+``` cd ../../Sources/ ```
+
+``` python3 SplashFOAM.py ```
+
 
 ## Features
 
