@@ -10,8 +10,8 @@ A dynamic GUI-based program for OpenFOAM.
   - [Meshing Tools](#meshing-tools)
   - [Simulation Setup](#simulation-setup)
   - [Configuration Management](#configuration-management)
+  - [Run Simulation](#run-simulation)
   - [Post-Processing](#post-processing)
-  - [Custom Scripting](#custom-scripting)
   - [Integrated Pre-Installation Script](#integrated-pre-installation-script)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
@@ -53,50 +53,69 @@ After installing the necessary packages, navigate to the Sources directory and l
 
 ``` python3 SplashFOAM.py ```
 
-## Features
 
+
+-------------------------
+## Features
 ### Geometry Import
 SplashFOAM allows users to import geometry files from various formats, including:
+
 - **STL** (stereolithography)
 - **OBJ** (Wavefront object)
 - **STEP** (Standard for the Exchange of Product Data)
+  
+Import Geometry enables the user to view their CAD in one of five options:
 
-Users can preview and inspect their CAD models directly within the SplashFOAM interface using the **Splash Visualizer**. Additionally, users can choose to open their geometries in external programs like FreeCAD, Gmsh, Blender, and ParaView for further modifications or analysis.
+- **Splash Visualizer**: A local program built into SplashFOAM for quick and efficient CAD visualization.
+- **FreeCAD**: Open your geometries directly in FreeCAD for further design modifications.
+- **Gmsh**: Utilize Gmsh for meshing or geometry inspection.
+- **Blender**: Seamlessly load your CAD files into Blender.
+- **ParaView**: Use ParaView to visualize complex CAD models.
 
-### Meshing Tools
+
+## Meshing Tools
 SplashFOAM offers a range of meshing capabilities:
-- **Hex-Dominant Meshing**: Generate hex-dominant meshes from STL files using a simple and user-friendly interface.
-- **Custom Meshing Parameters**: Users can specify minimum and maximum cell sizes to customize the mesh to their needs.
-- **Convert Meshes to Fluent**: An integrated tool that converts OpenFOAM meshes to Fluent-compatible formats, with error handling and user notifications.
-- **Mesh Removal**: Easily delete existing meshes and related files through a built-in cleanup tool.
 
-### Simulation Setup
+### Mesh Types
+Currently, SplashFOAM supports three types of meshes:
+
+- **Cartesian**: Generate structured hex-dominant meshes.
+- **Polyhedral**: Create meshes with polyhedral elements, which are beneficial for complex geometries.
+- **Tetrahedral**: Flexible tetrahedral meshing for various applications.
+
+These meshes are generated using cfMesh when creating a mesh from scratch. Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
+
+## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
+
 - **Case Directory Management**: Seamlessly load, configure and organize case directories.
 - **Simulation Configuration**: Adjust boundary conditions, solvers, and other simulation parameters through a graphical interface.
-- **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment.
+- **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case. Note: SplashFOAM does not allow direct changes in boundary condition files. If boundary changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
 
-### Configuration Management
+## Configuration Management
 Easily manage configuration files for different versions of OpenFOAM:
+
 - **Automatic Detection of Installed OpenFOAM Versions**: SplashFOAM identifies available versions on your system and sets up the necessary environment variables.
-- **Alias Setup**: Aliases for various OpenFOAM versions are added to `.bashrc` during installation, ensuring easy access to different versions.
+- **Alias Setup**: Aliases for various OpenFOAM versions are added to .bashrc during installation, ensuring easy access to different versions.
 
-### Post-Processing
+## Run Simulation
+SplashFOAM can launch a simulation locally or on a remote HPC cluster (Cloud HPC):
+
+- **Local Execution**: Run your simulations directly on your local machine.
+- **Remote Execution**: Configure SplashFOAM to submit jobs to a remote HPC environment for more computational power. More information on setting up remote HPC access can be found here.
+
+## Post-Processing
 SplashFOAM integrates with popular post-processing tools to streamline analysis:
-- **ParaView Integration**: Launch ParaView directly from SplashFOAM to analyze simulation results.
-- **2D Plotting with Xmgrace**: Quick access to plot simulation data using Xmgrace.
-- **Custom Plotting Scripts**: Run your custom plotting scripts for detailed analysis.
 
-### Custom Scripting
-- **Integrated Scripting Environment**: Users can write and run Python scripts for custom workflows.
-- **Tkinter and VTK Libraries**: Built-in support for Tkinter-based GUI components and VTK for advanced visualization tasks.
+- **ParaView Integration**: Launch ParaView directly from SplashFOAM to analyze simulation results.
+- **2D Plotting**: Quick access to plot simulation data using Xmgrace.
 
 ### Integrated Pre-Installation Script
 SplashFOAM includes a pre-installation script to ensure your system is ready:
 - **Automated Dependency Installation**: The script checks for required packages and installs them if missing, including OpenFOAM, FreeCAD, Gmsh, and more.
 - **WSL Compatibility**: Special considerations for users running SplashFOAM on Windows Subsystem for Linux (WSL), including setting up display configurations.
 ## Documentation
-The SplashFOAM manual is currently under development. In the meantime, please take a look at the repository for updates, or feel free to explore the code and get in touch with the [CFD Dose](https://cfddose.substack.com/) community for help.
+The SplashFOAM manual is currently under development. In the meantime, please take a look at the repository for updates, or get in touch with the [CFD Dose](https://cfddose.substack.com/) community for help.
 
 ## Contributing
 Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Contributions are always welcome!
