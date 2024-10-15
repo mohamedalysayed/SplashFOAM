@@ -1,6 +1,7 @@
 # SplashFOAM
 A dynamic GUI-based program for OpenFOAM.
 
+## TOC
 - [Overview](#overview)
 - [Installation](#installation)
 - [Features](#features)
