@@ -6,7 +6,7 @@
 #   \\  /    A nd           | www.simulitica.com
 #    \\/     M anipulation  |
 #-------------------------------------------------------------------------------
-#    Copyright (C) [2023] Splash by Simulitica Ltd.
+#    Copyright (C) [2023] Splash by Simulitica Ltd. [now CFD Dose]
 #------------------------------------------------------------------------------
 # License
 #     This file is part of Splash, distributed under a Proprietary License.
