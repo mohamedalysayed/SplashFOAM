@@ -56,9 +56,6 @@ After installing the necessary packages, navigate to the Sources directory and l
 
 ``` python3 SplashFOAM.py ```
 
-
-
--------------------------
 ## Features
 ### Geometry Import
 SplashFOAM allows users to import geometry files from various formats, including:
