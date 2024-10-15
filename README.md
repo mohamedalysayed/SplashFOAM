@@ -1,5 +1,5 @@
 # SplashFOAM
-A dynamic GUI-based program for OpenFOAM.
+A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
 
 ## TOC
 - [Overview](#overview)
