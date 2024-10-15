@@ -3,13 +3,8 @@ A dynamic GUI-based program for OpenFOAM.
 
 ![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
 
-## Table of Contents
 - [Overview](#overview)
 - [Installation](#installation)
-  - [Step 1: Clone the Repository](#step-1-clone-the-repository)
-  - [Step 2: Switch to the Correct Branch](#step-2-switch-to-the-correct-branch)
-  - [Step 3: Install Necessary Packages](#step-3-install-necessary-packages)
-  - [Step 4: Launch SplashFOAM](#step-4-launch-splashfoam)
 - [Features](#features)
   - [Geometry Import](#geometry-import)
   - [Meshing Tools](#meshing-tools)
@@ -57,7 +52,6 @@ After installing the necessary packages, navigate to the Sources directory and l
 ``` cd ../../Sources/ ```
 
 ``` python3 SplashFOAM.py ```
-
 
 ## Features
 
