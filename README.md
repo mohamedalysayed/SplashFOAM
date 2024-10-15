@@ -37,7 +37,6 @@ Ensure you are on the Standard-release branch to access the latest stable versio
 
 ``` git checkout Standard-release ```
 
-
 - Step 3: Install Necessary Packages
 Navigate to the SplashFOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
 
