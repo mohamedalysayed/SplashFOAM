@@ -65,11 +65,11 @@ SplashFOAM allows users to import geometry files from various formats, including
   
 Import Geometry enables the user to view their CAD in one of five options:
 
-- **Splash Visualizer**: A local program built into SplashFOAM for quick and efficient CAD visualization.
+- **Splash Viewer**: A local program built into SplashFOAM for quick and efficient CAD visualization.
 - **FreeCAD**: Open your geometries directly in FreeCAD for further design modifications.
 - **Gmsh**: Utilize Gmsh for meshing or geometry inspection.
 - **Blender**: Seamlessly load your CAD files into Blender.
-- **ParaView**: Use ParaView to visualize complex CAD models.
+- **ParaView**: Use ParaView to visualize and inspect complex CAD models.
 
 ## Meshing Tools
 SplashFOAM offers a range of meshing capabilities:
