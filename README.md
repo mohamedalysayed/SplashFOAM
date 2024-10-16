@@ -1,6 +1,8 @@
 # SplashFOAM
 A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
 
+![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
+
 ## TOC
 - [Overview](#overview)
 - [Installation](#installation)
@@ -19,8 +21,6 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
 SplashFOAM is a modular GUI for the Computational Fluid Dynamics (CFD) code OpenFOAM. The main impetus behind building SplashFOAM has been to increase the efficiency of CFD production, remove unnecessary friction, and allow engineers to focus on the physics of the problem rather than coding syntax. 
 
 Unlike other tools, SplashFOAM is **not confined to a specific OpenFOAM release**. It handles all OpenFOAM versions, whether ESI or Foundation versions, making it both forward and backward-compatible. This flexibility ensures that users can switch between different OpenFOAM versions without any hassle, maintaining a streamlined workflow across different projects. SplashFOAM aims to be a dynamic, intuitive, and efficient pre-processor, streamlining the setup and execution of OpenFOAM simulations.
-
-![SplashFOAM-Sep2024](https://github.com/user-attachments/assets/2917aa3c-d02e-40bd-ba4f-bc1f25f445de)
 
 ## Installation
 To get started with SplashFOAM, follow the steps below:
