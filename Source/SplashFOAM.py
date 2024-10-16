@@ -667,7 +667,7 @@ class SplashFOAM:
             filetypes=[("STL Files", "*.stl"), ("OBJ Files", "*.obj"), ("STEP Files", "*.stp"), ("All Files", "*.*")],
             initialdir=os.path.dirname(self.selected_file_path) if self.selected_file_path else None
         )
-
+            
         if file_path:
             self.selected_file_path = file_path
             meshing_folder = os.path.join(os.path.dirname(self.selected_file_path), "Meshing")
@@ -678,9 +678,10 @@ class SplashFOAM:
             # Create the Meshing folder if it doesn't exist
             if not os.path.exists(meshing_folder):
                 os.makedirs(meshing_folder)
-                
-            # Initiate the text_box with a simple CAD representation! 
-            self.generate_cad_visual()
+           
+            # Process the imported stl file    
+            self.stl_processor.process_stl(self.selected_file_path)
+            #messagebox.showinfo("Processing Complete", "STL analysis completed. Check the generated report.")
 
             # Copy and rename the geometry file
             geometry_filename = f"CAD.{file_path.split('.')[-1].lower()}"
@@ -969,7 +970,7 @@ class SplashFOAM:
         else:
             tk.messagebox.showerror("Error", "AllmeshCartesian script not found!")
 
-    # ______Craft your own mesh with teh desired type _______
+    # ______Craft your own mesh with the desired type _______
 
     def ask_mesh_type(self):
         # Create a popup to ask the user for mesh type
@@ -989,38 +990,6 @@ class SplashFOAM:
 
         # Return the selected mesh type
         return self.mesh_type_var.get()
-        
-    # Decoration function for meshing process    
-    def generate_mesh_visual(self):
-        mesh_representation = self.create_mesh_visual()
-        self.text_box.delete(1.0, tk.END)  # Clear existing content
-        self.text_box.insert(tk.END, mesh_representation)
-
-    def create_mesh_visual(self):
-        mesh = ""
-        mesh += "+---+---+---+\n"
-        mesh += f"| 1 | 2 | 3 |\n"
-        mesh += "+---+---+---+\n"
-        mesh += f"| 6 | 5 | 4 |\n"
-        mesh += "+---+---+---+\n"
-        mesh += f"| 7 | 8 | 9 |\n"
-        mesh += "+---+---+---+\n"
-        
-         # Add the decorative pattern below the mesh
-        pattern = """
- ____        _           _       __  __           _               
-/ ___| _ __ | | __ _ ___| |__   |  \/  | ___  ___| |__   ___ _ __ 
-\___ \| '_ \| |/ _` / __| '_ \  | |\/| |/ _ \/ __| '_ \ / _ \ '__|
- ___) | |_) | | (_| \__ \ | | | | |  | |  __/\__ \ | | |  __/ |   
-|____/| .__/|_|\__,_|___/_| |_| |_|  |_|\___||___/_| |_|\___|_|   
-      |_|                                                         
-__________________________________________________________________
-\n"""
-
-        return pattern + mesh
-
-# -------------------------------- Mesh Construction ------------------------------<
-
         
     # Decoration function for CAD import  
     def generate_cad_visual(self):
@@ -1048,10 +1017,39 @@ __________________________________________________________________
       |_|                                                                          
 _____________________________________________________
 \n"""
-
         return pattern + cad
+            
         
-    # Decoration function for CAD import  
+    # Decoration function for meshing process    
+    def generate_mesh_visual(self):
+        mesh_representation = self.create_mesh_visual()
+        self.text_box.delete(1.0, tk.END)  # Clear existing content
+        self.text_box.insert(tk.END, mesh_representation)
+
+    def create_mesh_visual(self):
+        mesh = ""
+        mesh += "+---+---+---+\n"
+        mesh += f"| 1 | 2 | 3 |\n"
+        mesh += "+---+---+---+\n"
+        mesh += f"| 6 | 5 | 4 |\n"
+        mesh += "+---+---+---+\n"
+        mesh += f"| 7 | 8 | 9 |\n"
+        mesh += "+---+---+---+\n"
+        
+         # Add the decorative pattern below the mesh
+        pattern = """
+ ____        _           _       __  __           _               
+/ ___| _ __ | | __ _ ___| |__   |  \/  | ___  ___| |__   ___ _ __ 
+\___ \| '_ \| |/ _` / __| '_ \  | |\/| |/ _ \/ __| '_ \ / _ \ '__|
+ ___) | |_) | | (_| \__ \ | | | | |  | |  __/\__ \ | | |  __/ |   
+|____/| .__/|_|\__,_|___/_| |_| |_|  |_|\___||___/_| |_|\___|_|   
+      |_|                                                         
+__________________________________________________________________
+\n"""
+        return pattern + mesh
+
+          
+    # Decoration function for Simulation Run  
     def generate_run_visual(self):
         cad_representation = self.create_run_visual()
         self.text_box.delete(1.0, tk.END)  # Clear existing content
