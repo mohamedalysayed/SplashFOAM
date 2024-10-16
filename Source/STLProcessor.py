@@ -1,4 +1,4 @@
-# STLProcessor.py
+import tkinter as tk
 import vtk
 import numpy as np
 import json
@@ -6,12 +6,15 @@ import os
 
 class STLProcessor:
     def __init__(self, parent):
-        self.parent = parent  # Store a reference to the parent
-
+        self.parent = parent  # Storing a reference to the parent
+                
     def read_stl_file(self, filename):
         reader = vtk.vtkSTLReader()
         reader.SetFileName(filename)
         reader.Update()
+        
+        # Initiate the text_box with the default CAD representation! 
+        self.generate_cad_visual()
         return reader.GetOutput()
 
     def compute_volume_and_surface_area(self, mesh):
@@ -100,84 +103,6 @@ class STLProcessor:
         json_output_file = f"{base_name}_report.json"
         with open(json_output_file, 'w') as outfile:
             json.dump(metrics, outfile, indent=4)
-    def process_stl(self, filename):
-        mesh = self.read_stl_file(filename)
-
-        # Compute metrics
-        volume, surface_area = self.compute_volume_and_surface_area(mesh)
-        center_of_mass = self.compute_center_of_mass(mesh)
-        min_bounds, max_bounds = self.compute_bounding_box(mesh)
-        min_area, max_area = self.compute_facet_areas(mesh)
-        min_edge_length, max_edge_length = self.compute_edge_lengths(mesh)
-        min_aspect_ratio, max_aspect_ratio = self.compute_aspect_ratios(mesh)
-        surface_normals = self.compute_surface_normals(mesh)
-
-        # Curvature analysis (mean curvature)
-        curved_mesh = self.compute_curvature(mesh)
-        curvature_values = self.extract_curvature_data(curved_mesh)
-
-        # Prepare data for JSON and text box output
-        report_data = {
-            "Volume": volume,
-            "Surface Area": surface_area,
-            "Center of Mass": center_of_mass,
-            "Bounding Box": {
-                "Min Bounds": min_bounds,
-                "Max Bounds": max_bounds
-            },
-            "Min Facet Area": min_area,
-            "Max Facet Area": max_area,
-            "Min Edge Length": min_edge_length,
-            "Max Edge Length": max_edge_length,
-            "Min Aspect Ratio": min_aspect_ratio,
-            "Max Aspect Ratio": max_aspect_ratio,
-            "Curvature Values": curvature_values,
-            "Surface Normals": {
-                "Outward Facing": surface_normals[0],
-                "Inward Facing": surface_normals[1]
-            }
-        }
-
-        # Write the report to a JSON file
-        base_name = os.path.splitext(os.path.basename(filename))[0]
-        json_output_file = f"{base_name}_report.json"
-        with open(json_output_file, 'w') as outfile:
-            json.dump(report_data, outfile, indent=4)
-        
-        # Display the report in the text box
-        self.display_report_in_text_box(report_data)
-
-        print(f"Analysis complete. Report generated: {json_output_file}")
-
-    def display_report_in_text_box(self, report_data):
-        """Display structured data from report_data on the text widget."""
-        self.text_box.delete(1.0, "end")  # Clear previous content if any
-        self.text_box.insert("end", "=== STL Analysis Report ===\n\n")
-
-        # Recursively display the report data
-        def format_and_display(data, indent=0):
-            indent_space = " " * (indent * 4)
-            if isinstance(data, dict):
-                for key, value in data.items():
-                    if isinstance(value, (dict, list)):
-                        self.text_box.insert("end", f"{indent_space}{key}:\n")
-                        format_and_display(value, indent + 1)
-                    else:
-                        self.text_box.insert("end", f"{indent_space}{key}: {value}\n")
-            elif isinstance(data, list):
-                for item in data:
-                    if isinstance(item, (dict, list)):
-                        format_and_display(item, indent + 1)
-                    else:
-                        self.text_box.insert("end", f"{indent_space}- {item}\n")
-            else:
-                self.text_box.insert("end", f"{indent_space}{data}\n")
-
-        format_and_display(report_data)
-
-        # Ensure the text box shows the latest content
-        self.text_box.see("end")
-        self.text_box.update_idletasks()
         
     def process_stl(self, filename):
         mesh = self.read_stl_file(filename)
@@ -208,14 +133,13 @@ class STLProcessor:
             "Max Facet Area": max_area,
             "Min Edge Length": min_edge_length,
             "Max Edge Length": max_edge_length,
-            "Min Aspect Ratio": min_aspect_ratio,
-            "Max Aspect Ratio": max_aspect_ratio,
-            "Curvature Values": curvature_values,
-            "Surface Normals": {
-                "Outward Facing": surface_normals[0],
-                "Inward Facing": surface_normals[1]
+#            "Min Aspect Ratio": min_aspect_ratio,
+#            "Max Aspect Ratio": max_aspect_ratio,
+#            "Curvature Values": curvature_values,
+#            "Surface Normals": {
+#                "Outward Facing": surface_normals[0],
+#                "Inward Facing": surface_normals[1]
             }
-        }
 
         # Write the report to a JSON file
         base_name = os.path.splitext(os.path.basename(filename))[0]
@@ -228,12 +152,43 @@ class STLProcessor:
 
         print(f"Analysis complete. Report generated: {json_output_file}")
         
+    # Decoration function for CAD import  
+    def generate_cad_visual(self):
+        cad_representation = self.create_cad_visual()
+        self.parent.text_box.delete(1.0, tk.END)  # Clear existing content
+        self.parent.text_box.insert(tk.END, cad_representation)
+
+    def create_cad_visual(self):
+        cad = ""
+        cad += "+-----------+\n"
+        cad += f"|           |\n"
+        cad += "+           +\n"
+        cad += f"|           |\n"
+        cad += "+           +\n"
+        cad += f"|           |\n"
+        cad += "+-----------+"
+        
+         # Add the decorative pattern below the mesh
+        pattern1 = """ 
+ ____        _           _        ____    _    ____  
+/ ___| _ __ | | __ _ ___| |__    / ___|  / \  |  _ \ 
+\___ \| '_ \| |/ _` / __| '_ \  | |     / _ \ | | | |
+ ___) | |_) | | (_| \__ \ | | | | |___ / ___ \| |_| |
+|____/| .__/|_|\__,_|___/_| |_|  \____/_/   \_\____/ 
+      |_|                                                                          
+_____________________________________________________
+\n"""
+
+        pattern2 = """                          
+_____________________________________________________
+\n"""
+        return pattern1 + cad + pattern2
+        
     def display_report_in_text_box(self, report_data):
         """Display structured data from report_data on the text widget."""
-        self.parent.text_box.delete(1.0, "end")  # Clear previous content if any
-        self.parent.text_box.insert("end", "===========================\n\n")
-        self.parent.text_box.insert("end", "=>  STL Analysis Report  <=\n\n")
-        self.parent.text_box.insert("end", "===========================\n\n")
+        #self.parent.text_box.delete(1.0, "end")  # Clear previous content if any
+        self.parent.text_box.insert("end", "              ->  STL Geometry Analysis <-              \n")
+        self.parent.text_box.insert("end", "              ----------------------------              \n\n")
 
         # Recursively display the report data
         def format_and_display(data, indent=0):
