@@ -5,7 +5,7 @@ import tarfile
 import os 
 from tkinter import ttk, simpledialog
 import subprocess
-import pexpect
+#import pexpect
 import time
 
 class ReplaceControlDictParameters:

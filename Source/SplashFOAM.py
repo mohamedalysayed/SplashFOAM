@@ -22,6 +22,7 @@ from tkinter import Listbox
 from collections import defaultdict # Import defaultdict | for mesh parameters 
 from tkinter.colorchooser import askcolor
 from tkinter.font import Font
+from STLProcessor import STLProcessor
 
 # Importing local classes
 from SearchWidget import SearchWidget  # Import the SearchWidget class from the other file
@@ -49,365 +50,6 @@ def view_toolbar():
 #
 # TERMINAL APP 
 #______________           
-
-###class SplashFOAM:  
-###    def __init__(self, root):
-###        self.root = root
-###        self.root.config(background="white") # black
-###        self.root.title("SplashFOAM - v0.1")
-###        
-###        # Set the window icon using a PhotoImage
-###        icon_path = "../Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
-###        icon_image = tk.PhotoImage(file=icon_path)
-###        self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
-###        
-###        # ======================= Create a menubar ----------------------------->
-###        menubar = tk.Menu(root)
-###
-###        # Create a File menu and add it to the menu bar
-###        file_menu = tk.Menu(menubar, tearoff=0)
-###        file_menu.add_command(label="New", command=file_new)
-###        file_menu.add_command(label="Profile theme", command=self.change_theme)
-###        file_menu.add_separator()
-###        file_menu.add_command(label="Exit", command=root.quit)
-###        menubar.add_cascade(label="File", menu=file_menu)
-###
-###        # Create an Edit menu and add it to the menu bar
-###        edit_menu = tk.Menu(menubar, tearoff=0)
-###        edit_menu.add_command(label="Undo", command=edit_undo)
-###        menubar.add_cascade(label="Edit", menu=edit_menu)
-###        
-###        # Create a View menu and add it to the menu bar
-###        view_menu = tk.Menu(menubar, tearoff=0)
-###        view_menu.add_command(label="Status Bar", command=view_status_bar)
-###
-###        # Create a submenu for the Toolbar option
-###        toolbar_submenu = tk.Menu(view_menu, tearoff=0)
-###        toolbar_submenu.add_command(label="Show Toolbar", command=view_toolbar)
-###        toolbar_submenu.add_command(label="Hide Toolbar", command=lambda: print("Hide Toolbar"))
-###        
-###        # Add the submenu to the "View" menu
-###        view_menu.add_command(label="Results Panel", command=self.toggle_results_panel)
-###
-###        # Add the submenu to the "View" menu
-###        view_menu.add_cascade(label="Toolbar", menu=toolbar_submenu)
-###   
-###        # Add the "View" menu to the menu bar
-###        menubar.add_cascade(label="View", menu=view_menu)
-###
-###        # Create a Help menu and add it to the menu bar
-###        help_menu = tk.Menu(menubar, tearoff=0)
-###        help_menu.add_command(label="About", command=self.show_about_message)
-###        help_menu.add_command(label="Manual", command=show_help)
-###        
-###        help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, foreground="blue")
-###        help_menu.add_command(label="Report an issue", command=self.open_contact_page, foreground="red")
-###        help_menu.add_command(label="Support SplashFOAM", command=self.support_SplashFOAM, foreground="green")
-###        help_menu.add_command(label="Cloud HPC", command=self.cloud_HPC, background= "black", foreground="white")
-###        menubar.add_cascade(label="Help", menu=help_menu)
-###        
-###        # Display the menu bar
-###        root.config(menu=menubar)
-###        # ======================= Create a menubar -----------------------------<
-###        
-###        # ============= Time Recorder =============
-###        #---------------------
-###        # License parameters #
-###        #---------------------
-###        self.start_time = time.time()
-###        self.license_start_date_file = "license_start_date.txt"  # File to store the start date
-###        self.license_duration = 1 * 365 * 24 * 3600  # 1 year in seconds
-###        self.notice_period_before_end = 15 * 24 * 3600  # Notify 15 days before the license expires
-###        self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
-###        
-###        # Create a label for the "Elapsed time:" text
-###        self.elapsed_time_label = tk.Label(root, text="Elapsed Time", font=("Helvetica", 24), bg="white", fg="darkblue")
-###        self.elapsed_time_label.grid(row=2, column=10, sticky="ew")
-###
-###        # Create a label for the timer
-###        self.timer_label = tk.Label(root, text="00:00:00.0", font=("Helvetica", 36, "bold"), bg="white", fg="darkblue")
-###        self.timer_label.grid(row=3, column=10, sticky="ew")
-###
-###        
-###        # Start updating the timer
-###        self.update_timer()
-###        
-###        # Initialize the vg color of the 3D stl CAD
-###        self.bg_color_counter = 1
-###
-###        # Bind the window close event
-###        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-###        
-###        # ============= Time Recorder ===============
-###        # Display a welcome message
-###        self.show_welcome_message()
-###        
-###        # Display the main text box widget
-###        self.setup_ui()
-###        
-###        # Variable to track visibility state of the action bar
-###        self.show_first_column = True  
-###
-###        # Add logos
-###        self.add_logos()
-###  
-###        # Add a background image
-###        self.add_bgImage()
-###        
-###        # A dictionary to define a help message for each mesh parameter 
-###        self.PARAMETER_HELP = {
-###        "minCellSize": "minCellSize:\nSpecify the minimum cell size [in meters]. As a first guess you might take divide the size of the smallest element in your geometry divided by 2!",
-###        "maxCellSize": "maxCellSize:\nSpecify the maximum cell size [in meters]. As a first guess you might take divide the size of the smallest element in your geometry!",
-###        "boundaryCellSize": "boundaryCellSize:\nSpecify the cell size near boundaries. As a first guess you might take divide the size of the smallest element in your geometry divided by 5!"}
-###        
-###        # Create a button to import a geometry
-###        style = ttk.Style()
-###        style.configure("TButton", padding=20, relief="flat", background="lightblue", foreground="black", font=(12))  
-###        
-###        # First button of SplashFOAM - Importing a geometry file
-###        self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
-###        self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.import_button, "Click to import the geometry to be simulated")     
-###        # Allow the button to expand horizontally with the window
-###        #root.columnconfigure(0, weight=1)   
-###        
-###        ## Create a button to open a directory dialog
-###        #self.browse_button = ttk.Button(self.root, text="Physical Properties", command=self.browse_directory)
-###        #self.browse_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
-###        #self.add_tooltip(self.browse_button, "Click to change the physical properties of your fluid")
-###        
-###        # Create a mesh type variable (set it so "Cartesian" as a default)
-###        self.mesh_type_var = tk.StringVar(value="Cartesian")
-###        self.mesh_type = None
-###        
-###        # Create a button to create the mesh
-###        self.create_mesh_button = ttk.Button(self.root, text="Create Mesh", command=self.create_mesh)
-###        self.create_mesh_button.grid(row=1, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.create_mesh_button, "Click to start building your mesh")
-###        
-###        # Create a button to load the case directory
-###        self.load_case_button = ttk.Button(self.root, text="Load Case", command=self.load_case)
-###        self.load_case_button.grid(row=2, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.load_case_button, "Click to choose the running directory of your case")
-###        
-###        # Create a button to initialize the command execution
-###        self.initialize_simulation_button = ttk.Button(self.root, text="Initialize Simulation", command=self.initialize_simulation)
-###        self.initialize_simulation_button.grid(row=3, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.initialize_simulation_button, "Click to initialize/reset your simulation")
-###        
-###        # Create a button to configure the simulation settings before run
-###        self.configure_simulation_button = ttk.Button(self.root, text="Configure Simulation", command=self.open_simulation_setup_popup)
-###        self.configure_simulation_button.grid(row=4, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.configure_simulation_button, "Click to configure your simulation")
-###        
-###        # Create a button to run simulation
-###        self.run_simulation_button = ttk.Button(self.root, text="Run Simulation", command=self.run_simulation)
-###        self.run_simulation_button.grid(row=5, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.run_simulation_button, "Click to start your simulation")
-###        
-###        # Stop Simulation Button
-###        self.stop_simulation_button = ttk.Button(self.root, text="Stop Simulation", command=self.stop_simulation)
-###        self.stop_simulation_button.grid(row=6, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.stop_simulation_button, "Click to terminate your simulation")
-###        #self.stop_simulation_button["state"] = tk.DISABLED  # Initially disable the button
-###        
-###        # Create a button to plot results using xmgrace
-###        self.plot_results_xmgrace_button = ttk.Button(self.root, text="2D Plotting", command=self.plot_results_xmgrace)
-###        self.plot_results_xmgrace_button.grid(row=7, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.plot_results_xmgrace_button, "Click to plot simulation results using xmgrace")
-###
-###        # Create a button to execute commands to the terminal kernel 
-###        self.execute_button = tk.Button(root, text="CLI", command=self.execute_command)
-###        self.execute_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
-###        self.execute_button.grid(row=13, column=4, pady=10, padx=7, sticky="nw") 
-###        self.add_tooltip(self.execute_button, "Click to run a terminal command")
-###
-###        # IMPORTANT FLAG! the two following blocks dictate the buttons style all over. 
-###        style.theme_use('default') # classic, default, alt, clam 
-###
-###        # Configure a custom style for the Entry widget
-###        style.configure('Professional.TEntry', 
-###                        foreground='lightblue', 
-###                        font=('Helvetica', 11, 'bold'), 
-###                        borderwidth=2, 
-###                        relief='flat',
-###                        padding=10)
-###
-###        # Create an entry field for entering the commands by the user
-###        default_sentence = "top"  # Or "htop"
-###        self.entry = ttk.Entry(root, style='Professional.TEntry', width=18, foreground="black")
-###        self.entry.grid(row=13, column=4, pady=50, padx=7, sticky="nw")
-###        self.entry.insert(0, default_sentence)
-###
-###        # Create a ttk.Style to configure the progress bar
-###        self.style = ttk.Style()
-###        self.style.configure("Custom.Horizontal.TProgressbar", thickness=20, troughcolor="lightgray", background="lightblue")
-###        
-###        # Test button [10-12 taken!]
-###        self.paraview_button = ttk.Button(self.root, text="Post-processing", command=self.paraview_application)
-###        self.paraview_button.grid(row=8, column=0, pady=1, padx=10, sticky="ew")
-###        self.add_tooltip(self.paraview_button, "Click to open Paraview")
-        
-###        # _____________________________Profile Theme_____________________________________
-###        
-###        # Configure a smaller style for the button
-###        style = ttk.Style()
-###        style.configure("Small.TButton", font=("TkDefaultFont", 10), padding=3, background="lightblue")
-###        
-###        # Create a Checkbutton for resetting profile theme to default 
-###        self.reset_var = tk.BooleanVar()
-###        reset_checkbutton_style = ttk.Style()
-###        reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
-###        reset_checkbutton = ttk.Checkbutton(self.root, text="Reset Profile Theme", variable=self.reset_var, style="Custom.TCheckbutton", command=self.toggle_reset)
-###        reset_checkbutton.grid(row=14, column=0, padx=7, pady=1, sticky="w")
-###        
-###        # Create a Checkbutton using the custom style for showing/hiding results section 
-###        style = ttk.Style()
-###        style.configure("Custom.TCheckbutton", foreground="black", background="white")
-###        toggle_visibility_button = ttk.Checkbutton(root, text="Show/Hide Elapsed Time", command=self.toggle_results_panel, style="Custom.TCheckbutton")
-###        toggle_visibility_button.grid(row=17, column=0, pady=1, padx=7, sticky="w") 
-###        
-###        # Create Checkbutton for monitoring simulation
-###        self.monitor_simulation_var = tk.BooleanVar()
-###        reset_checkbutton_style = ttk.Style()
-###        reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
-###        monitor_simulation_checkbutton = ttk.Checkbutton(root, text="Monitor Simulation", variable=self.monitor_simulation_var, command=self.toggle_monitor_simulation, style="Custom.TCheckbutton")
-###        monitor_simulation_checkbutton.grid(row=15, column=0, pady=1, padx=7, sticky="w")
-###        
-###        # Create Checkbutton for monitoring simulation
-###        self.monitor_simulationLog_var = tk.BooleanVar()
-###        reset_checkbutton_style = ttk.Style()
-###        reset_checkbutton_style.configure("Custom.TCheckbutton", foreground="black", background="white")
-###        monitor_simulationLog_checkbutton = ttk.Checkbutton(root, text="Simulation Results", variable=self.monitor_simulationLog_var, command=self.toggle_simulation_results, style="Custom.TCheckbutton")
-###        monitor_simulationLog_checkbutton.grid(row=16, column=0, pady=1, padx=7, sticky="w")
-###
-###        # Store initial profile theme values
-###        self.initial_font = self.text_box.cget("font")
-###        self.initial_foreground = self.text_box.cget("foreground")
-###        self.initial_background = self.text_box.cget("background")
-###         
-###        
-###        # _____________________________Profile Theme_____________________________________
-###
-###        # Create a progress bar with the custom style
-###        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=280, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-###        self.progress_bar_canvas.grid(row=13, column=0, padx=10, pady=15, sticky="w")                
-###        self.progress_bar_canvas_flag=True
-###
-###        #----------Text Widget with Scrollbar-----------       
-###        # Add the search widget to the main app
-###        self.search_widget = SearchWidget(root, self.text_box)
-###        #----------Text Widget with Scrollbar-----------
-###        
-###        #---------- Config row and column weights to allow resizing------ 
-###        no_global_columns = 5
-###        no_global_rows = 13
-###        
-###        # Adjust the row range according to the exsisting number
-###        for i in range(no_global_rows):  # Assuming you have 13 rows
-###            self.root.rowconfigure(i, weight=1)
-###
-###        # Adjust the column range according to the exsisting number
-###        for i in range(no_global_columns):
-###            self.root.columnconfigure(i, weight=1)
-###        #---------- Config row and column weights to allow resizing------
-###        
-###        # Initialize variables for simulation thread
-###        self.simulation_thread = None
-###        self.simulation_running = False
-###        
-###        # Initialize the available fuels to choose from
-###        self.fuels = ["Propane", "Gasoline", "Ethanol" , "Hydrogen", "Methanol", "Ammonia", "Dodecane", "Heptane"]
-###        
-###        ## Create a label for the "Fuel Selector" dropdown
-###        #self.fuel_selector_label = ttk.Label(self.root, text="Fuel selector ▼", font=("TkDefaultFont", 12), background="white") # , foreground="green")
-###        #self.fuel_selector_label.grid(row=0, column=1, pady=1, padx=10, sticky="w") # can be shown when needed! FLAG
-###
-###        # Define the fuel options
-###        fuels = ["Methanol", "Ammonia", "Dodecane"]
-###
-###        # Create a StringVar to store the selected fuel
-###        self.selected_fuel = tk.StringVar()
-###
-###        # Set a default value for the dropdown
-###        default_value = "Available fuel options"
-###        self.selected_fuel.set(default_value)
-###
-###        # Create a dropdown menu for fuel selection
-####        self.fuel_selector = ttk.Combobox(self.root, textvariable=self.selected_fuel, values=self.fuels)
-####        self.fuel_selector.grid(row=1, column=1, pady=1, padx=10, sticky="w")
-###
-###        # Bind an event handler to the <<ComboboxSelected>> event
-###        #self.fuel_selector.bind("<<ComboboxSelected>>", self.on_fuel_selected)
-###       
-###        # Create a label for status messages
-###        self.status_label_title = ttk.Label(self.root, text="")
-###        status_title = "SplashFOAM v0.1"
-###        self.status_label_title.grid(row=15, column=4, columnspan=5, pady=1, padx=10, sticky="n")
-###        self.status_label_title.config(text=status_title, font=("Helvetica", 12, "bold"), background="white", foreground="darkblue")
-###        
-###        self.status_label = ttk.Label(self.root, text="")
-###        default_status = "Start by importing geometry and configuring your case!"
-###        self.status_label.grid(row=16, column=4, columnspan=5, pady=1, padx=10, sticky="n")
-###        self.status_label.config(text=default_status, font=("Helvetica", 12), background="white", foreground="darkblue")
-###
-###        # ... (other initialization code)
-###        self.selected_file_path = None
-###        self.selected_openfoam_path = None  
-###        self.selected_file_content = None
-###        self.mesh_dict_file_path = None
-###        self.control_dict_file_path = None
-###        self.selected_mesh_file_content = None
-###        self.selected_control_file_content = None
-###        self.geometry_dest_path = None
-###        self.control_dict_path = None 
-###        self.separateMeshLogFile = False
-###        self.openfoam_sourced = False
-###        self.caseMeshLogFile = False
-###        self.solverLogFile = False 
-###        self.geometry_loaded = False
-###        
-###        # Mesh parameters 
-###        self.mesh_params = ["minCellSize", "maxCellSize", "boundaryCellSize", "nLayers", "optimiseLayer", "untangleLayers", "thicknessRatio", "maxFirstLayerThickness", "nSmoothNormals", "maxNumIterations", "featureSizeFactor", "reCalculateNormals", "relThicknessTol", "restartFromLatestStep", "enforceGeometryConstraints"] # "stopAfter"
-###        self.control_dict_params = ["application", "startFrom", "startTime", "stopAt", "endTime", "deltaT", "writeControl", "writeInterval", "purgeWrite", "writeFormat", "writePrecision", "timePrecision", "runTimeModifiable", "maxCo"]
-###        
-###        self.header = """/*--------------------------------*- C++ -*----------------------------------*\\
-###  =========                 |
-###  \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-###   \\\\    /   O peration     | Website:  https://openfoam.org
-###    \\\\  /    A nd           | Version:  SplashFOAM v0.1
-###     \\\\/     M anipulation  |
-###\\*---------------------------------------------------------------------------*/\n"""
-###        self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
-###        self.mixture_params = ["molWeight", "rho", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
-###
-###
-###    # -------------- Main logos --------------------------    
-###    def add_logos(self):
-###
-###        # Create PhotoImage objects directly from image files
-###        self.logo_openfoam = tk.PhotoImage(file="../Resources/Logos/openfoam_logo.png")
-###        self.logo_simulitica = tk.PhotoImage(file="../Resources/Logos/simulitica_logo.png")
-###
-###        # Resize images if needed
-###        self.logo_openfoam = self.logo_openfoam.subsample(2, 2)  # Adjust the subsample as needed
-###        self.logo_simulitica = self.logo_simulitica.subsample(5, 5)  # Adjust the subsample as needed
-###
-###        style = ttk.Style()
-###        style.configure('White.TButton', background='white')
-###        self.OF_version_button = ttk.Button(text="OF version", command=self.select_openfoam_version, image=self.logo_openfoam, style='White.TButton')
-###        self.OF_version_button.image=self.logo_openfoam
-###        self.OF_version_button.grid(row=10, column=0, pady=1, padx=10, sticky="ew")
-###
-###        self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
-###        self.simLabel.grid(row=11, column=0, pady=1, padx=10, sticky="ew")
-###        self.simLabel.configure(background="white")
-###
-###        # Create a label for copyright text
-###        self.copyright_label = ttk.Label(self.root, text="© 2023 Simulitica Ltd")
-###        self.copyright_label.grid(row=12, column=0, pady=1, padx=10, sticky="n")
-###        self.copyright_label.configure(background="white", font="bold")
-###    # -------------- Main logos -------------------------- 
 
 class SplashFOAM:  
     def __init__(self, root):
@@ -460,7 +102,7 @@ class SplashFOAM:
         root.config(menu=menubar)
         # ======================= Create a menubar -----------------------------<
 
-        # ============= Time Recorder =============
+        # ============= Time Recorder =============>
         # License parameters
         self.start_time = time.time()
         self.license_start_date_file = "license_start_date.txt"  # File to store the start date
@@ -479,6 +121,7 @@ class SplashFOAM:
         
         # Start updating the timer
         self.update_timer()
+        # ============= Time Recorder =============<
         
         # Display the main text box widget
         self.setup_ui()
@@ -509,7 +152,6 @@ class SplashFOAM:
         # ----------------------
         # Style of Action Panel 
         # ----------------------
-
         # Create a ttk.Style to configure buttons
         style = ttk.Style()
         style.configure(
@@ -520,6 +162,13 @@ class SplashFOAM:
             foreground="black",
             font=("Arial", 12, "bold")  
         )
+        
+        # Initialize the STLProcessor
+        self.stl_processor = STLProcessor(self)
+
+        # Add button to process STL
+        #self.process_stl_button = ttk.Button(self.root, text="Process STL", command=self.process_stl)
+        #self.process_stl_button.grid(row=10, column=0, pady=1, padx=10, sticky="nsew")
 
         # Create a button to import a geometry file
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
@@ -655,6 +304,7 @@ class SplashFOAM:
         # Create a progress bar with the custom style
         self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=280, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
         self.progress_bar_canvas.grid(row=12, column=0, padx=10, pady=15, sticky="nsew")  # Progress bar is also resizable
+        self.progress_bar_canvas_flag=True
         
         #----------Text Widget with Scrollbar-----------       
         # Add the search widget to the main app
@@ -724,8 +374,7 @@ class SplashFOAM:
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
         self.mixture_params = ["molWeight", "rho", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
 
-
-    # -------------- Main logos --------------------------    
+    # -------------- Main logos -------------------------->    
     def add_logos(self):
     
         # Create PhotoImage objects directly from image files
@@ -755,13 +404,21 @@ class SplashFOAM:
         self.copyright_label.configure(background="white", font="bold")
     
         # Ensure that rows 10, 11, and 12 are configured for resizing
-        self.root.grid_rowconfigure(9, weight=1)  # Ensure row 10 resizes
-        self.root.grid_rowconfigure(10, weight=1)  # Ensure row 11 resizes
-        self.root.grid_rowconfigure(11, weight=1)  # Ensure row 12 resizes
-    # -------------- Main logos --------------------------
+        self.root.grid_rowconfigure(9, weight=1)  # Ensure rows resize well here
+        self.root.grid_rowconfigure(10, weight=1)  
+        self.root.grid_rowconfigure(11, weight=1)  
+    # -------------- Main logos --------------------------<
 
 
 
+
+    def process_stl(self):
+        # Open file dialog to select STL file
+        stl_file = filedialog.askopenfilename(title="Select STL File", filetypes=[("STL files", "*.stl")])
+        if stl_file:
+            self.stl_processor.process_stl(stl_file)
+            messagebox.showinfo("Processing Complete", "STL analysis completed. Check the generated report.")
+            
     def paraview_application(self):
         # This function will be executed in a separate thread to avoid blocking the main GUI thread
         def run_paraview():
@@ -780,7 +437,6 @@ class SplashFOAM:
 
         # Start the thread, which will run ParaView in the background without blocking the main UI
         paraview_thread.start()
-    
                 
     # Toggle function for action bar visibility
     def toggle_results_panel(self):
@@ -914,7 +570,6 @@ class SplashFOAM:
         time.sleep(2)  # wait for 3 seconds
         welcome_label.destroy()  # Destroy the Label to collapse the popup
 
-
     def show_about_message(self):
         about_message = (
             "\n"
@@ -947,7 +602,37 @@ class SplashFOAM:
         
     # -------------- Welcome Message -------------------------- 
      
-     # -------------- Splash background image(s) --------------------------  
+    # -------------- Splash background image(s) -------------------------->  
+#    def add_bgImage(self):
+#        # Specify the image path
+#        image_path = "../Resources/Images/racing-car.png"
+
+#        # Create a tk.PhotoImage object directly from the file
+#        self.splash_bgImage = tk.PhotoImage(file=image_path)
+
+#        # Adjust the subsample as needed
+#        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
+
+#        # Create a label to display the image, initially without the frame effect
+#        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white", cursor="hand2")
+#        self.splash_bgImage_label.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+
+#        # Bind the hover effect
+#        self.splash_bgImage_label.bind("<Enter>", self.on_hover)
+#        self.splash_bgImage_label.bind("<Leave>", self.off_hover)
+
+#        # Make the image clickable
+#        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
+#        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.skool.com/cfd-dose-5227/about"))
+#        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.cfddose.substack.com"))
+
+##    def on_hover(self, event):
+##        # Change the label appearance to simulate a frame around it on hover
+##        event.widget.config(bg="white", bd=1, relief="groove")
+
+##    def off_hover(self, event):
+##        # Revert the label appearance when not hovering over it
+##        event.widget.config(bg="white", bd=0, relief="flat")
 
     def add_bgImage(self):
         # Specify the image path
@@ -959,31 +644,23 @@ class SplashFOAM:
         # Adjust the subsample as needed
         self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
 
-        # Create a label to display the image, initially without the frame effect
-        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white", cursor="hand2")
-        self.splash_bgImage_label.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+        # Create a button with the image, and bind it to the process_stl function
+        self.splash_bgImage_button = tk.Button(
+            self.root, 
+            image=self.splash_bgImage, 
+            bg="white", 
+            command=self.process_stl_click,  # Attach the function directly
+            cursor="hand2"
+        )
+        self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)                
+                    
+    def process_stl_click(self, event=None):
+        # Call the process_stl method when the image is clicked
+        self.process_stl()        
 
-        # Bind the hover effect
-        self.splash_bgImage_label.bind("<Enter>", self.on_hover)
-        self.splash_bgImage_label.bind("<Leave>", self.off_hover)
-
-        # Make the image clickable
-        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
-        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.skool.com/cfd-dose-5227/about"))
-        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.cfddose.substack.com"))
-
-    def on_hover(self, event):
-        # Change the label appearance to simulate a frame around it on hover
-        event.widget.config(bg="white", bd=1, relief="groove")
-
-    def off_hover(self, event):
-        # Revert the label appearance when not hovering over it
-        event.widget.config(bg="white", bd=0, relief="flat")
-    
-        # -------------- Splash background image(s) -------------------------- 
+    # -------------- Splash background image(s) --------------------------< 
             
-    # -------------- importing the geometry --------------------------------------------------------------------    
-
+    # ------------------------------------- Importing the geometry ------------------------------------->    
     def import_geometry(self):
         file_path = filedialog.askopenfilename(
             title="Select Geometry File",
@@ -1113,9 +790,7 @@ class SplashFOAM:
 
         else:
             tk.messagebox.showerror("Error", "No file selected for import")
-        
-        # -------------- importing the geometry --------------------------------------------------------------------    
-
+   # ------------------------------------- Importing the geometry -------------------------------------<    
         
     def visualize_stl(self, file_path):
         # Read the STL file
@@ -1159,8 +834,7 @@ class SplashFOAM:
         else:
             tk.messagebox.showerror("Error", "Splash Visualizer currently supports only STL files.")
 
-            
-# -------------------------------- MESH CREATION ------------------------------
+# -------------------------------- Mesh Construction ------------------------------>
     def create_mesh(self):
         # Check if geometry is loaded
         if not self.geometry_loaded:
@@ -1344,6 +1018,9 @@ __________________________________________________________________
 \n"""
 
         return pattern + mesh
+
+# -------------------------------- Mesh Construction ------------------------------<
+
         
     # Decoration function for CAD import  
     def generate_cad_visual(self):
@@ -1400,12 +1077,10 @@ _____________________________________________________
       |_|                                            
 _____________________________________________________
 \n"""
-
         return pattern + run
         
-# -------------------------------- MESH CREATION ------------------------------            
             
-# --------------------- running the simulation ---------------------------------------
+    # Loading an existing openfoam case
     def load_case(self):
         selected_directory = filedialog.askdirectory()
         if selected_directory:
@@ -1587,10 +1262,8 @@ _____________________________________________________
 
         # Open a popup to replace simulation setup parameters
         ReplaceSimulationSetupParameters(self, constant_params, system_params, existing_values)
-
     # ++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++
 
-    #+++++++++++++++++++++++++++++++++ Sim Setup ++++++++++++++++++++++++++++++++++++++++           
     def update_control_dict_parameters(self):
         # Read the content of the "controlDict" file
         self.control_dict_file_path = os.path.join(self.selected_file_path, "system", "controlDict")
@@ -1620,7 +1293,7 @@ _____________________________________________________
         else:
             tk.messagebox.showerror("Error", "No controlDict parameters found in the 'controlDict' file!")
 
-    # --------------------- running the simulation ---------------------------
+    # --------------------------- Running the simulation --------------------------------->
     def run_simulation(self):
 
         if self.selected_file_path is None:
@@ -1725,7 +1398,7 @@ _____________________________________________________
         ##subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
         ##time.sleep(0.1)  # Add a 100ms delay if needed
         
-    # --------------------- running the simulation ---------------------------------------
+    # --------------------------- Running the simulation ---------------------------------<
         
     def stop_simulation(self): # FLAG! at the moment, the controlDict file needs to be open and saved and closed, for the function to work :/
         if not self.simulation_running:
