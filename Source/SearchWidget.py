@@ -5,19 +5,16 @@ class SearchWidget:
     def __init__(self, root, text_widget):
         self.text_widget = text_widget
 
-        # Create a search bar 
-        #-------------->
         # Create a find a keyword
         search_button = tk.Button(root, text="Find", command=self.search_text)
-        search_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
+        search_button.configure(relief="flat", background="lightblue", foreground="black", font=("Arial", 12, "bold"))
         search_button.grid(row=9, column=4, pady=3, padx=5, sticky="nsew") 
         
         # Create an entry field for entering the commands by the user
         default_sentence = "Search here!" 
-        self.search_entry = ttk.Entry(root, style='Professional.TEntry', width=18, foreground="black")
+        self.search_entry = ttk.Entry(root, style='Professional.TEntry', width=18, foreground="lightblue", font=("Arial", 12, "bold"))
         self.search_entry.grid(row=10, column=4, pady=3, padx=5, sticky="nsew")
         self.search_entry.insert(0, default_sentence)
-        # --------------<
         
         self.result_label = tk.Label(root, text="")
         self.result_label.grid(row=11, column=4, pady=3, padx=5)
