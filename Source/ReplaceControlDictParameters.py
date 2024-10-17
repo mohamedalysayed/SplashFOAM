@@ -1,3 +1,4 @@
+# Standard library imports 
 import tkinter as tk
 import re
 import shutil
@@ -5,8 +6,11 @@ import tarfile
 import os 
 from tkinter import ttk, simpledialog
 import subprocess
-#import pexpect
 import time
+import threading
+
+# Importing local classes
+from CloudHPCManager import CloudHPCManager
 
 class ReplaceControlDictParameters:
     def __init__(self, parent, control_dict_params, existing_values):
@@ -75,35 +79,46 @@ class ReplaceControlDictParameters:
         # Now, run the simulation
         self.parent.run_openfoam_simulation()
 
-# ======================================================> 
-    def send_to_cluster(self):
-        # Zip the simulation directory
-        simulation_dir = self.parent.selected_file_path
-        tar_path = f"{simulation_dir}.tar.gz"
-        
-        with tarfile.open(tar_path, "w:gz") as tar:
-            tar.add(simulation_dir, arcname=os.path.basename(simulation_dir))
+# ======================================================>
 
-        print(f"Simulation directory has been zipped to {tar_path}")
-        print(f"#======================================================================>")
+    def send_to_cluster(self):
+        cloud_manager = CloudHPCManager()
         
-        print(f"Simulation case name is: {os.path.basename(simulation_dir)}")
-        print(f"#______________________________________________________________________<")
-        
-        # Get the directory one level up from the selected file path
-        parent_dir = os.path.dirname(self.parent.selected_file_path)
-        
-        # Command to be executed
-        export_path_command = 'export PATH="/usr/local/bin:$PATH"'
-        command = f'{export_path_command} && cloudHPCexec {tar_path}'
-        
-        # Execute the command in a new terminal
-        try:
-            # The following command is for Unix-based systems. Adjust if needed for other operating systems.
-            subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f'cd {parent_dir} && {command}; exec bash'])
-            print(f"Simulation tar file {tar_path} is being sent to the cluster.")
-        except Exception as e:
-            tk.messagebox.showerror("Error", f"Failed to execute command: {e}")
+        # Open the UI to select CPU, RAM, script, and folder for the simulation
+        def open_cluster_ui():
+            cloud_manager.open_ui()
+
+        # Run the UI in a separate thread
+        threading.Thread(target=open_cluster_ui).start()
+    
+     
+#    def send_to_cluster(self):
+#        # Zip the simulation directory
+#        simulation_dir = self.parent.selected_file_path
+#        tar_path = f"{simulation_dir}.tar.gz"
+#        
+#        with tarfile.open(tar_path, "w:gz") as tar:
+#            tar.add(simulation_dir, arcname=os.path.basename(simulation_dir))
+
+#        print(f"Simulation directory has been zipped to {tar_path}")
+#        print(f"#======================================================================>")
+#        print(f"Simulation case name is: {os.path.basename(simulation_dir)}")
+#        print(f"#______________________________________________________________________<")
+#        
+#        # Get the directory one level up from the selected file path
+#        parent_dir = os.path.dirname(self.parent.selected_file_path)
+#        
+#        # Command to be executed
+#        export_path_command = 'export PATH="/usr/local/bin:$PATH"'
+#        command = f'{export_path_command} && cloudHPCexec {tar_path}'
+#        
+#        # Execute the command in a new terminal
+#        try:
+#            # The following command is for Unix-based systems. Adjust if needed for other operating systems.
+#            subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f'cd {parent_dir} && {command}; exec bash'])
+#            print(f"Simulation tar file {tar_path} is being sent to the cluster.")
+#        except Exception as e:
+#            tk.messagebox.showerror("Error", f"Failed to execute command: {e}")
 # ======================================================<       
 
     def replace_control_dict_parameters(self, new_values):
