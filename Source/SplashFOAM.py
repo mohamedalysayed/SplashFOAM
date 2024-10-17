@@ -67,7 +67,8 @@ class SplashFOAM:
 
         # File menu
         file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(label="New", command=file_new)
+        file_menu.add_command(label="New File", command=self.file_new)
+        file_menu.add_command(label="Analyze STL file", command=self.process_stl)
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
@@ -107,7 +108,7 @@ class SplashFOAM:
         self.start_time = time.time()
         self.license_start_date_file = "license_start_date.txt"  # File to store the start date
         self.license_duration = 1 * 365 * 24 * 3600  # 1 year in seconds
-        #self.license_duration = 14 * 24 * 3600  # 1 year in seconds
+        #self.license_duration = 14 * 24 * 3600  # 14 days in seconds
         self.notice_period_before_end = 15 * 24 * 3600  # Notify 15 days before the license expires
         self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
         
@@ -237,7 +238,7 @@ class SplashFOAM:
         
         # Create a button to execute commands to the terminal kernel
         self.execute_button = tk.Button(self.root, text="CLI", command=self.execute_command)
-        self.execute_button.configure(relief="flat", background="lightblue", foreground="black", font=12)
+        self.execute_button.configure(relief="flat", background="lightblue", foreground="black", font=("Arial", 12, "bold"))
         self.execute_button.grid(row=10, column=1, pady=3, padx=5, sticky="nsew")  # Changed row to 14 and column to 0 (below the text box on the left)
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
         
@@ -255,7 +256,7 @@ class SplashFOAM:
         
         # Create an entry field for entering the commands by the user
         default_sentence = "top"  # Or "htop"
-        self.entry = ttk.Entry(self.root, style='Professional.TEntry', width=18, foreground="black")
+        self.entry = ttk.Entry(self.root, style='Professional.TEntry', width=18, foreground="lightblue", font=("Arial", 12, "bold"))
         self.entry.grid(row=9, column=1, pady=3, padx=5, sticky="nsew")  # Changed row to 15 and column to 0 (below the execute button)
         self.entry.insert(0, default_sentence)
         
@@ -374,6 +375,28 @@ class SplashFOAM:
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
         self.mixture_params = ["molWeight", "rho", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
 
+
+
+    # Creating an empty text file
+    def file_new(self):
+        # Define the path for the new file
+        new_file_path = os.path.join(os.getcwd(), "new_file.txt")
+
+        # Create a new empty text file
+        with open(new_file_path, 'w') as new_file:
+            new_file.write("")  # Writing an empty string (optional)
+
+        # Function to open the file in gedit in a separate thread
+        def open_in_gedit():
+            try:
+                subprocess.run(["gedit", new_file_path], check=True)
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to open gedit: {e}")
+
+        # Start the open_in_gedit function in a new thread to avoid blocking the UI
+        gedit_thread = threading.Thread(target=open_in_gedit)
+        gedit_thread.start()
+    
     # -------------- Main logos -------------------------->    
     def add_logos(self):
     
@@ -634,6 +657,8 @@ class SplashFOAM:
 ##        # Revert the label appearance when not hovering over it
 ##        event.widget.config(bg="white", bd=0, relief="flat")
 
+
+
     def add_bgImage(self):
         # Specify the image path
         image_path = "../Resources/Images/racing-car.png"
@@ -648,11 +673,16 @@ class SplashFOAM:
         self.splash_bgImage_button = tk.Button(
             self.root, 
             image=self.splash_bgImage, 
-            bg="white", 
+            bg="white",  # Set background color here
+            bd=0,  # Set border width here
             command=self.process_stl_click,  # Attach the function directly
-            cursor="hand2"
+            cursor="hand2",
+            relief="flat"  # Border style
         )
-        self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)                
+
+        # Use grid() only for layout without bd option
+        self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+
                     
     def process_stl_click(self, event=None):
         # Call the process_stl method when the image is clicked
@@ -678,11 +708,10 @@ class SplashFOAM:
             # Create the Meshing folder if it doesn't exist
             if not os.path.exists(meshing_folder):
                 os.makedirs(meshing_folder)
-           
-            # Process the imported stl file    
-            self.stl_processor.process_stl(self.selected_file_path)
-            #messagebox.showinfo("Processing Complete", "STL analysis completed. Check the generated report.")
 
+            # Initiate the text_box with a nice mesh representation! 
+            self.generate_cad_visual()
+           
             # Copy and rename the geometry file
             geometry_filename = f"CAD.{file_path.split('.')[-1].lower()}"
             geometry_dest = os.path.join(meshing_folder, geometry_filename)
@@ -698,7 +727,8 @@ class SplashFOAM:
             splash_logo_path = os.path.join(base_path, "Resources", "Logos", "simulitica_icon_logo.png")
             freecad_logo_path = os.path.join(base_path, "Resources", "Logos", "freecad_logo.png")
             gmsh_logo_path = os.path.join(base_path, "Resources", "Logos", "gmsh_logo.png")
-            blender_logo_path = os.path.join(base_path, "Resources", "Logos", "blender_logo.png")
+            #blender_logo_path = os.path.join(base_path, "Resources", "Logos", "blender_logo.png")
+            blender_logo_path = os.path.join(base_path, "Resources", "Logos", "blender-logo-2.png")
             paraview_logo_path = os.path.join(base_path, "Resources", "Logos", "paraview_logo.png")
 
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
@@ -706,8 +736,41 @@ class SplashFOAM:
             popup.title("Choose CAD Viewer")
             popup.geometry("400x800")
             popup.configure(bg="white")
+            
+            # --------- Toggle for processing the imported CAD file ----------->
+            # Add a toggle button at the bottom of the popup
+            self.toggle_on = False  # Initialize the toggle state to off
 
+            def toggle_frame_color():
+                if not self.toggle_on:
+                    frame_toggle_button.config(bg="lightblue")
+                    self.stl_processor.process_stl(self.selected_file_path)  # Process the STL file when toggle is on
+                else:
+                    frame_toggle_button.config(bg="white")
+                self.toggle_on = not self.toggle_on
 
+            def on_hover(event):
+                frame_toggle_button.config(bg="lightblue", fg="black")
+
+            def on_leave(event):
+                if not self.toggle_on:
+                    frame_toggle_button.config(bg="white", fg="black")
+
+            frame_toggle_button = tk.Button(
+                popup, 
+                text="Process STL File", 
+                command=toggle_frame_color, 
+                bg="black",
+                fg="cyan", 
+                bd=1, 
+                relief="raised"
+            )
+
+            frame_toggle_button.bind("<Enter>", on_hover)
+            frame_toggle_button.bind("<Leave>", on_leave)
+
+            frame_toggle_button.pack(side=tk.BOTTOM, pady=5)
+            # --------- Toggle for processing the imported CAD file -----------<
             def open_freecad():
                 subprocess.run(["freecad", geometry_dest, "&"], check=True)
                 # Zoom to fit
@@ -752,41 +815,90 @@ class SplashFOAM:
                 paraview_thread.start()
 
             # Load logos
-            splash_logo = tk.PhotoImage(file=splash_logo_path).subsample(6, 6)
+            splash_logo = tk.PhotoImage(file=splash_logo_path).subsample(7, 7)
             freecad_logo = tk.PhotoImage(file=freecad_logo_path).subsample(4, 4)
             gmsh_logo = tk.PhotoImage(file=gmsh_logo_path).subsample(9, 9)
-            blender_logo = tk.PhotoImage(file=blender_logo_path).subsample(9, 9)
+            blender_logo = tk.PhotoImage(file=blender_logo_path).subsample(6, 6)
             paraview_logo = tk.PhotoImage(file=paraview_logo_path).subsample(9, 9)
             
             # ---------------------------------------------
             # Create buttons with logos for the CAD viewers
             # ---------------------------------------------
             # Splash Visualizer button
-            splash_button = tk.Button(popup, text="Open in Splash Visualizer", command=self.open_splash_visualizer, image=splash_logo, compound="top", bg="white", highlightbackground="white")
+            splash_button = tk.Button(
+                popup, 
+                text="Open in Splash Visualizer", 
+                command=self.open_splash_visualizer, 
+                image=splash_logo, 
+                compound="top", 
+                bg="white", 
+                highlightbackground="white", 
+                borderwidth=0,  # No border
+                relief="flat"  # Flat appearance
+            )
             splash_button.image = splash_logo
-            splash_button.pack(side=tk.TOP, padx=30, pady=1)
+            splash_button.pack(side=tk.TOP, padx=30, pady=2)
 
-            
             # Gmsh Visualizer button
-            gmsh_button = tk.Button(popup, text="Open in Gmsh", command=open_gmsh, image=gmsh_logo, compound="top", bg="white", highlightbackground="white")
+            gmsh_button = tk.Button(
+                popup, 
+                text="Open in Gmsh", 
+                command=open_gmsh, 
+                image=gmsh_logo, 
+                compound="top", 
+                bg="white", 
+                highlightbackground="white", 
+                borderwidth=0,  # No border
+                relief="flat"  # Flat appearance
+            )
             gmsh_button.image = gmsh_logo
-            gmsh_button.pack(side=tk.TOP, padx=20, pady=1)
+            gmsh_button.pack(side=tk.TOP, padx=20, pady=2)
 
             # Blender Visualizer button
-            blender_button = tk.Button(popup, text="Open in Blender", command=open_blender, image=blender_logo, compound="top", bg="white", highlightbackground="white")
+            blender_button = tk.Button(
+                popup, 
+                text="Open in Blender", 
+                command=open_blender, 
+                image=blender_logo, 
+                compound="top", 
+                bg="white", 
+                highlightbackground="white", 
+                borderwidth=0,  # No border
+                relief="flat"  # Flat appearance
+            )
             blender_button.image = blender_logo
-            blender_button.pack(side=tk.TOP, padx=20, pady=1)
+            blender_button.pack(side=tk.TOP, padx=20, pady=2)
 
             # FreeCAD Visualizer button
-            freecad_button = tk.Button(popup, text="Open in FreeCAD", command=open_freecad, image=freecad_logo, compound="top", bg="white", highlightbackground="white")
+            freecad_button = tk.Button(
+                popup, 
+                text="Open in FreeCAD", 
+                command=open_freecad, 
+                image=freecad_logo, 
+                compound="top", 
+                bg="white", 
+                highlightbackground="white", 
+                borderwidth=0,  # No border
+                relief="flat"  # Flat appearance
+            )
             freecad_button.image = freecad_logo
-            freecad_button.pack(side=tk.TOP, padx=30, pady=1)
+            freecad_button.pack(side=tk.TOP, padx=30, pady=2)
 
             # Paraview Visualizer button
-            paraview_button = tk.Button(popup, text="Open in ParaView", command=open_paraview, image=paraview_logo, compound="top", bg="white", highlightbackground="white")
+            paraview_button = tk.Button(
+                popup, 
+                text="Open in ParaView", 
+                command=open_paraview, 
+                image=paraview_logo, 
+                compound="top", 
+                bg="white", 
+                highlightbackground="white", 
+                borderwidth=0,  # No border
+                relief="flat"  # Flat appearance
+            )
             paraview_button.image = paraview_logo
-            paraview_button.pack(side=tk.TOP, padx=30, pady=1)
-
+            paraview_button.pack(side=tk.TOP, padx=30, pady=2)
+#           
             popup.mainloop()
 
         else:
@@ -1034,7 +1146,7 @@ _____________________________________________________
         mesh += f"| 6 | 5 | 4 |\n"
         mesh += "+---+---+---+\n"
         mesh += f"| 7 | 8 | 9 |\n"
-        mesh += "+---+---+---+\n"
+        mesh += "+---+---+---+"
         
          # Add the decorative pattern below the mesh
         pattern = """
