@@ -1192,23 +1192,23 @@ _____________________________________________________
             
     # Loading an existing openfoam case
     def load_case(self):
-        selected_directory = filedialog.askdirectory()
-        if selected_directory:
-            self.selected_file_path = selected_directory
-            self.status_label.config(text=f"Case directory identified: {selected_directory}")
+        self.selected_directory = filedialog.askdirectory()
+        if self.selected_directory:
+            self.selected_file_path = self.selected_directory
+            self.status_label.config(text=f"Case directory identified: {self.selected_directory}")
             self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
             self.initialize_simulation_button["state"] = tk.NORMAL # Enable the "Initialize Simulation" button
             
             # Create a dummy 'splash.foam' file in the selected directory
             try:
-                dummy_file_path = os.path.join(selected_directory, "splash.foam")
+                dummy_file_path = os.path.join(self.selected_directory, "splash.foam")
                 with open(dummy_file_path, 'w') as dummy_file:
                     dummy_file.write('')  # Write an empty string to create an empty file
             except Exception as e:
                 self.status_label.config(text=f"Error creating 'splash.foam': {e}", foreground="red")
                 
             # Check for constant/polyMesh directory
-            polyMesh_path = os.path.join(selected_directory, "constant", "polyMesh")
+            polyMesh_path = os.path.join(self.selected_directory, "constant", "polyMesh")
             if os.path.isdir(polyMesh_path):
                 # Prompt the user
                 response = messagebox.askyesno("Mesh Confirmation", "This case seems to have a mesh, do you want to load it?")
