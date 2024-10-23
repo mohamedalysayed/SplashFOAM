@@ -77,7 +77,7 @@ SplashFOAM allows users to import geometry files from various formats, including
 
 - **STL** (stereolithography)
 - **OBJ** (Wavefront object)
-- **STEP** (Standard for the Exchange of Product Data)
+- **STEP** (Standard for the exchange of product data - analytical format)
   
 Import Geometry enables the user to view their CAD in one of five options:
 
@@ -138,4 +138,4 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
 The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
 
 ## Contributing
-Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Contributions are always welcome!
+Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Feedback is super valuable here ;) 
