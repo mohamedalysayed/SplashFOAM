@@ -81,7 +81,7 @@ Currently, SplashFOAM supports three types of meshes:
 - **Polyhedral**: Create meshes with polyhedral elements, which are beneficial for complex geometries.
 - **Tetrahedral**: Flexible tetrahedral meshing for various applications.
 
-These meshes are generated using cfMesh when creating a mesh from scratch. Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
+These meshes are generated using [_cfMesh_](https://cfmesh.com/) when creating a mesh from scratch. Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
 
 ## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
