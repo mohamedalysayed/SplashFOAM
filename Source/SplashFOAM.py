@@ -167,10 +167,6 @@ class SplashFOAM:
         # Initialize the STLProcessor
         self.stl_processor = STLProcessor(self)
 
-        # Add button to process STL
-        #self.process_stl_button = ttk.Button(self.root, text="Process STL", command=self.process_stl)
-        #self.process_stl_button.grid(row=10, column=0, pady=1, padx=10, sticky="nsew")
-
         # Create a button to import a geometry file
         self.import_button = ttk.Button(self.root, text="Import Geometry", command=self.import_geometry)
         self.import_button.grid(row=0, column=0, pady=1, padx=10, sticky="nsew")
@@ -265,10 +261,9 @@ class SplashFOAM:
         self.root.grid_rowconfigure(14, weight=1)  # Ensures the row for the entry field resizes dynamically
 
 
-# ---------------
+# --------------->
 #  Check buttons
-# ---------------
-
+# <--------------
         # Set different weights for the rows to control how they resize
         self.root.grid_rowconfigure(14, weight=0)  # Reset Profile Theme button's row gets some priority
         self.root.grid_rowconfigure(15, weight=0)  # Give less weight to the rows below so they shrink first
@@ -292,9 +287,16 @@ class SplashFOAM:
         self.monitor_simulationLog_var = tk.BooleanVar()
         monitor_simulationLog_checkbutton = ttk.Checkbutton(root, text="Simulation log", variable=self.monitor_simulationLog_var, command=self.toggle_simulation_results, style="Custom.TCheckbutton")
         monitor_simulationLog_checkbutton.grid(row=16, column=0, pady=1, padx=7, sticky="nsew")
-        
-        # Create a Checkbutton using the custom style for showing/hiding results section
-        toggle_visibility_button = ttk.Checkbutton(root, text="Show Elapsed Time", command=self.toggle_results_panel, style="Custom.TCheckbutton")
+
+        # Create a Checkbutton using the custom style for showing/hiding the results section
+        self.results_panel_var = tk.BooleanVar(value=True)  # Set to False so it starts unchecked
+        toggle_visibility_button = ttk.Checkbutton(
+            root, 
+            text="Show Elapsed Time", 
+            variable=self.results_panel_var, 
+            command=self.toggle_results_panel, 
+            style="Custom.TCheckbutton"
+        )
         toggle_visibility_button.grid(row=17, column=0, pady=1, padx=7, sticky="nsew")
 
         # Store initial profile theme values
@@ -376,7 +378,6 @@ class SplashFOAM:
         self.mixture_params = ["molWeight", "rho", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
 
 
-
     # Creating an empty text file
     def file_new(self):
         # Define the path for the new file
@@ -408,14 +409,26 @@ class SplashFOAM:
         self.logo_openfoam = self.logo_openfoam.subsample(3, 3)  # Adjust the subsample as needed
         self.logo_simulitica = self.logo_simulitica.subsample(8, 8)  # Adjust the subsample as needed
     
+
+
+        # Create a style for the button to remove any hover effect or unwanted borders
         style = ttk.Style()
-        style.configure('White.TButton', background='white')
-    
+        style.configure('White.TButton', background='white', relief="flat", borderwidth=0)
+        style.map('White.TButton', background=[('active', 'white')], relief=[('pressed', 'flat')])
+
         # Create the button for OpenFOAM version with the logo
-        self.OF_version_button = ttk.Button(text="OF version", command=self.select_openfoam_version, image=self.logo_openfoam, style='White.TButton')
-        self.OF_version_button.image = self.logo_openfoam
-        self.OF_version_button.grid(row=9, column=0, pady=1, padx=5, sticky="nsew")  # Changed sticky to "nsew" for dynamic resizing
-    
+        self.OF_version_button = ttk.Button(
+            self.root,
+            text="",
+            command=self.select_openfoam_version,
+            image=self.logo_openfoam,
+            style='White.TButton',
+            cursor="hand2"  # Make it clear it's clickable
+        )
+        self.OF_version_button.grid(row=9, column=0, pady=1, padx=5, sticky="nsew")  # Use nsew for proper resizing
+
+
+
         # Add the Simulitica logo
         self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
         self.simLabel.grid(row=10, column=0, pady=1, padx=5, sticky="nsew")  # Changed sticky to "nsew" for dynamic resizing
@@ -426,12 +439,11 @@ class SplashFOAM:
         self.copyright_label.grid(row=11, column=0, pady=1, padx=5, sticky="nsew")  # Changed sticky to "nsew" for dynamic resizing
         self.copyright_label.configure(background="white", font="bold")
     
-        # Ensure that rows 10, 11, and 12 are configured for resizing
-        self.root.grid_rowconfigure(9, weight=1)  # Ensure rows resize well here
+        # Ensure that rows 9, 10, and 11 are configured for resizing
+        self.root.grid_rowconfigure(9, weight=1)  
         self.root.grid_rowconfigure(10, weight=1)  
         self.root.grid_rowconfigure(11, weight=1)  
     # -------------- Main logos --------------------------<
-
 
     def process_stl(self):
         # Open file dialog to select STL file
@@ -458,41 +470,22 @@ class SplashFOAM:
 
         # Start the thread, which will run ParaView in the background without blocking the main UI
         paraview_thread.start()
-                
-    # Toggle function for action bar visibility
-#    def toggle_results_panel(self):
-#        self.show_first_column = not self.show_first_column
-
-#        # Toggle the visibility of buttons in the first column
-#        if self.show_first_column:
-
-#            # The following elements are shown by default
-#            self.elapsed_time_label.grid(row=0, column=7, sticky="ew")
-#            self.timer_label.grid(row=1, column=7, sticky="ew")
-#            self.splash_bgImage_label.grid(row=2, column=7, pady=1, padx=10, sticky="ew", rowspan=4)        
-#        else:            
-#            self.elapsed_time_label.grid_remove()
-#            self.timer_label.grid_remove()
-#            self.splash_bgImage_label.grid_remove()
-
 
     # Toggle function for action bar visibility
     def toggle_results_panel(self):
-        self.show_first_column = not self.show_first_column
+        self.show_first_column = self.results_panel_var.get()  # Check the state of the variable
 
         # Toggle the visibility of buttons in the first column
         if self.show_first_column:
             # Show elements
-            self.elapsed_time_label.grid(row=0, column=7, sticky="ew")
-            self.timer_label.grid(row=1, column=7, sticky="ew")
-            #self.splash_bgImage_label.grid(row=2, column=7, pady=1, padx=10, sticky="ew", rowspan=4)
-            self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+            self.elapsed_time_label.grid(row=0, column=7, sticky="nsew")
+            self.timer_label.grid(row=1, column=7, sticky="nsew")
+            self.splash_bgImage_label.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
         else:
             # Hide elements
             self.elapsed_time_label.grid_remove()
             self.timer_label.grid_remove()
-            #self.splash_bgImage_label.grid_remove()
-            self.splash_bgImage_button.grid_remove()
+            self.splash_bgImage_label.grid_remove()
 
     def browse_directory(self):
         selected_file = filedialog.askopenfilename()
@@ -644,32 +637,36 @@ class SplashFOAM:
      
     # -------------- Splash background image(s) -------------------------->  
 
+##    # Clickable background image (process STL file)
+##    #______________________________________________
+##    def add_bgImage(self):
+##        # Specify the image path
+##        image_path = "../Resources/Images/racing-car.png"
 
-    def add_bgImage(self):
-        # Specify the image path
-        image_path = "../Resources/Images/racing-car.png"
+##        # Create a tk.PhotoImage object directly from the file
+##        self.splash_bgImage = tk.PhotoImage(file=image_path)
 
-        # Create a tk.PhotoImage object directly from the file
-        self.splash_bgImage = tk.PhotoImage(file=image_path)
+##        # Adjust the subsample as needed
+##        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
 
-        # Adjust the subsample as needed
-        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
+##        # Create a button with the image, and bind it to the process_stl function
+##        self.splash_bgImage_button = tk.Button(
+##            self.root, 
+##            image=self.splash_bgImage, 
+##            bg="white",  # Set background color to white
+##            activebackground="white",  # Set active background to white to prevent color change on click
+##            bd=0,  # Remove border
+##            command=self.process_stl_click,  # Attach the function directly
+##            cursor="hand2",  # Set cursor to hand on hover
+##            relief="flat"  # Flat border style
+##        )
 
-        # Create a button with the image, and bind it to the process_stl function
-        self.splash_bgImage_button = tk.Button(
-            self.root, 
-            image=self.splash_bgImage, 
-            bg="white",  # Set background color here
-            bd=0,  # Set border width here
-            command=self.process_stl_click,  # Attach the function directly
-            cursor="hand2",
-            relief="flat"  # Border style
-        )
+##        # Use grid() for layout
+##        self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
 
-        # Use grid() only for layout without bd option
-        self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
-        
-        
+
+         # Clickable background image (website link)
+         #______________________________________________
 #        # Create a label to display the image, initially without the frame effect [FLAG: Do we need this at all?!]
 #        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white", cursor="hand2")
 #        self.splash_bgImage_label.grid(row=2, column=7, pady=1, padx=10, sticky="nsew", rowspan=4)
@@ -691,6 +688,27 @@ class SplashFOAM:
 #        # Revert the label appearance when not hovering over it
 #        event.widget.config(bg="white", bd=0, relief="flat")
 
+
+    def add_bgImage(self):
+        # Specify the image path
+        image_path = "../Resources/Images/racing-car.png"
+
+        # Create a tk.PhotoImage object directly from the file
+        self.splash_bgImage = tk.PhotoImage(file=image_path)
+
+        # Adjust the subsample as needed
+        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
+
+        # Create a label to display the image (not clickable)
+        self.splash_bgImage_label = tk.Label(
+            self.root, 
+            image=self.splash_bgImage, 
+            bg="white"  # Set background color to white to match the background
+        )
+
+        # Use grid for layout
+        self.splash_bgImage_label.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+         
                     
     def process_stl_click(self, event=None):
         # Call the process_stl method when the image is clicked
@@ -742,7 +760,7 @@ class SplashFOAM:
             # Create a popup to ask the user whether to open the CAD file in FreeCAD, Gmsh, or ParaView
             popup = tk.Toplevel(self.root)
             popup.title("Choose CAD Viewer")
-            popup.geometry("400x800")
+            popup.geometry("400x750")
             popup.configure(bg="white")
             
             # --------- Toggle for processing the imported CAD file ----------->
@@ -837,7 +855,7 @@ class SplashFOAM:
             # Splash Visualizer button
             splash_button = tk.Button(
                 popup, 
-                text="Open in Splash Visualizer", 
+                text="Open in Splash Viewer", 
                 command=self.open_splash_visualizer, 
                 image=splash_logo, 
                 compound="top", 
@@ -1127,7 +1145,7 @@ class SplashFOAM:
         cad += f"|           |\n"
         cad += "+           +\n"
         cad += f"|           |\n"
-        cad += "+-----------+\n"
+        cad += "+-----------+"
         
          # Add the decorative pattern below the mesh
         pattern = """ 
@@ -1185,7 +1203,7 @@ __________________________________________________________________
         run += f"|           |\n"
         run += "+           +\n"
         run += f"|           |\n"
-        run += "+-----------+\n"
+        run += "+-----------+"
         
          # Add the decorative pattern below the mesh
         pattern = """   
@@ -1215,7 +1233,7 @@ _____________________________________________________
 
             if base_folders_exist and time_folder_exists:
                 self.selected_file_path = self.selected_directory
-                self.status_label.config(text=f"Case directory identified: {self.selected_directory}")
+                self.status_label.config(text=f"Case directory identified: {self.selected_directory}", foreground="darkblue")
                 self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
                 self.initialize_simulation_button["state"] = tk.NORMAL  
                 self.configure_simulation_button["state"] = tk.NORMAL  
@@ -1497,9 +1515,6 @@ _____________________________________________________
 
                 # Use Popen to capture real-time output
                 process = subprocess.Popen(["./Allrun"], cwd=self.selected_file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
-                
-                # Clear previous content from the text box
-                ###self.text_box.delete(1.0, "end")
 
                 # Continuously read and insert output into the Text widget
                 while True:
@@ -1535,10 +1550,6 @@ _____________________________________________________
                 self.stop_simulation_button["state"] = tk.DISABLED
         else:
             tk.messagebox.showerror("Error", "Allrun script not found!")
-            
-        # Now, update the modification timestamp of the controlDict file | FLAG, maybe not needed anymore! 
-        ##subprocess.run(["touch", control_dict_path], check=True)  # Update file modification timestamp
-        ##time.sleep(0.1)  # Add a 100ms delay if needed
         
     # --------------------------- Running the simulation ---------------------------------<
         
@@ -1925,32 +1936,40 @@ _____________________________________________________
         popup.destroy()
 
     def select_openfoam_version(self):
+        # Create a popup window
         popup = tk.Toplevel(self.root)
         popup.title("Select OpenFOAM Version")
-        popup.geometry("350x450")  # Adjust size as necessary
-        selected_version = tk.StringVar()
+        popup.geometry("350x450")
+        selected_version = tk.StringVar(value="2306")  # Set the default version to v2306
 
-        # Create a style object for padding
+        # Create a style object for custom styling
         style = ttk.Style()
+
+        # Configure radiobutton padding
         style.configure("TRadiobutton", padding=5)
+
+        # Custom style for section titles
+        style.configure("Title.TLabel", font=("TkDefaultFont", 12, "bold"), foreground="darkblue")
 
         # OpenFOAM Foundation Versions
         foundation_frame = ttk.LabelFrame(popup, text="OpenFOAM Foundation", padding=(10, 5))
         foundation_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
 
-        foundation_versions = [("v11", "11")]
+        # Foundation versions
         foundation_versions = [("v8", "8"), ("v9", "9"), ("v10", "10"), ("v11", "11"), ("v12", "12")]
         for text, version in foundation_versions:
             ttk.Radiobutton(foundation_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
-        # OpenFOAM Extended Versions
+        # OpenFOAM ESI Versions
         extended_frame = ttk.LabelFrame(popup, text="OpenFOAM ESI", padding=(10, 5))
         extended_frame.pack(side='top', padx=10, pady=10, fill='both', expand=True)
-        extended_versions = [("v2306", "2306")]
+
+        # ESI versions (default selected is v2306)
         extended_versions = [("v2212", "2212"), ("v2306", "2306"), ("v2312", "2312"), ("v2406", "2406")]
         for text, version in extended_versions:
             ttk.Radiobutton(extended_frame, text=text, variable=selected_version, value=version, style="TRadiobutton").pack(anchor='w')
 
+        # Activate button
         def activate_and_close():
             version = selected_version.get()
             if version:
@@ -1958,6 +1977,11 @@ _____________________________________________________
                 popup.destroy()
 
         ttk.Button(popup, text="Activate", command=activate_and_close).pack(pady=10)
+
+        # Ensure popup is modal
+        popup.transient(self.root)
+        popup.grab_set()
+        self.root.wait_window(popup)
         
     #____________________________________________ sourcing OF __________________________________________________    
              
@@ -1972,7 +1996,7 @@ _____________________________________________________
     def cloud_HPC(self, event=None):
         webbrowser.open_new("https://cfddose.substack.com/p/cfd-free-from-complexity")
 
-    # Splash Timer 
+    # Splash Timer (license related)
     def update_timer(self):
         current_time = time.time()
 
@@ -2059,11 +2083,11 @@ _____________________________________________________
             # Create a "Renew License Now" button inside the popup
             renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/splash-v1"))
             renew_button.pack(pady=20)  # Adjust padding as needed
-        
+
+# --------------------------------------------------------------<
 # Hot links
 # https://www.simulitica.com/splash-v10
-# https://www.buymeacoffee.com/simulitica
-# https://www.paypal.com/paypalme/MohamedSayed314 # Paypal link 
+# https://www.buymeacoffee.com/simulitica # poor simulitica :( 
 # --------------------------------------------------------------<
 
     def load_last_recorded_time(self):
