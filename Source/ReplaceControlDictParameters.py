@@ -71,7 +71,7 @@ class ReplaceControlDictParameters:
     def launch_simulation_and_close(self):
     
         if not self.parent.openfoam_sourced:
-            tk.messagebox.showerror("Error", "OpenFOAM is not sourced. Please source matching OpenFOAM version first.")
+            tk.messagebox.showerror("Error", "OpenFOAM is not sourced. Please activate a suitable version by clicking on the OpenFOAM logo in the main window.")
             return
         # Close the popup window
         self.popup.destroy()
