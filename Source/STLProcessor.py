@@ -13,6 +13,9 @@ class STLProcessor:
         reader.SetFileName(filename)
         reader.Update()
         
+#        # Visualize the CAD imported in Splash Viewer
+#        self.parent.open_splash_visualizer()
+        
         # Initiate the text_box with the default CAD representation! 
         self.generate_cad_visual()
         return reader.GetOutput()
@@ -133,12 +136,12 @@ class STLProcessor:
             "Max Facet Area": max_area,
             "Min Edge Length": min_edge_length,
             "Max Edge Length": max_edge_length,
-#            "Min Aspect Ratio": min_aspect_ratio,
-#            "Max Aspect Ratio": max_aspect_ratio,
-#            "Curvature Values": curvature_values,
-#            "Surface Normals": {
-#                "Outward Facing": surface_normals[0],
-#                "Inward Facing": surface_normals[1]
+            "Min Aspect Ratio": min_aspect_ratio,
+            "Max Aspect Ratio": max_aspect_ratio,
+            "Curvature Values": curvature_values,
+            "Surface Normals": {
+                "Outward Facing": surface_normals[0],
+                "Inward Facing": surface_normals[1]}
             }
 
         # Write the report to a JSON file
