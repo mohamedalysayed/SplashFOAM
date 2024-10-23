@@ -81,7 +81,7 @@ Currently, SplashFOAM supports three types of meshes:
 - **Polyhedral**: Create meshes with polyhedral elements, which are beneficial for complex geometries.
 - **Tetrahedral**: Flexible tetrahedral meshing for various applications.
 
-These meshes are generated using cfMesh when creating a mesh from scratch. Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
+These meshes are generated using [_cfMesh_](https://cfmesh.com/) when creating a mesh from scratch. Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
 
 ## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
@@ -108,10 +108,11 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
 - **ParaView Integration**: Launch ParaView directly from SplashFOAM to analyze simulation results.
 - **2D Plotting**: Quick access to plot simulation data using Xmgrace.
 
-### Integrated Pre-Installation Script
+## Integrated Pre-Installation Script
 SplashFOAM includes a pre-installation script to ensure your system is ready:
 - **Automated Dependency Installation**: The script checks for required packages and installs them if missing, including OpenFOAM, FreeCAD, Gmsh, and more.
 - **WSL Compatibility**: Special considerations for users running SplashFOAM on Windows Subsystem for Linux (WSL), including setting up display configurations.
+  
 ## Documentation
 The SplashFOAM manual is currently under development. In the meantime, please take a look at the repository for updates, or get in touch with the [CFD Dose](https://cfddose.substack.com/) community for help.
 
