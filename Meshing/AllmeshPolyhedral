@@ -21,7 +21,6 @@ rm -rf constant/polyMesh
 rm -rf VTK
 
 # Update the user with the status - spinner goes after 
-echo
 echo "__________________________________________________________________"
 echo 
 echo "Mesh is being crafted, please hang on... " & 
