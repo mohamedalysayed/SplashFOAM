@@ -433,13 +433,11 @@ class SplashFOAM:
     # -------------- Main logos --------------------------<
 
 
-
-
     def process_stl(self):
         # Open file dialog to select STL file
-        stl_file = filedialog.askopenfilename(title="Select STL File", filetypes=[("STL files", "*.stl")])
-        if stl_file:
-            self.stl_processor.process_stl(stl_file)
+        self.selected_file_path = filedialog.askopenfilename(title="Select STL File", filetypes=[("STL files", "*.stl")])
+        if self.selected_file_path:
+            self.stl_processor.process_stl(self.selected_file_path)
             messagebox.showinfo("Processing Complete", "STL analysis completed. Check the generated report.")
             
     def paraview_application(self):
@@ -744,7 +742,8 @@ class SplashFOAM:
             def toggle_frame_color():
                 if not self.toggle_on:
                     frame_toggle_button.config(bg="lightblue")
-                    self.stl_processor.process_stl(self.selected_file_path)  # Process the STL file when toggle is on
+                    # Process the STL file when toggle is on.. 
+                    self.stl_processor.process_stl(self.selected_file_path)
                 else:
                     frame_toggle_button.config(bg="white")
                 self.toggle_on = not self.toggle_on
@@ -771,6 +770,7 @@ class SplashFOAM:
 
             frame_toggle_button.pack(side=tk.BOTTOM, pady=5)
             # --------- Toggle for processing the imported CAD file -----------<
+            
             def open_freecad():
                 subprocess.run(["freecad", geometry_dest, "&"], check=True)
                 # Zoom to fit
@@ -1189,38 +1189,60 @@ _____________________________________________________
 \n"""
         return pattern + run
         
-            
-    # Loading an existing openfoam case
+
+    # Loading an existing OpenFOAM case
     def load_case(self):
         self.selected_directory = filedialog.askdirectory()
         if self.selected_directory:
-            self.selected_file_path = self.selected_directory
-            self.status_label.config(text=f"Case directory identified: {self.selected_directory}")
-            self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
-            self.initialize_simulation_button["state"] = tk.NORMAL # Enable the "Initialize Simulation" button
-            
-            # Create a dummy 'splash.foam' file in the selected directory
-            try:
-                dummy_file_path = os.path.join(self.selected_directory, "splash.foam")
-                with open(dummy_file_path, 'w') as dummy_file:
-                    dummy_file.write('')  # Write an empty string to create an empty file
-            except Exception as e:
-                self.status_label.config(text=f"Error creating 'splash.foam': {e}", foreground="red")
+            # Check if the selected directory contains the necessary OpenFOAM folders
+            base_folders = ["constant", "system"]
+            time_folders = ["0", "0.orig"]  # Check for either '0' or '0.orig'
+
+            # Check if 'constant' and 'system' folders exist
+            base_folders_exist = all(os.path.isdir(os.path.join(self.selected_directory, d)) for d in base_folders)
+            # Check if either '0' or '0.orig' exists
+            time_folder_exists = any(os.path.isdir(os.path.join(self.selected_directory, t)) for t in time_folders)
+
+            if base_folders_exist and time_folder_exists:
+                self.selected_file_path = self.selected_directory
+                self.status_label.config(text=f"Case directory identified: {self.selected_directory}")
+                self.run_simulation_button["state"] = tk.NORMAL  # Enable the "Run Simulation" button
+                self.initialize_simulation_button["state"] = tk.NORMAL  
+                self.configure_simulation_button["state"] = tk.NORMAL  
+                self.stop_simulation_button["state"] = tk.NORMAL 
                 
-            # Check for constant/polyMesh directory
-            polyMesh_path = os.path.join(self.selected_directory, "constant", "polyMesh")
-            if os.path.isdir(polyMesh_path):
-                # Prompt the user
-                response = messagebox.askyesno("Mesh Confirmation", "This case seems to have a mesh, do you want to load it?")
-                if response:
-                    self.paraview_application()  # Call the function to load the mesh
-            
-            # Monitor residuals using foamMonitor | FLAG - monitoring residuals starts here 
-            # self.monitor_simulation()
+                # Create a dummy 'splash.foam' file in the selected directory
+                try:
+                    dummy_file_path = os.path.join(self.selected_directory, "splash.foam")
+                    with open(dummy_file_path, 'w') as dummy_file:
+                        dummy_file.write('')  # Write an empty string to create an empty file
+                except Exception as e:
+                    self.status_label.config(text=f"Error creating 'splash.foam': {e}", foreground="red")
+                    
+                # Check for constant/polyMesh directory
+                polyMesh_path = os.path.join(self.selected_directory, "constant", "polyMesh")
+                if os.path.isdir(polyMesh_path):
+                    # Prompt the user
+                    response = messagebox.askyesno("Mesh Confirmation", "This case seems to have a mesh, do you want to load it?")
+                    if response:
+                        self.paraview_application()  # Call the function to load the mesh
+
+                # Additional OpenFOAM-related checks can be added here
+                
+            else:
+                messagebox.showerror("Invalid OpenFOAM Case", "The selected folder does not represent a valid OpenFOAM case. ")
+                self.status_label.config(text="Invalid OpenFOAM case selected!", foreground="red")
+                self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
+                self.initialize_simulation_button["state"] = tk.DISABLED  
+                self.configure_simulation_button["state"] = tk.DISABLED  
+                self.stop_simulation_button["state"] = tk.DISABLED  
         else:
             self.status_label.config(text="No case directory selected!", foreground="darkblue")
             self.run_simulation_button["state"] = tk.DISABLED  # Disable the "Run Simulation" button
-            self.initialize_simulation_button["state"] = tk.DISABLED  # Disable the "Initialize Simulation" button
+            self.initialize_simulation_button["state"] = tk.DISABLED  
+            self.configure_simulation_button["state"] = tk.DISABLED  
+            self.stop_simulation_button["state"] = tk.DISABLED  
+ 
                 
     def initialize_simulation(self):
         if self.selected_file_path is None:
