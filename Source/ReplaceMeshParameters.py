@@ -5,7 +5,122 @@ import shutil
 import subprocess
 from tkinter import ttk, simpledialog, filedialog, messagebox
 
+#class ReplaceMeshParameters:
+#    def __init__(self, parent, mesh_params, existing_values):
+#        self.parent = parent
+#        self.mesh_params = mesh_params
+#        self.existing_values = existing_values
+#        self.entry_widgets = {}  # Dictionary to store references to entry widgets
+#        self.new_values = {}
 
+#        # Create a new top-level window (pop-up)
+#        self.popup_window = tk.Toplevel(self.parent.root)
+#        self.popup_window.title("Replace Mesh Parameters")
+#        self.popup_window.geometry("600x400")  # Set an initial size for the window
+#        
+#        # Create a canvas, a vertical scrollbar, and a horizontal scrollbar inside the pop-up window
+#        self.canvas = tk.Canvas(self.popup_window, bg="#f0f0f0", bd=2, relief="ridge")
+#        self.canvas.grid(row=0, column=0, sticky="nsew", rowspan=14)
+
+#        self.v_scrollbar = tk.Scrollbar(self.popup_window, orient="vertical", command=self.canvas.yview)
+#        self.v_scrollbar.grid(row=0, column=1, sticky='ns', rowspan=14)
+
+#        self.h_scrollbar = tk.Scrollbar(self.popup_window, orient="horizontal", command=self.canvas.xview)
+#        self.h_scrollbar.grid(row=14, column=0, sticky='ew')  # Adjust the grid position
+
+#        self.canvas.configure(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
+
+#        self.frame = ttk.Frame(self.canvas, style="My.TFrame")
+#        self.canvas.create_window((0, 0), window=self.frame, anchor="nw")
+
+#        self.frame.bind("<Configure>", self.on_frame_configure)
+
+#        # Style configuration (optional)
+#        style = ttk.Style()
+#        style.configure("My.TLabel", font=("TkDefaultFont", 10, "bold"), padding=5)
+#        style.configure("My.TEntry", padding=5, foreground="blue")
+#        style.configure("My.TButton", padding=10, relief="flat", background="lightblue", foreground="black")
+#        style.configure("My.TCheckbutton", padding=5)
+
+#        # Modified to use custom styles and added padding
+#        mesh_label = ttk.Label(self.frame, text="Mesh Controls", style="My.TLabel", foreground="red")
+#        mesh_label.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="w")
+
+#        separator = ttk.Separator(self.frame, orient='horizontal')
+#        separator.grid(row=2, column=1, columnspan=3, pady=5, padx=10, sticky='ew')
+
+#        # Dictionary to store references to checkbutton variables
+#        self.comment_vars = {}
+
+#        for index, param in enumerate(mesh_params):
+#            # Prepend a bullet point to the parameter name
+#            bullet_point = u"\u2022"  # Unicode character for a bullet point
+#            parameter_with_bullet = f"{bullet_point} {param}"
+
+#            label = ttk.Label(self.frame, text=parameter_with_bullet, style="My.TLabel")
+#            label.grid(row=index+9, column=1, padx=10, sticky="w")
+#            entry_var = tk.StringVar(value=existing_values.get(param, ""))
+#            entry = ttk.Entry(self.frame, textvariable=entry_var, style="My.TEntry")
+#            entry.grid(row=index+9, column=2, padx=10)
+#            self.new_values[param] = entry_var
+#            self.entry_widgets[param] = entry
+
+#            comment_var = tk.BooleanVar(value=False)
+#            checkbutton = ttk.Checkbutton(self.frame, text="Disable", variable=comment_var, style="My.TCheckbutton")
+#            checkbutton.grid(row=index+9, column=3, padx=10)
+#            self.comment_vars[param] = comment_var
+
+#        # Workflow Control Frame
+#        workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control", padding=10)
+#        workflow_frame.grid(row=24, column=1, padx=10, pady=20, sticky="ew", columnspan=3)
+
+#        # Create radio buttons for workflow options
+#        self.selected_workflow = tk.StringVar()
+#        self.workflow_options = ["templateGeneration", "surfaceTopology", "surfaceProjection",
+#                                 "patchAssignment", "edgeExtraction", "boundaryLayerGeneration",
+#                                 "meshOptimisation", "boundaryLayerRefinement"]
+
+#        for option in self.workflow_options:
+#            ttk.Radiobutton(workflow_frame, text=option, variable=self.selected_workflow, value=option).pack(anchor='w')
+
+#        # Load the last selected choice from a configuration file (if available)
+#        last_selected_choice = self.load_last_selected_choice()
+#        if last_selected_choice:
+#            self.selected_workflow.set(last_selected_choice)
+
+#        # Get the existing stopAfter value from the meshDict file
+#        existing_stop_after_value = self.extract_stop_after_value(parent.selected_mesh_file_content)
+
+#        # Set the selected workflow option based on the existing stopAfter value
+#        if existing_stop_after_value in self.workflow_options:
+#            self.selected_workflow.set(existing_stop_after_value)
+
+#        # Mesh pop up features (button arrangement)
+#        update_button = ttk.Button(self.frame, text="Create", command=self.update_mesh_parameters, style="Professional.TButton")
+#        update_button.grid(row=91, column=1, pady=3, padx=5, sticky="nsew")
+
+#        mesh_quality_button = ttk.Button(self.frame, text="Statistics", command=self.parent.load_meshChecked, style="Professional.TButton")
+#        mesh_quality_button.grid(row=92, column=1, pady=3, padx=5, sticky="nsew")
+
+#        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="Professional.TButton")
+#        save_mesh_button.grid(row=93, column=1, pady=3, padx=5, sticky="nsew")
+#        
+#        # Create a button for converting the mesh to Fluent mesh
+#        convert_button = ttk.Button(self.frame, text="Convert (.msh)", command=self.convert_to_fluent, style="Professional.TButton")
+#        convert_button.grid(row=91, column=2, pady=3, padx=5, sticky="nsew")
+
+#        remove_mesh_button = ttk.Button(self.frame, text="Remove", command=self.remove_mesh, style="Professional.TButton")
+#        remove_mesh_button.grid(row=92, column=2, pady=3, padx=5, sticky="nsew")
+
+#        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="Professional.TButton")
+#        close_button.grid(row=93, column=2, pady=3, padx=5, sticky="nsew")
+
+#        # Ensuring the pop-up window is resizable
+#        self.popup_window.grid_rowconfigure(0, weight=1)
+#        self.popup_window.grid_columnconfigure(0, weight=1)
+     
+
+# ----====----====>
 class ReplaceMeshParameters:
     def __init__(self, parent, mesh_params, existing_values):
         self.parent = parent
@@ -17,38 +132,41 @@ class ReplaceMeshParameters:
         # Create a new top-level window (pop-up)
         self.popup_window = tk.Toplevel(self.parent.root)
         self.popup_window.title("Replace Mesh Parameters")
-        self.popup_window.geometry("600x400")  # Set an initial size for the window
-        
-        # Create a canvas, a vertical scrollbar, and a horizontal scrollbar inside the pop-up window
-        self.canvas = tk.Canvas(self.popup_window, bg="#f0f0f0", bd=2, relief="ridge")
-        self.canvas.grid(row=0, column=0, sticky="nsew", rowspan=14)
+        self.popup_window.geometry("630x950")  # Set an initial size for the window
+        self.popup_window.minsize(600, 400)  # Make the window resizable
+        self.popup_window.grid_rowconfigure(0, weight=1)
+        self.popup_window.grid_columnconfigure(0, weight=1)
+
+        # Create a canvas and scrollbars for the content
+        self.canvas = tk.Canvas(self.popup_window, bg="lightgrey", bd=0, relief="ridge")
+        self.canvas.grid(row=0, column=0, sticky="nsew")
 
         self.v_scrollbar = tk.Scrollbar(self.popup_window, orient="vertical", command=self.canvas.yview)
-        self.v_scrollbar.grid(row=0, column=1, sticky='ns', rowspan=14)
+        self.v_scrollbar.grid(row=0, column=1, sticky='ns')
 
         self.h_scrollbar = tk.Scrollbar(self.popup_window, orient="horizontal", command=self.canvas.xview)
-        self.h_scrollbar.grid(row=14, column=0, sticky='ew')  # Adjust the grid position
+        self.h_scrollbar.grid(row=1, column=0, sticky='ew')
 
         self.canvas.configure(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
 
-        self.frame = ttk.Frame(self.canvas, style="My.TFrame")
+        self.frame = ttk.Frame(self.canvas)
         self.canvas.create_window((0, 0), window=self.frame, anchor="nw")
 
         self.frame.bind("<Configure>", self.on_frame_configure)
 
-        # Style configuration (optional)
+        # Style configuration for consistent color scheme
         style = ttk.Style()
-        style.configure("My.TLabel", font=("TkDefaultFont", 10, "bold"), padding=5)
+        style.configure("My.TLabel", font=("TkDefaultFont", 12, "bold"), padding=5, background="lightgrey")
         style.configure("My.TEntry", padding=5, foreground="blue")
-        style.configure("My.TButton", padding=10, relief="flat", background="lightblue", foreground="black")
-        style.configure("My.TCheckbutton", padding=5)
+        style.configure("My.TButton", padding=10, relief="flat", background="black", foreground="lightblue")
+        style.configure("My.TCheckbutton", padding=5, background="lightgrey")
 
-        # Modified to use custom styles and added padding
+        # Header label
         mesh_label = ttk.Label(self.frame, text="Mesh Controls", style="My.TLabel", foreground="red")
-        mesh_label.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="w")
+        mesh_label.grid(row=0, column=0, pady=(10, 0), padx=10, sticky="w")
 
         separator = ttk.Separator(self.frame, orient='horizontal')
-        separator.grid(row=2, column=1, columnspan=3, pady=5, padx=10, sticky='ew')
+        separator.grid(row=1, column=0, columnspan=3, pady=5, padx=10, sticky='ew')
 
         # Dictionary to store references to checkbutton variables
         self.comment_vars = {}
@@ -59,21 +177,21 @@ class ReplaceMeshParameters:
             parameter_with_bullet = f"{bullet_point} {param}"
 
             label = ttk.Label(self.frame, text=parameter_with_bullet, style="My.TLabel")
-            label.grid(row=index+9, column=1, padx=10, sticky="w")
+            label.grid(row=index+2, column=0, padx=10, sticky="w")
             entry_var = tk.StringVar(value=existing_values.get(param, ""))
             entry = ttk.Entry(self.frame, textvariable=entry_var, style="My.TEntry")
-            entry.grid(row=index+9, column=2, padx=10)
+            entry.grid(row=index+2, column=1, padx=10, sticky="ew")
             self.new_values[param] = entry_var
             self.entry_widgets[param] = entry
 
             comment_var = tk.BooleanVar(value=False)
             checkbutton = ttk.Checkbutton(self.frame, text="Disable", variable=comment_var, style="My.TCheckbutton")
-            checkbutton.grid(row=index+9, column=3, padx=10)
+            checkbutton.grid(row=index+2, column=2, padx=10, sticky="w")
             self.comment_vars[param] = comment_var
 
-        # Workflow Control Frame
-        workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control", padding=10)
-        workflow_frame.grid(row=24, column=1, padx=10, pady=20, sticky="ew", columnspan=3)
+        # Workflow control frame
+        workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control", padding=10, style="My.TFrame")
+        workflow_frame.grid(row=len(mesh_params)+3, column=0, padx=10, pady=20, sticky="ew", columnspan=3)
 
         # Create radio buttons for workflow options
         self.selected_workflow = tk.StringVar()
@@ -83,44 +201,46 @@ class ReplaceMeshParameters:
 
         for option in self.workflow_options:
             ttk.Radiobutton(workflow_frame, text=option, variable=self.selected_workflow, value=option).pack(anchor='w')
-
+            
+            
         # Load the last selected choice from a configuration file (if available)
         last_selected_choice = self.load_last_selected_choice()
         if last_selected_choice:
             self.selected_workflow.set(last_selected_choice)
 
-        # Get the existing stopAfter value from the meshDict file
-        existing_stop_after_value = self.extract_stop_after_value(parent.selected_mesh_file_content)
+        # Mesh popup buttons
+        update_button = ttk.Button(self.frame, text="Create", command=self.update_mesh_parameters, style="My.TButton")
+        update_button.grid(row=len(mesh_params)+4, column=0, pady=3, padx=5, sticky="nsew")
 
-        # Set the selected workflow option based on the existing stopAfter value
-        if existing_stop_after_value in self.workflow_options:
-            self.selected_workflow.set(existing_stop_after_value)
+        mesh_quality_button = ttk.Button(self.frame, text="Statistics", command=self.parent.load_meshChecked, style="My.TButton")
+        mesh_quality_button.grid(row=len(mesh_params)+5, column=0, pady=3, padx=5, sticky="nsew")
 
-        # Mesh pop up features (button arrangement)
-        update_button = ttk.Button(self.frame, text="Create", command=self.update_mesh_parameters, style="Professional.TButton")
-        update_button.grid(row=91, column=1, pady=3, padx=5, sticky="nsew")
+        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="My.TButton")
+        save_mesh_button.grid(row=len(mesh_params)+6, column=0, pady=3, padx=5, sticky="nsew")
 
-        mesh_quality_button = ttk.Button(self.frame, text="Statistics", command=self.parent.load_meshChecked, style="Professional.TButton")
-        mesh_quality_button.grid(row=92, column=1, pady=3, padx=5, sticky="nsew")
+        # Convert button
+        convert_button = ttk.Button(self.frame, text="Convert (.msh)", command=self.convert_to_fluent, style="My.TButton")
+        convert_button.grid(row=len(mesh_params)+4, column=1, pady=3, padx=5, sticky="nsew")
 
-        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="Professional.TButton")
-        save_mesh_button.grid(row=93, column=1, pady=3, padx=5, sticky="nsew")
-        
-        # Create a button for converting the mesh to Fluent mesh
-        convert_button = ttk.Button(self.frame, text="Convert", command=self.convert_to_fluent, style="Professional.TButton")
-        convert_button.grid(row=91, column=2, pady=3, padx=5, sticky="nsew")
+        remove_mesh_button = ttk.Button(self.frame, text="Remove", command=self.remove_mesh, style="My.TButton")
+        remove_mesh_button.grid(row=len(mesh_params)+5, column=1, pady=3, padx=5, sticky="nsew")
 
-        remove_mesh_button = ttk.Button(self.frame, text="Remove", command=self.remove_mesh, style="Professional.TButton")
-        remove_mesh_button.grid(row=92, column=2, pady=3, padx=5, sticky="nsew")
+        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")
+        close_button.grid(row=len(mesh_params)+6, column=1, pady=3, padx=5, sticky="nsew")
 
-        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="Professional.TButton")
-        close_button.grid(row=93, column=2, pady=3, padx=5, sticky="nsew")
+        # Make the frame expandable
+        self.frame.grid_columnconfigure(1, weight=1)
+        self.frame.grid_rowconfigure(len(mesh_params)+7, weight=1)
 
-        # Ensuring the pop-up window is resizable
+        # Make the window resizable
         self.popup_window.grid_rowconfigure(0, weight=1)
         self.popup_window.grid_columnconfigure(0, weight=1)
-        
- 
+
+
+
+
+
+
     def extract_stop_after_value(self, mesh_file_content):
         # Extract the stopAfter value from the workflowControl block in the meshDict file
         match = re.search(r'workflowControl\s*{[^}]*stopAfter\s+(\w+);', mesh_file_content, re.DOTALL)
@@ -293,7 +413,7 @@ class ReplaceMeshParameters:
             
             # Display the command's output and error in the text_box
             if output:
-                self.parent.text_box.insert(tk.END, "Output:\n" + output)
+                self.parent.text_box.insert(tk.END, output)
             if error:
                 self.parent.text_box.insert(tk.END, "\nError:\n" + error)
             
