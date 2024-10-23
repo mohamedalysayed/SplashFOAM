@@ -290,7 +290,7 @@ class SplashFOAM:
         
         # Create Checkbutton for monitoring simulation log
         self.monitor_simulationLog_var = tk.BooleanVar()
-        monitor_simulationLog_checkbutton = ttk.Checkbutton(root, text="Simulation Results", variable=self.monitor_simulationLog_var, command=self.toggle_simulation_results, style="Custom.TCheckbutton")
+        monitor_simulationLog_checkbutton = ttk.Checkbutton(root, text="Simulation log", variable=self.monitor_simulationLog_var, command=self.toggle_simulation_results, style="Custom.TCheckbutton")
         monitor_simulationLog_checkbutton.grid(row=16, column=0, pady=1, padx=7, sticky="nsew")
         
         # Create a Checkbutton using the custom style for showing/hiding results section
@@ -460,20 +460,39 @@ class SplashFOAM:
         paraview_thread.start()
                 
     # Toggle function for action bar visibility
+#    def toggle_results_panel(self):
+#        self.show_first_column = not self.show_first_column
+
+#        # Toggle the visibility of buttons in the first column
+#        if self.show_first_column:
+
+#            # The following elements are shown by default
+#            self.elapsed_time_label.grid(row=0, column=7, sticky="ew")
+#            self.timer_label.grid(row=1, column=7, sticky="ew")
+#            self.splash_bgImage_label.grid(row=2, column=7, pady=1, padx=10, sticky="ew", rowspan=4)        
+#        else:            
+#            self.elapsed_time_label.grid_remove()
+#            self.timer_label.grid_remove()
+#            self.splash_bgImage_label.grid_remove()
+
+
+    # Toggle function for action bar visibility
     def toggle_results_panel(self):
         self.show_first_column = not self.show_first_column
 
-    # Toggle the visibility of buttons in the first column
+        # Toggle the visibility of buttons in the first column
         if self.show_first_column:
-
-            # The following elements are shown by default
-            self.splash_bgImage_label.grid(row=2, column=7, pady=1, padx=10, sticky="ew", rowspan=4)        
+            # Show elements
             self.elapsed_time_label.grid(row=0, column=7, sticky="ew")
             self.timer_label.grid(row=1, column=7, sticky="ew")
-        else:            
+            #self.splash_bgImage_label.grid(row=2, column=7, pady=1, padx=10, sticky="ew", rowspan=4)
+            self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+        else:
+            # Hide elements
             self.elapsed_time_label.grid_remove()
             self.timer_label.grid_remove()
-            self.splash_bgImage_label.grid_remove()
+            #self.splash_bgImage_label.grid_remove()
+            self.splash_bgImage_button.grid_remove()
 
     def browse_directory(self):
         selected_file = filedialog.askopenfilename()
@@ -624,37 +643,6 @@ class SplashFOAM:
     # -------------- Welcome Message -------------------------- 
      
     # -------------- Splash background image(s) -------------------------->  
-#    def add_bgImage(self):
-#        # Specify the image path
-#        image_path = "../Resources/Images/racing-car.png"
-
-#        # Create a tk.PhotoImage object directly from the file
-#        self.splash_bgImage = tk.PhotoImage(file=image_path)
-
-#        # Adjust the subsample as needed
-#        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
-
-#        # Create a label to display the image, initially without the frame effect
-#        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white", cursor="hand2")
-#        self.splash_bgImage_label.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
-
-#        # Bind the hover effect
-#        self.splash_bgImage_label.bind("<Enter>", self.on_hover)
-#        self.splash_bgImage_label.bind("<Leave>", self.off_hover)
-
-#        # Make the image clickable
-#        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
-#        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.skool.com/cfd-dose-5227/about"))
-#        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.cfddose.substack.com"))
-
-##    def on_hover(self, event):
-##        # Change the label appearance to simulate a frame around it on hover
-##        event.widget.config(bg="white", bd=1, relief="groove")
-
-##    def off_hover(self, event):
-##        # Revert the label appearance when not hovering over it
-##        event.widget.config(bg="white", bd=0, relief="flat")
-
 
 
     def add_bgImage(self):
@@ -680,6 +668,28 @@ class SplashFOAM:
 
         # Use grid() only for layout without bd option
         self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+        
+        
+#        # Create a label to display the image, initially without the frame effect [FLAG: Do we need this at all?!]
+#        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white", cursor="hand2")
+#        self.splash_bgImage_label.grid(row=2, column=7, pady=1, padx=10, sticky="nsew", rowspan=4)
+
+#        # Bind the hover effect
+#        self.splash_bgImage_label.bind("<Enter>", self.on_hover)
+#        self.splash_bgImage_label.bind("<Leave>", self.off_hover)
+
+#        # Make the image clickable
+#        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
+#        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.skool.com/cfd-dose-5227/about"))
+#        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.cfddose.substack.com"))
+
+#    def on_hover(self, event):
+#        # Change the label appearance to simulate a frame around it on hover
+#        event.widget.config(bg="white", bd=1, relief="groove")
+
+#    def off_hover(self, event):
+#        # Revert the label appearance when not hovering over it
+#        event.widget.config(bg="white", bd=0, relief="flat")
 
                     
     def process_stl_click(self, event=None):
