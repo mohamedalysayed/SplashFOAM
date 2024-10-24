@@ -235,7 +235,7 @@ class SplashFOAM:
         # Create a button to execute commands to the terminal kernel
         self.execute_button = tk.Button(self.root, text="CLI", command=self.execute_command)
         self.execute_button.configure(relief="flat", background="lightblue", foreground="black", font=("Arial", 12, "bold"))
-        self.execute_button.grid(row=10, column=1, pady=3, padx=5, sticky="nsew")  # Changed row to 14 and column to 0 (below the text box on the left)
+        self.execute_button.grid(row=10, column=1, pady=3, padx=1, sticky="nsew")  # Changed row to 14 and column to 0 (below the text box on the left)
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
         
         # Configure a smaller style for the button
@@ -253,7 +253,7 @@ class SplashFOAM:
         # Create an entry field for entering the commands by the user
         default_sentence = "top"  # Or "htop"
         self.entry = ttk.Entry(self.root, style='Professional.TEntry', width=18, foreground="lightblue", font=("Arial", 12, "bold"))
-        self.entry.grid(row=9, column=1, pady=3, padx=5, sticky="nsew")  # Changed row to 15 and column to 0 (below the execute button)
+        self.entry.grid(row=9, column=1, pady=3, padx=1, sticky="nsew")  # Changed row to 15 and column to 0 (below the execute button)
         self.entry.insert(0, default_sentence)
         
         # Ensure the button and entry field can resize
@@ -1174,7 +1174,7 @@ _____________________________________________________
         mesh += f"| 6 | 5 | 4 |\n"
         mesh += "+---+---+---+\n"
         mesh += f"| 7 | 8 | 9 |\n"
-        mesh += "+---+---+---+"
+        mesh += "+---+---+---+\n"
         
          # Add the decorative pattern below the mesh
         pattern = """
@@ -1203,7 +1203,7 @@ __________________________________________________________________
         run += f"|           |\n"
         run += "+           +\n"
         run += f"|           |\n"
-        run += "+-----------+"
+        run += "+-----------+\n"
         
          # Add the decorative pattern below the mesh
         pattern = """   
@@ -1744,7 +1744,7 @@ _____________________________________________________
     def setup_ui(self):
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)
-        self.text_box.grid(row=0, column=1, columnspan=4, padx=10, pady=1, sticky="nsew", rowspan=9)  # Changed columnspan to 4 for better layout
+        self.text_box.grid(row=0, column=1, columnspan=4, padx=1, pady=1, sticky="nsew", rowspan=9)  # Changed columnspan to 4 for better layout
         self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
 
         splash_welcome_msg = """
