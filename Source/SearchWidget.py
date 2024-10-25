@@ -4,20 +4,20 @@ from tkinter import ttk
 class SearchWidget:
     def __init__(self, root, text_widget):
         self.text_widget = text_widget
-
-        # Create a find a keyword
-        search_button = tk.Button(root, text="Find", command=self.search_text)
-        search_button.configure(relief="flat", background="lightblue", foreground="black", font=("Arial", 12, "bold"))
-        search_button.grid(row=9, column=4, pady=3, padx=1, sticky="nsew") 
         
         # Create an entry field for entering the commands by the user
         default_sentence = "Search here!" 
         self.search_entry = ttk.Entry(root, style='Professional.TEntry', width=18, foreground="lightblue", font=("Arial", 12, "bold"))
-        self.search_entry.grid(row=10, column=4, pady=3, padx=1, sticky="nsew")
+        self.search_entry.grid(row=9, column=4, pady=3, padx=1, sticky="sew")
         self.search_entry.insert(0, default_sentence)
         
+        # Create a find a keyword
+        search_button = tk.Button(root, text="Find", command=self.search_text)
+        search_button.configure(relief="flat", background="lightblue", foreground="black", font=("Arial", 12, "bold"))
+        search_button.grid(row=10, column=4, pady=3, padx=1, sticky="new")
+        
         self.result_label = tk.Label(root, text="")
-        self.result_label.grid(row=11, column=4, pady=3, padx=1)
+        self.result_label.grid(row=11, column=4, pady=3, padx=1, sticky="new")
         self.result_label.configure(background="white", foreground="black")
 
         # Bind the <Return> key event to the search function
@@ -57,7 +57,7 @@ class SearchWidget:
         self.text_widget.tag_config("highlight", background="yellow", foreground="black")
 
         # Update result label
-        self.result_label.config(text=f"{occurrences} occurrences found!", background="white", foreground="darkblue", font=("Arial", 10, "bold"))
+        self.result_label.config(text=f"{occurrences} occurrences found!", background="white", foreground="darkblue", font=("Arial", 11, "bold"))
         self.current_result_index = 0
 
     def next_occurrence(self):

@@ -235,7 +235,7 @@ class SplashFOAM:
         # Create a button to execute commands to the terminal kernel
         self.execute_button = tk.Button(self.root, text="CLI", command=self.execute_command)
         self.execute_button.configure(relief="flat", background="lightblue", foreground="black", font=("Arial", 12, "bold"))
-        self.execute_button.grid(row=10, column=1, pady=3, padx=1, sticky="nsew")  # Changed row to 14 and column to 0 (below the text box on the left)
+        self.execute_button.grid(row=10, column=1, pady=3, padx=1, sticky="new")  # Changed row to 14 and column to 0 (below the text box on the left)
         self.add_tooltip(self.execute_button, "Click to run a terminal command")
         
         # Configure a smaller style for the button
@@ -253,13 +253,12 @@ class SplashFOAM:
         # Create an entry field for entering the commands by the user
         default_sentence = "top"  # Or "htop"
         self.entry = ttk.Entry(self.root, style='Professional.TEntry', width=18, foreground="lightblue", font=("Arial", 12, "bold"))
-        self.entry.grid(row=9, column=1, pady=3, padx=1, sticky="nsew")  # Changed row to 15 and column to 0 (below the execute button)
+        self.entry.grid(row=9, column=1, pady=3, padx=1, sticky="sew")  # Changed row to 15 and column to 0 (below the execute button)
         self.entry.insert(0, default_sentence)
         
         # Ensure the button and entry field can resize
         self.root.grid_rowconfigure(13, weight=1)  # Ensures the row for the execute button resizes dynamically
         self.root.grid_rowconfigure(14, weight=1)  # Ensures the row for the entry field resizes dynamically
-
 
 # --------------->
 #  Check buttons
@@ -304,10 +303,20 @@ class SplashFOAM:
         self.initial_foreground = self.text_box.cget("foreground")
         self.initial_background = self.text_box.cget("background")
 
+        # Create a style for the progress bar
+        style = ttk.Style()
+        style.configure("Custom.Horizontal.TProgressbar", troughcolor="white", background="lightblue", thickness=10)
+
         # Create a progress bar with the custom style
-        self.progress_bar_canvas = ttk.Progressbar(self.root, orient="horizontal", length=280, mode="indeterminate", style="Custom.Horizontal.TProgressbar")
-        self.progress_bar_canvas.grid(row=12, column=0, padx=10, pady=15, sticky="nsew")  # Progress bar is also resizable
-        self.progress_bar_canvas_flag=True
+        self.progress_bar_canvas = ttk.Progressbar(
+            self.root,
+            orient="horizontal",
+            length=280,
+            mode="indeterminate",
+            style="Custom.Horizontal.TProgressbar"
+        )
+        self.progress_bar_canvas.grid(row=12, column=0, padx=10, pady=5, sticky="new")
+        self.progress_bar_canvas_flag = True
         
         #----------Text Widget with Scrollbar-----------       
         # Add the search widget to the main app
@@ -333,14 +342,18 @@ class SplashFOAM:
         # Create a label for status messages
         self.status_label_title = ttk.Label(self.root, text="")
         status_title = "SplashFOAM v0.1"
-        self.status_label_title.grid(row=15, column=1, columnspan=4, pady=1, padx=10, sticky="nsew")  # Changed to sticky="nsew" for dynamic resizing
-        self.status_label_title.config(text=status_title, font=("Helvetica", 12, "bold"), background="white", foreground="darkblue")
+        self.status_label_title.grid(row=14, column=1, columnspan=1, pady=1, padx=10, sticky="nsew")  # Changed to sticky="nsew" for dynamic resizing
+        self.status_label_title.config(text=status_title, font=("Helvetica", 14, "bold"), background="white", foreground="grey")
+        
+        # Separate the status bar 
+        separator = tk.Frame(self.root, height=1, bg="darkred")
+        separator.grid(row=15, column=1, columnspan=1, pady=(5, 1), padx=10, sticky="new")
         
         self.status_label = ttk.Label(self.root, text="")
         default_status = "Start by importing geometry and configuring your case!"
-        self.status_label.grid(row=16, column=1, columnspan=4, pady=1, padx=10, sticky="nsew")  # Changed to sticky="nsew" for dynamic resizing
+        self.status_label.grid(row=16, column=1, columnspan=8, pady=1, padx=10, sticky="new")  # Changed to sticky="nsew" for dynamic resizing
         self.status_label.config(text=default_status, font=("Helvetica", 12), background="white", foreground="darkblue")
-        
+   
         # Other parameter initializations 
         self.selected_file_path = None
         self.selected_openfoam_path = None  
@@ -707,7 +720,7 @@ class SplashFOAM:
         )
 
         # Use grid for layout
-        self.splash_bgImage_label.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+        self.splash_bgImage_label.grid(row=2, column=7, pady=5, padx=10, sticky="new", rowspan=6)
          
                     
     def process_stl_click(self, event=None):
