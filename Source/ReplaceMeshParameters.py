@@ -5,122 +5,6 @@ import shutil
 import subprocess
 from tkinter import ttk, simpledialog, filedialog, messagebox
 
-#class ReplaceMeshParameters:
-#    def __init__(self, parent, mesh_params, existing_values):
-#        self.parent = parent
-#        self.mesh_params = mesh_params
-#        self.existing_values = existing_values
-#        self.entry_widgets = {}  # Dictionary to store references to entry widgets
-#        self.new_values = {}
-
-#        # Create a new top-level window (pop-up)
-#        self.popup_window = tk.Toplevel(self.parent.root)
-#        self.popup_window.title("Replace Mesh Parameters")
-#        self.popup_window.geometry("600x400")  # Set an initial size for the window
-#        
-#        # Create a canvas, a vertical scrollbar, and a horizontal scrollbar inside the pop-up window
-#        self.canvas = tk.Canvas(self.popup_window, bg="#f0f0f0", bd=2, relief="ridge")
-#        self.canvas.grid(row=0, column=0, sticky="nsew", rowspan=14)
-
-#        self.v_scrollbar = tk.Scrollbar(self.popup_window, orient="vertical", command=self.canvas.yview)
-#        self.v_scrollbar.grid(row=0, column=1, sticky='ns', rowspan=14)
-
-#        self.h_scrollbar = tk.Scrollbar(self.popup_window, orient="horizontal", command=self.canvas.xview)
-#        self.h_scrollbar.grid(row=14, column=0, sticky='ew')  # Adjust the grid position
-
-#        self.canvas.configure(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
-
-#        self.frame = ttk.Frame(self.canvas, style="My.TFrame")
-#        self.canvas.create_window((0, 0), window=self.frame, anchor="nw")
-
-#        self.frame.bind("<Configure>", self.on_frame_configure)
-
-#        # Style configuration (optional)
-#        style = ttk.Style()
-#        style.configure("My.TLabel", font=("TkDefaultFont", 10, "bold"), padding=5)
-#        style.configure("My.TEntry", padding=5, foreground="blue")
-#        style.configure("My.TButton", padding=10, relief="flat", background="lightblue", foreground="black")
-#        style.configure("My.TCheckbutton", padding=5)
-
-#        # Modified to use custom styles and added padding
-#        mesh_label = ttk.Label(self.frame, text="Mesh Controls", style="My.TLabel", foreground="red")
-#        mesh_label.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="w")
-
-#        separator = ttk.Separator(self.frame, orient='horizontal')
-#        separator.grid(row=2, column=1, columnspan=3, pady=5, padx=10, sticky='ew')
-
-#        # Dictionary to store references to checkbutton variables
-#        self.comment_vars = {}
-
-#        for index, param in enumerate(mesh_params):
-#            # Prepend a bullet point to the parameter name
-#            bullet_point = u"\u2022"  # Unicode character for a bullet point
-#            parameter_with_bullet = f"{bullet_point} {param}"
-
-#            label = ttk.Label(self.frame, text=parameter_with_bullet, style="My.TLabel")
-#            label.grid(row=index+9, column=1, padx=10, sticky="w")
-#            entry_var = tk.StringVar(value=existing_values.get(param, ""))
-#            entry = ttk.Entry(self.frame, textvariable=entry_var, style="My.TEntry")
-#            entry.grid(row=index+9, column=2, padx=10)
-#            self.new_values[param] = entry_var
-#            self.entry_widgets[param] = entry
-
-#            comment_var = tk.BooleanVar(value=False)
-#            checkbutton = ttk.Checkbutton(self.frame, text="Disable", variable=comment_var, style="My.TCheckbutton")
-#            checkbutton.grid(row=index+9, column=3, padx=10)
-#            self.comment_vars[param] = comment_var
-
-#        # Workflow Control Frame
-#        workflow_frame = ttk.LabelFrame(self.frame, text="Workflow Control", padding=10)
-#        workflow_frame.grid(row=24, column=1, padx=10, pady=20, sticky="ew", columnspan=3)
-
-#        # Create radio buttons for workflow options
-#        self.selected_workflow = tk.StringVar()
-#        self.workflow_options = ["templateGeneration", "surfaceTopology", "surfaceProjection",
-#                                 "patchAssignment", "edgeExtraction", "boundaryLayerGeneration",
-#                                 "meshOptimisation", "boundaryLayerRefinement"]
-
-#        for option in self.workflow_options:
-#            ttk.Radiobutton(workflow_frame, text=option, variable=self.selected_workflow, value=option).pack(anchor='w')
-
-#        # Load the last selected choice from a configuration file (if available)
-#        last_selected_choice = self.load_last_selected_choice()
-#        if last_selected_choice:
-#            self.selected_workflow.set(last_selected_choice)
-
-#        # Get the existing stopAfter value from the meshDict file
-#        existing_stop_after_value = self.extract_stop_after_value(parent.selected_mesh_file_content)
-
-#        # Set the selected workflow option based on the existing stopAfter value
-#        if existing_stop_after_value in self.workflow_options:
-#            self.selected_workflow.set(existing_stop_after_value)
-
-#        # Mesh pop up features (button arrangement)
-#        update_button = ttk.Button(self.frame, text="Create", command=self.update_mesh_parameters, style="Professional.TButton")
-#        update_button.grid(row=91, column=1, pady=3, padx=5, sticky="nsew")
-
-#        mesh_quality_button = ttk.Button(self.frame, text="Statistics", command=self.parent.load_meshChecked, style="Professional.TButton")
-#        mesh_quality_button.grid(row=92, column=1, pady=3, padx=5, sticky="nsew")
-
-#        save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="Professional.TButton")
-#        save_mesh_button.grid(row=93, column=1, pady=3, padx=5, sticky="nsew")
-#        
-#        # Create a button for converting the mesh to Fluent mesh
-#        convert_button = ttk.Button(self.frame, text="Convert (.msh)", command=self.convert_to_fluent, style="Professional.TButton")
-#        convert_button.grid(row=91, column=2, pady=3, padx=5, sticky="nsew")
-
-#        remove_mesh_button = ttk.Button(self.frame, text="Remove", command=self.remove_mesh, style="Professional.TButton")
-#        remove_mesh_button.grid(row=92, column=2, pady=3, padx=5, sticky="nsew")
-
-#        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="Professional.TButton")
-#        close_button.grid(row=93, column=2, pady=3, padx=5, sticky="nsew")
-
-#        # Ensuring the pop-up window is resizable
-#        self.popup_window.grid_rowconfigure(0, weight=1)
-#        self.popup_window.grid_columnconfigure(0, weight=1)
-     
-
-# ----====----====>
 class ReplaceMeshParameters:
     def __init__(self, parent, mesh_params, existing_values):
         self.parent = parent
@@ -211,22 +95,32 @@ class ReplaceMeshParameters:
         # Mesh popup buttons
         update_button = ttk.Button(self.frame, text="Create", command=self.update_mesh_parameters, style="My.TButton")
         update_button.grid(row=len(mesh_params)+4, column=0, pady=3, padx=5, sticky="nsew")
+        
+        # Improve Mesh button
+        improve_mesh_button = ttk.Button(self.frame, text="Improve Mesh", command=self.improve_mesh_quality,  style="My.TButton")
+        improve_mesh_button.grid(row=len(mesh_params)+5, column=0, pady=3, padx=5, sticky="nsew")
 
         mesh_quality_button = ttk.Button(self.frame, text="Statistics", command=self.parent.load_meshChecked, style="My.TButton")
-        mesh_quality_button.grid(row=len(mesh_params)+5, column=0, pady=3, padx=5, sticky="nsew")
+        mesh_quality_button.grid(row=len(mesh_params)+6, column=0, pady=3, padx=5, sticky="nsew")
 
         save_mesh_button = ttk.Button(self.frame, text="Save Mesh", command=self.save_mesh, style="My.TButton")
-        save_mesh_button.grid(row=len(mesh_params)+6, column=0, pady=3, padx=5, sticky="nsew")
+        save_mesh_button.grid(row=len(mesh_params)+4, column=1, pady=3, padx=5, sticky="nsew")
 
         # Convert button
         convert_button = ttk.Button(self.frame, text="Convert (.msh)", command=self.convert_to_fluent, style="My.TButton")
-        convert_button.grid(row=len(mesh_params)+4, column=1, pady=3, padx=5, sticky="nsew")
+        convert_button.grid(row=len(mesh_params)+5, column=1, pady=3, padx=5, sticky="nsew")
 
-        remove_mesh_button = ttk.Button(self.frame, text="Remove", command=self.remove_mesh, style="My.TButton")
-        remove_mesh_button.grid(row=len(mesh_params)+5, column=1, pady=3, padx=5, sticky="nsew")
+        remove_mesh_button = ttk.Button(self.frame, text="Clean", command=self.remove_mesh, style="My.TButton")
+        remove_mesh_button.grid(row=len(mesh_params)+6, column=1, pady=3, padx=5, sticky="nsew")
+        
+        # Refinement Objects button 
+        refine_button = ttk.Button(self.frame, text="Add Refinement Objects", command=self.open_refinement_popup, style="My.TButton")
+        refine_button.grid(row=len(mesh_params)+7, column=0, pady=3, padx=5, sticky="nsew")
 
-        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")
-        close_button.grid(row=len(mesh_params)+6, column=1, pady=3, padx=5, sticky="nsew")
+#        close_button = ttk.Button(self.frame, text="Close", command=self.close_replace_mesh_parameters, style="My.TButton")
+#        close_button.grid(row=len(mesh_params)+6, column=1, pady=3, padx=5, sticky="nsew")
+        
+        
 
         # Make the frame expandable
         self.frame.grid_columnconfigure(1, weight=1)
@@ -235,11 +129,6 @@ class ReplaceMeshParameters:
         # Make the window resizable
         self.popup_window.grid_rowconfigure(0, weight=1)
         self.popup_window.grid_columnconfigure(0, weight=1)
-
-
-
-
-
 
     def extract_stop_after_value(self, mesh_file_content):
         # Extract the stopAfter value from the workflowControl block in the meshDict file
@@ -428,6 +317,246 @@ class ReplaceMeshParameters:
         except Exception as e:
             self.parent.text_box.insert(tk.END, "Failed to run foamMeshToFluent: " + str(e))
  
+
+    # Function to execute improveMeshQuality and display the result
+    def improve_mesh_quality(self):
+        # Clear the text_box before displaying new output
+        self.parent.text_box.delete(1.0, tk.END)
+
+        try:
+            # Set the working directory to geometry_dest_path
+            working_directory = self.parent.geometry_dest_path
+
+            # Ensure the command runs in the correct environment
+            command = ['bash', '-c', 'source /usr/lib/openfoam/openfoam2306/etc/bashrc && improveMeshQuality']
+
+            # Execute the command in the specified directory
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=working_directory)
+            output, error = process.communicate()
+
+            # Display the command's output and error in the text_box
+            if output:
+                self.parent.text_box.insert(tk.END, output)
+            if error:
+                self.parent.text_box.insert(tk.END, "\nError:\n" + error)
+
+            # Check if the process completed successfully
+            if process.returncode == 0:
+                tk.messagebox.showinfo("Success", "Mesh improvement completed successfully!")
+            else:
+                tk.messagebox.showerror("Error", "Mesh improvement failed. Please check the output for details.")
+
+        except Exception as e:
+            self.parent.text_box.insert(tk.END, f"Failed to run improveMeshQuality: {e}")    
+
+# ================= Refinement Objects Rational - attempt 1 =====================>
+
+# The current mechanism adds the refinement box while creating the mesh ... 
+# and then removes it from the meshDict file once done. So far this is working quite well. 
+
+    def open_refinement_popup(self):
+        # Create a pop-up window for refinement configuration
+        refinement_popup = tk.Toplevel(self.popup_window)
+        refinement_popup.title("Refinement Objects Configuration")
+        
+        # Read existing meshDict to check for existing refinement objects
+        existing_refinements = {}
+        try:
+            with open(self.parent.mesh_dict_file_path, "r") as file:
+                content = file.readlines()
+                in_object_refinements_block = False
+                current_obj = None
+                
+                for line in content:
+                    line = line.strip()
+                    
+                    # Check for the beginning of the objectRefinements block
+                    if line == "objectRefinements":
+                        in_object_refinements_block = True
+                        continue
+                    
+                    # Check for the end of the objectRefinements block
+                    if in_object_refinements_block and line == "{":
+                        continue
+                    
+                    if in_object_refinements_block:
+                        if line.endswith("{"):
+                            # Object name (e.g., sphere1)
+                            current_obj = line[:-1]  # Remove the opening brace
+                            existing_refinements[current_obj] = {}
+                        elif current_obj and line.endswith(";"):
+                            # Parameter lines (e.g., cellSize 0.001;)
+                            key_value = line[:-1].strip().split("    ")  # Remove the semicolon and split
+                            if len(key_value) == 2:
+                                existing_refinements[current_obj][key_value[0]] = key_value[1].strip()
+                        elif line == "}":
+                            current_obj = None
+                    
+                    # Check for the end of the objectRefinements block
+                    if in_object_refinements_block and line == "}":
+                        in_object_refinements_block = False
+
+        except FileNotFoundError:
+            existing_refinements = {}  # File doesn't exist, no objects to load
+
+        # Notify user if any refinement objects are found
+        if existing_refinements:
+            tk.messagebox.showinfo("Existing Refinement Objects", f"Found {len(existing_refinements)} existing refinement objects.")
+            
+        # Refinement Type Selection
+        tk.Label(refinement_popup, text="Refinement Type:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        refinement_type = tk.StringVar()
+        refinement_type.set("sphere")  # Set default
+        refinement_type_option_menu = tk.OptionMenu(refinement_popup, refinement_type, "sphere", "hollowcone", "box")
+        refinement_type_option_menu.grid(row=0, column=1, padx=5, pady=5)
+
+        # Number of Refinement Objects
+        tk.Label(refinement_popup, text="Number of Objects:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        num_objects_entry = tk.Entry(refinement_popup)
+        num_objects_entry.grid(row=1, column=1, padx=5, pady=5)
+
+        # Input Area for Parameters
+        params_frame = ttk.Frame(refinement_popup)
+        params_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="nsew")
+
+        # Trigger to gather parameters based on type and count
+        def populate_parameters():
+            # Disable Populate button
+            populate_button.config(state=tk.DISABLED)
+            
+            # Clear any existing parameter fields
+            for widget in params_frame.winfo_children():
+                widget.destroy()
+                
+            try:
+                num_objects = int(num_objects_entry.get())
+            except ValueError:
+                tk.messagebox.showerror("Input Error", "Please enter a valid number of objects.")
+                populate_button.config(state=tk.NORMAL)  # Re-enable if error
+                return
+            
+            # Determine parameters by type with correct names
+            type_params = {
+                "box": ["cellSize", "type", "centre", "lengthX", "lengthY", "lengthZ"],
+                "hollowcone": ["cellSize", "type", "centre", "p0", "p1", "radius0_Inner", "radius0_Outer", "radius1_Inner", "radius1_Outer"],
+                "sphere": ["cellSize", "type", "centre", "radius"]
+            }
+            params = type_params.get(refinement_type.get(), [])
+
+            # Create entry fields for each object and parameter
+            entries = {}
+            for i in range(num_objects):
+                obj_name = f"{refinement_type.get()}{i+1}"
+                tk.Label(params_frame, text=f"{obj_name}", fg="darkblue", font=("Helvetica", 12, "bold")).grid(row=i*len(params), column=0, padx=5, pady=5, sticky="w")
+                
+                # Load existing values if found
+                if obj_name in existing_refinements:
+                    for j, param in enumerate(params):
+                        if param == "type":
+                            # Display type as non-editable label
+                            tk.Label(params_frame, text="Object Type").grid(row=i*len(params) + j + 1, column=0, padx=5, pady=5, sticky="w")
+                            tk.Label(params_frame, text=refinement_type.get()).grid(row=i*len(params) + j + 1, column=1, padx=5, pady=5, sticky="w")
+                        else:
+                            tk.Label(params_frame, text=param).grid(row=i*len(params) + j + 1, column=0, padx=5, pady=5, sticky="w")
+                            entry = tk.Entry(params_frame)
+                            entry.insert(0, existing_refinements[obj_name].get(param, ''))  # Load existing value if available
+                            entry.grid(row=i*len(params) + j + 1, column=1, padx=5, pady=5)
+                            entries[(i, param)] = entry
+                else:
+                    for j, param in enumerate(params):
+                        if param == "type":
+                            tk.Label(params_frame, text="Object Type").grid(row=i*len(params) + j + 1, column=0, padx=5, pady=5, sticky="w")
+                            tk.Label(params_frame, text=refinement_type.get()).grid(row=i*len(params) + j + 1, column=1, padx=5, pady=5, sticky="w")
+                        else:
+                            tk.Label(params_frame, text=param).grid(row=i*len(params) + j + 1, column=0, padx=5, pady=5, sticky="w")
+                            entry = tk.Entry(params_frame)
+                            if param in ["p0", "p1", "centre"]:
+                                entry.insert(0, "Example: (X Y Z)")  # Provide example in entry
+                            entry.grid(row=i*len(params) + j + 1, column=1, padx=5, pady=5)
+                            entries[(i, param)] = entry
+
+            # Save button function inside open_refinement_popup()
+            def save_refinements():
+                # Gather refinement data
+                refinement_data = []
+                for obj_id in range(num_objects):
+                    obj_params = {param: entries[(obj_id, param)].get() for param in params if param != "type"}
+                    refinement_data.append({"type": refinement_type.get(), "parameters": obj_params})
+                
+                # Check if data is correctly populated before writing
+                if not refinement_data:
+                    tk.messagebox.showerror("Save Error", "No data available to write to meshDict.")
+                    return
+                
+                # Write to meshDict file in the specified format
+             
+                try:
+                    # Open the file in read/write mode
+                    with open(self.parent.mesh_dict_file_path, "r+") as file:
+                        # Read the entire content at once
+                        content = file.readlines()
+                        in_object_refinements_block = False
+                        
+                        # Check for existing objectRefinements block
+                        for line in content:
+                            line = line.strip()
+                            if line == "objectRefinements":
+                                in_object_refinements_block = True
+                                break
+                        
+                        # If no existing block is found, create it
+                        if not in_object_refinements_block:
+                            content.append("\nobjectRefinements\n{\n")  # Create new block if it doesn't exist
+                            # Write the contents back to the file
+                            file.seek(0)
+                            file.writelines(content)
+                            file.truncate()  # Clear the file after the current position
+
+                        # Now append the new objects in the block
+                        for idx, obj in enumerate(refinement_data, start=1):
+                            obj_name = f"{obj['type']}{idx}"
+                            file.write(f"    {obj_name}\n{{\n")
+                            
+                            # Write the type of object in the format `type objectType;`
+                            file.write(f"        type    {obj['type']};\n")
+                            
+                            # Write other parameters
+                            for param, value in obj["parameters"].items():
+                                formatted_param = param.replace(" ", "") if " " in param else param
+                                file.write(f"        {formatted_param}    {value};\n")
+                            
+                            file.write("    }\n\n")
+                        
+                        # Check if the last line is not a closing brace, add it
+                        if not content[-1].strip() == "}":
+                            file.write("}\n")  # Close the block if it was created
+                        
+                        file.flush()  # Ensure all data is written to disk
+                        tk.messagebox.showinfo("Saved", f"{len(refinement_data)} refinement objects configured.")
+                        print(f"Successfully written {len(refinement_data)} blocks to meshDict.")
+                except FileNotFoundError:
+                    tk.messagebox.showerror("File Error", "The specified meshDict file does not exist.")
+                except IOError as e:
+                    tk.messagebox.showerror("File Error", f"An I/O error occurred: {e}")
+                except Exception as e:
+                    tk.messagebox.showerror("File Error", f"An error occurred while writing to meshDict: {e}")                
+
+                # Close the refinement popup after saving
+                refinement_popup.destroy()       
+
+            # Save button (same as before)
+            save_button = ttk.Button(refinement_popup, text="Save", command=save_refinements)
+            save_button.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
+
+        # Populate button to dynamically adjust parameters
+        populate_button = ttk.Button(refinement_popup, text="Populate Parameters", command=populate_parameters)
+        populate_button.grid(row=5, column=1, padx=5, pady=5, sticky="s")
+        
+        # Size the popup window appropriately
+        refinement_popup.geometry("400x400")
+        
+# ================= Refinement Objects Rational - attempt 1 =====================<
+   
     # Deleting old mesh files
     def remove_mesh(self):
         # Ask the user for confirmation before deleting the mesh
@@ -464,11 +593,6 @@ class ReplaceMeshParameters:
         else:
             # If the user clicked 'No', do nothing
             messagebox.showinfo("Cancelled", "Mesh deletion cancelled.")
-    # ........................Remove Mesh.................................            
 
-     
     def close_replace_mesh_parameters(self):
         self.popup_window.destroy()  # Close the pop-up window
-
-
-

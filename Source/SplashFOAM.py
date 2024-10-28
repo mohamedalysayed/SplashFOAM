@@ -222,7 +222,7 @@ class SplashFOAM:
             self.root.columnconfigure(i, weight=1, uniform="columns")
         
         # Set the initial size of the window to fit a small monitor
-        self.root.geometry("1400x1000")  # Example size for small monitor
+        self.root.geometry("1400x800")  # Example size for small monitor # 1400x1000
 
         # Centering the window on the screen:
         self.root.update_idletasks()  # Ensure window has been drawn
@@ -700,7 +700,6 @@ class SplashFOAM:
 #    def off_hover(self, event):
 #        # Revert the label appearance when not hovering over it
 #        event.widget.config(bg="white", bd=0, relief="flat")
-
 
     def add_bgImage(self):
         # Specify the image path
@@ -1758,7 +1757,7 @@ _____________________________________________________
         # Create the Text widget
         self.text_box = tk.Text(self.root, wrap=tk.WORD, height=30, width=100)
         self.text_box.grid(row=0, column=1, columnspan=4, padx=1, pady=1, sticky="nsew", rowspan=9)  # Changed columnspan to 4 for better layout
-        self.text_box.configure(foreground="lightblue", background="black", font=("courier", 13, "bold"))
+        self.text_box.configure(foreground="lightblue", background="black", font=("courier", 10, "bold"))
 
         splash_welcome_msg = """
         
@@ -1767,22 +1766,22 @@ _____________________________________________________
         
         
         
-           __        __   _                            _           
-           \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___     
-            \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \    
-             \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |   
-              \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/    
-                                                                     
-            ____        _           _     _____ ___    _    __  __ 
-           / ___| _ __ | | __ _ ___| |__ |  ___/ _ \  / \  |  \/  |
-           \___ \| '_ \| |/ _` / __| '_ \| |_ | | | |/ _ \ | |\/| |
-            ___) | |_) | | (_| \__ \ | | |  _|| |_| / ___ \| |  | |
-           |____/| .__/|_|\__,_|___/_| |_|_|   \___/_/   \_\_|  |_|
-                 |_|                                               
-         
+                       __        __   _                            _           
+                       \ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___     
+                        \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \    
+                         \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |   
+                          \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/    
+                                                                                 
+                        ____        _           _     _____ ___    _    __  __ 
+                       / ___| _ __ | | __ _ ___| |__ |  ___/ _ \  / \  |  \/  |
+                       \___ \| '_ \| |/ _` / __| '_ \| |_ | | | |/ _ \ | |\/| |
+                        ___) | |_) | | (_| \__ \ | | |  _|| |_| / ___ \| |  | |
+                       |____/| .__/|_|\__,_|___/_| |_|_|   \___/_/   \_\_|  |_|
+                             |_|                                               
+             
 
-                     Your gate to efficient CFD production! 
-                     ______________________________________
+                                 Your gate to efficient CFD production! 
+                                 ______________________________________
         """
         self.text_box.insert(tk.END, splash_welcome_msg)
         
