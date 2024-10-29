@@ -608,7 +608,7 @@ class SplashFOAM:
 
         # Create a PhotoImage object and set it to the Label
         welcome_image = tk.PhotoImage(file="../Resources/Images/racing-car.png")
-        welcome_image = welcome_image.subsample(6, 6)
+        welcome_image = welcome_image.subsample(9, 9)
         welcome_label.config(image=welcome_image, compound="top")
 
         # Update the main loop to display the image for 2 seconds
