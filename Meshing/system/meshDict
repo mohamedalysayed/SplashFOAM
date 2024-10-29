@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  SplashFOAM v1.0
+    \\  /    A nd           | Version:  SplashFOAM v0.1
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -27,12 +27,17 @@ boundaryCellSize 0.0003;
 
 boundaryLayers
 {
-    nLayers 4;
-    optimiseLayer 1; 
-    untangleLayers 1; // active by default; 0 to disable
-    thicknessRatio 1.15;
-    maxFirstLayerThickness 0.0001;
-    
+    patchBoundaryLayers
+    {
+        "wall.*"
+        {
+            nLayers 4;
+            optimiseLayer 1; 
+            untangleLayers 1; // active by default; 0 to disable
+            thicknessRatio 1.15;
+            maxFirstLayerThickness 0.00005;
+        }
+    }
     
     optimisationParameters
     {
@@ -47,6 +52,28 @@ boundaryLayers
         // Controls the maximum difference of the layer thickness between the two neighbouring points, divided by the distance between the points.
         relThicknessTol 0.1; 
     }
+}
+
+// Renaming BCs so patches are not defaulted to walls
+renameBoundary
+{
+    defaultName         wall; //fixedWalls;
+    defaultType         wall;
+
+    newPatchNames
+    {   
+        "inlet.*"
+        {
+            newName     inlet;
+            newType     patch;
+        }
+
+        "outlet.*"
+        {
+            newName     outlet;
+            newType     patch;
+        }
+    }   
 }
 
 workflowControl
