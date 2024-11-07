@@ -1,0 +1,37 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  11
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      surfaceFeaturesDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+surfaces
+(
+    "CAD.obj"
+);
+
+includedAngle   150;
+
+subsetFeatures
+{
+    nonManifoldEdges yes;
+    openEdges        yes;
+}
+
+trimFeatures
+{
+    minElem         0;
+    minLen          0;
+}
+
+writeObj        yes;
+
+// ************************************************************************* //

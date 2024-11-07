@@ -16,13 +16,13 @@ class ReplaceMeshParameters:
         # Create a new top-level pop-up window
         self.popup_window = tk.Toplevel(self.parent.root)
         self.popup_window.title("Replace Mesh Parameters")
-        self.popup_window.geometry("550x1040")  # Set an initial size for the window
-        self.popup_window.minsize(600, 400)  # Make the window resizable
+        self.popup_window.geometry("550x1040")  # Initial size for the window
+        self.popup_window.minsize(600, 400) 
         self.popup_window.grid_rowconfigure(0, weight=1)
         self.popup_window.grid_columnconfigure(0, weight=1)
 
         # Create a canvas and scrollbars for the content
-        self.canvas = tk.Canvas(self.popup_window, bg="lightgrey", bd=0, relief="ridge") # lightgrey
+        self.canvas = tk.Canvas(self.popup_window, bg="lightgrey", bd=0, relief="ridge") 
         self.canvas.grid(row=0, column=0, sticky="nsew")
 
         self.v_scrollbar = tk.Scrollbar(self.popup_window, orient="vertical", command=self.canvas.yview)
@@ -46,7 +46,7 @@ class ReplaceMeshParameters:
         style = ttk.Style()
 
         # Header label style
-        style.configure("Header.TLabel", font=("TkDefaultFont", 14, "bold"), foreground="darkblue", background="lightgrey") # lightgrey
+        style.configure("Header.TLabel", font=("TkDefaultFont", 14, "bold"), foreground="darkblue", background="lightgrey")
 
         # Mesh parameter label and entry styles
         style.configure("Param.TLabel", font=("TkDefaultFont", 12), padding=5, background="lightgrey")
@@ -59,7 +59,6 @@ class ReplaceMeshParameters:
         # Header label
         mesh_label = ttk.Label(self.frame, text="Mesh Controls", style="Header.TLabel")
         mesh_label.grid(row=0, column=0, pady=10, padx=10, sticky="w")
-
 
         # Dictionary to store references to checkbutton variables
         self.comment_vars = {}
@@ -86,30 +85,6 @@ class ReplaceMeshParameters:
         refine_button = ttk.Button(self.frame, text="Add Refinement Objects", command=self.open_refinement_popup, style="My.TButton")
         refine_button.grid(row=len(mesh_params)+3, column=0, pady=10, padx=5, sticky="nsew")    
 
-# This design does NOT have the label glitch we have currently (white greyish space)
-##        # Define a custom style
-##        style = ttk.Style()
-##        style.configure("Header.TLabel", font=("Helvetica", 14, "bold"), background="white", foreground="darkblue")
-##        style.configure("Custom.TRadiobutton", background="white", foreground="black")  # Radiobutton style
-
-##        # Workflow control frame (using tk.Frame for a cleaner look)
-##        workflow_frame = tk.Frame(self.frame, background="white", padx=10, pady=10)
-##        workflow_frame.grid(row=len(mesh_params) + 4, column=0, padx=10, pady=20, sticky="ew", columnspan=2)
-
-##        # Header label for the list
-##        header_label = ttk.Label(workflow_frame, text="Workflow Control", style="Header.TLabel")
-##        header_label.pack(anchor='w', pady=(0, 10))
-
-##        # Create radio buttons for workflow options with the custom style
-##        self.selected_workflow = tk.StringVar()
-##        self.workflow_options = ["templateGeneration", "surfaceTopology", "surfaceProjection",
-##                                 "patchAssignment", "edgeExtraction", "boundaryLayerGeneration",
-##                                 "meshOptimisation", "boundaryLayerRefinement"]
-
-##        for option in self.workflow_options:
-##            ttk.Radiobutton(workflow_frame, text=option, variable=self.selected_workflow,
-##                            value=option, style="Custom.TRadiobutton").pack(anchor='w')
-                      
         # Define custom styles
         style = ttk.Style()
         style.configure("Custom.TLabelframe", font=("Helvetica", 12), background="lightgrey", foreground="darkblue")  
@@ -133,7 +108,7 @@ class ReplaceMeshParameters:
         for option in self.workflow_options:
             ttk.Radiobutton(workflow_frame, text=option, variable=self.selected_workflow, value=option, style="Custom.TRadiobutton").pack(anchor='w')
             
-        # Load the last selected choice from a configuration file (if available)
+        # Load the last selected choice from a configuration file (when available)
         last_selected_choice = self.load_last_selected_choice()
         if last_selected_choice:
             self.selected_workflow.set(last_selected_choice)
@@ -386,8 +361,7 @@ class ReplaceMeshParameters:
         except Exception as e:
             self.parent.text_box.insert(tk.END, f"Failed to run improveMeshQuality: {e}")    
 
-# ================= Refinement Objects Rational - attempt 1 =====================>
-
+    # ================= Refinement Objects Rational - attempt 1 =====================>
     # The current mechanism adds the refinement box while creating the mesh ... 
     # and then removes it from the meshDict file once done. So far this is working quite well. 
     def open_refinement_popup(self):
@@ -443,7 +417,7 @@ class ReplaceMeshParameters:
         tk.Label(refinement_popup, text="Refinement Type:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         refinement_type = tk.StringVar()
         refinement_type.set("sphere")  # Set default
-        refinement_type_option_menu = tk.OptionMenu(refinement_popup, refinement_type, "sphere", "cone", "hollowcone", "box")
+        refinement_type_option_menu = tk.OptionMenu(refinement_popup, refinement_type, "sphere", "cone", "hollowCone", "box")
         refinement_type_option_menu.grid(row=0, column=1, padx=5, pady=5)
 
         # Number of Refinement Objects
@@ -459,7 +433,6 @@ class ReplaceMeshParameters:
         def populate_parameters():
             # Disable Populate button
             populate_button.config(state=tk.DISABLED)
-            #populate_button.config(state=tk.NORMAL)
             
             # Clear any existing parameter fields
             for widget in params_frame.winfo_children():
@@ -476,8 +449,8 @@ class ReplaceMeshParameters:
             type_params = {
                 #"box": ["cellSize", "type", "centre", "lengthX", "lengthY", "lengthZ", "additionalRefinementLevels"],
                 "sphere": ["cellSize", "type", "centre", "radius"],
-                "cone": ["cellSize", "type", "centre", "p0", "p1", "radius0", "radius1"],
-                "hollowcone": ["cellSize", "type", "centre", "p0", "p1", "radius0_Inner", "radius0_Outer", "radius1_Inner", "radius1_Outer"],
+                "cone": ["cellSize", "type", "p0", "p1", "radius0", "radius1"],
+                "hollowcone": ["cellSize", "type", "p0", "p1", "radius0_Inner", "radius0_Outer", "radius1_Inner", "radius1_Outer"],
                 "box": ["cellSize", "type", "centre", "lengthX", "lengthY", "lengthZ"]
             }
             params = type_params.get(refinement_type.get(), [])
@@ -517,38 +490,6 @@ class ReplaceMeshParameters:
                 # Add a separator after each object except the last one
                 if i < num_objects - 1:  # Prevent adding after the last object
                     ttk.Separator(params_frame, orient="horizontal").grid(row=(i + 1) * (len(params) + 1), column=0, columnspan=2, pady=5, sticky="ew")
-        
-#            # Create entry fields for each object and parameter
-#            entries = {}
-#            for i in range(num_objects):
-#                obj_name = f"{refinement_type.get()}{i+1}"
-#                tk.Label(params_frame, text=f"{obj_name}", fg="darkblue", font=("Helvetica", 12, "bold")).grid(row=i*len(params), column=0, padx=5, pady=5, sticky="w")
-#                
-#                # Load existing values if found
-#                if obj_name in existing_refinements:
-#                    for j, param in enumerate(params):
-#                        if param == "type":
-#                            # Display type as non-editable label
-#                            tk.Label(params_frame, text="Object Type").grid(row=i*len(params) + j + 1, column=0, padx=5, pady=5, sticky="w")
-#                            tk.Label(params_frame, text=refinement_type.get()).grid(row=i*len(params) + j + 1, column=1, padx=5, pady=5, sticky="w")
-#                        else:
-#                            tk.Label(params_frame, text=param).grid(row=i*len(params) + j + 1, column=0, padx=5, pady=5, sticky="w")
-#                            entry = tk.Entry(params_frame)
-#                            entry.insert(0, existing_refinements[obj_name].get(param, ''))  # Load existing value if available
-#                            entry.grid(row=i*len(params) + j + 1, column=1, padx=5, pady=5)
-#                            entries[(i, param)] = entry
-#                else:
-#                    for j, param in enumerate(params):
-#                        if param == "type":
-#                            tk.Label(params_frame, text="Object Type").grid(row=i*len(params) + j + 1, column=0, padx=5, pady=5, sticky="w")
-#                            tk.Label(params_frame, text=refinement_type.get()).grid(row=i*len(params) + j + 1, column=1, padx=5, pady=5, sticky="w")
-#                        else:
-#                            tk.Label(params_frame, text=param).grid(row=i*len(params) + j + 1, column=0, padx=5, pady=5, sticky="w")
-#                            entry = tk.Entry(params_frame)
-#                            if param in ["p0", "p1", "centre"]:
-#                                entry.insert(0, "(X Y Z)")  
-#                            entry.grid(row=i*len(params) + j + 1, column=1, padx=5, pady=5)
-#                            entries[(i, param)] = entry
 
             # Save button function inside open_refinement_popup()
             def save_refinements():
@@ -627,9 +568,8 @@ class ReplaceMeshParameters:
         populate_button.grid(row=5, column=0, padx=10, pady=5, sticky="sw")
         
         # Size the popup window appropriately
-        refinement_popup.geometry("400x400")
-        
-# ================= Refinement Objects Rational - attempt 1 =====================<
+        refinement_popup.geometry("400x400")      
+        # ================= Refinement Objects Rational - attempt 1 =====================<
    
     # Deleting old mesh files
     def remove_mesh(self):
@@ -670,35 +610,3 @@ class ReplaceMeshParameters:
 
     def close_replace_mesh_parameters(self):
         self.popup_window.destroy()  # Close the pop-up window
-        
-        
-
-#boundaryLayers
-#{
-
-#    patchBoundaryLayers
-#    {
-#        wallCeramic
-#        {
-#            nLayers 4;
-#            optimiseLayer 1; 
-#            untangleLayers 1; // active by default; 0 to disable
-#            thicknessRatio 1.15;
-#            maxFirstLayerThickness 0.0001;
-#        }
-#    }
-#    
-#    optimisationParameters
-#    {
-#        // Number of iterations in the procedure for smoothing normal vectors in the boundary layer
-#        nSmoothNormals 1; 
-#        // Number of iterations in the smoothing procedure. 
-#        maxNumIterations 5; 
-#        // The ratio between the maximum allowed layer thickness and the estimated feature size.
-#        featureSizeFactor 0.3; 
-#        // Calculates the surface normal vectors, and aligns boundary-layer edges to point in the normal direction
-#        reCalculateNormals 2; 
-#        // Controls the maximum difference of the layer thickness between the two neighbouring points, divided by the distance between the points.
-#        relThicknessTol 0.1; 
-#    }
-#}

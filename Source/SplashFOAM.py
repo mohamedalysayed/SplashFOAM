@@ -350,7 +350,7 @@ class SplashFOAM:
         separator.grid(row=15, column=1, columnspan=1, pady=(5, 1), padx=10, sticky="new")
         
         self.status_label = ttk.Label(self.root, text="")
-        default_status = "Start by importing geometry and configuring your case!"
+        default_status = "Start by importing your geometry or configuring an existing OpenFOAM case!"
         self.status_label.grid(row=16, column=1, columnspan=8, pady=1, padx=10, sticky="new")  # Changed to sticky="nsew" for dynamic resizing
         self.status_label.config(text=default_status, font=("Helvetica", 12), background="white", foreground="darkblue")
    
@@ -398,7 +398,7 @@ class SplashFOAM:
 
         # Create a new empty text file
         with open(new_file_path, 'w') as new_file:
-            new_file.write("")  # Writing an empty string (optional)
+            new_file.write("")  # Writing an empty string (left for furture dev.)
 
         # Function to open the file in gedit in a separate thread
         def open_in_gedit():
@@ -2096,11 +2096,12 @@ _____________________________________________________
             renew_button = ttk.Button(popup, text="Renew License Now", command=lambda: webbrowser.open_new_tab("https://www.simulitica.com/splash-v1"))
             renew_button.pack(pady=20)  # Adjust padding as needed
 
-# --------------------------------------------------------------<
+# ---------------------------------------------------------------------------<
 # Hot links
 # https://www.simulitica.com/splash-v10
 # https://www.buymeacoffee.com/simulitica # poor simulitica :( 
-# --------------------------------------------------------------<
+# https://www.udemy.com/course/t-flows-crash-course-cfd/ -> T-Flows on Udemy
+# ---------------------------------------------------------------------------<
 
     def load_last_recorded_time(self):
         if os.path.exists(self.elapsed_time_file):
