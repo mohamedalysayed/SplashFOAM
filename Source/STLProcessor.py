@@ -13,9 +13,6 @@ class STLProcessor:
         reader.SetFileName(filename)
         reader.Update()
         
-#        # Visualize the CAD imported in Splash Viewer
-#        self.parent.open_splash_visualizer()
-        
         # Initiate the text_box with the default CAD representation! 
         self.generate_cad_visual()
         return reader.GetOutput()
