@@ -450,7 +450,7 @@ class ReplaceMeshParameters:
                 #"box": ["cellSize", "type", "centre", "lengthX", "lengthY", "lengthZ", "additionalRefinementLevels"],
                 "sphere": ["cellSize", "type", "centre", "radius"],
                 "cone": ["cellSize", "type", "p0", "p1", "radius0", "radius1"],
-                "hollowcone": ["cellSize", "type", "p0", "p1", "radius0_Inner", "radius0_Outer", "radius1_Inner", "radius1_Outer"],
+                "hollowCone": ["cellSize", "type", "p0", "p1", "radius0_Inner", "radius0_Outer", "radius1_Inner", "radius1_Outer"],
                 "box": ["cellSize", "type", "centre", "lengthX", "lengthY", "lengthZ"]
             }
             params = type_params.get(refinement_type.get(), [])
@@ -568,7 +568,7 @@ class ReplaceMeshParameters:
         populate_button.grid(row=5, column=0, padx=10, pady=5, sticky="sw")
         
         # Size the popup window appropriately
-        refinement_popup.geometry("400x400")      
+        refinement_popup.geometry("400x450")      
         # ================= Refinement Objects Rational - attempt 1 =====================<
    
     # Deleting old mesh files
