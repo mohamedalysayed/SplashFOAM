@@ -58,10 +58,11 @@ Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.
 
   ```bash
   cd SplashFOAM/Resources/Build_Splash/
-  chmod +x Ubuntu_MEL.sh
-  ./Ubuntu_MEL.sh
+  chmod +x Ubuntu_MEL_Interactive.sh
+  ./Ubuntu_MEL_Interactive.sh
+![Pre-Installer](https://github.com/user-attachments/assets/97458aff-18e4-4d99-b101-7c2a5853f138)
 
-This will ensure that all required packages are installed.
+This will ensure that all required packages are installed. The user have the option to install other secondary packages according to their need. 
 
 - **Step 4: Launch SplashFOAM**
 
@@ -93,7 +94,6 @@ Import Geometry enables the user to view their CAD in one of five options:
 ![Screenshot from 2024-10-23 23-36-41](https://github.com/user-attachments/assets/0e3c72f3-6224-419f-8c2c-9b45f402c4ed)
 
 
-
 ## Meshing Tools
 SplashFOAM offers a range of meshing capabilities:
 
@@ -104,12 +104,12 @@ Currently, SplashFOAM supports three types of meshes:
 - **Polyhedral**: Create meshes with polyhedral elements that benefit complex geometries.
 - **Tetrahedral**: Flexible tetrahedral meshing for various applications.
 
-These meshes are generated using [_cfMesh_](https://cfmesh.com/) when creating a mesh from scratch. Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
+When creating a mesh from scratch, these meshes are generated using [_cfMesh_](https://cfmesh.com/). Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
 
 ## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
 
-- **Case Directory Management**: Seamlessly load, configure, and organize case directories.
+- **Case Directory Management**: Seamlessly load, configure and organize case directories.
 - **Simulation Configuration**: Adjust boundary conditions, solvers, and other simulation parameters through a graphical interface.
 - **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case. Note: SplashFOAM does not allow direct changes in boundary condition files. If boundary changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
 
