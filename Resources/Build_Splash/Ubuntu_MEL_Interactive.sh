@@ -1,5 +1,6 @@
 #!/bin/bash
-# Script to install the required CFD-related packages on Ubuntu
+# Interactive installation script using Zenity ...
+# It installs the required CFD-related packages on Ubuntu!
 
 echo "_________________________________________________________________________________"
 echo "                                                                                 "
@@ -14,47 +15,146 @@ echo ".%%...%%..%%......%%..................%%..%%..%%..%%..%%....%%....%%......
 echo ".%%...%%..%%%%%%..%%%%%%...........%%%%....%%%%...%%..%%..%%%%%%..%%........%%..."
 echo "................................................................................."
 echo "_________________________________________________________________________________"
+echo "                                                                                 "
+##echo "Installation log will be saved to: $LOG_FILE"
 
-# Install curl if not already installed
-echo "Checking if curl is installed..."
-if ! [ -x "$(command -v curl)" ]; then
-  echo "curl is not installed. Installing..."
-  sudo apt-get update
-  sudo apt-get install -y curl
-else
-  echo "curl is already installed."
+### Set up logging
+##LOG_FILE="$(pwd)/Pre-installation.log"  # Save log file in the current directory
+##echo "Installation log will be saved to: $LOG_FILE"
+##> "$LOG_FILE"  # Clear the log file
+##exec > "$LOG_FILE" 2>&1  # Redirect all output to the log file
+
+DEFAULT_SELECTION="curl:git:freecad:vim:gmsh:grace:python3-tk:python3-pip:OpenFOAM Foundation: openfoam10:OpenFOAM ESI: openfoam2306-default"
+SELECTION=${SELECTION:-$DEFAULT_SELECTION}
+
+# Displaying a checklist of packages with Zenity
+show_selection_dialog() {
+  zenity --list \
+    --checklist \
+    --height=800 \
+    --width=1000 \
+    --title="SplashFOAM Pre-Installer" \
+    --text="Select the applications to install (Note! Required packages are checked and must remain selected):" \
+    --column="Install" --column="Application" --column="Description" \
+    TRUE "curl (required)" "Command-line tool for data transfer (required)" \
+    TRUE "git (required)" "Version control system (required)" \
+    TRUE "python3-tk (required)" "Python Tkinter library (required)" \
+    TRUE "python3-pip (required)" "Python package installer (required)" \
+    TRUE "vtk (required)" "Python bindings for VTK (required)" \
+    TRUE "pillow (required)" "Python Imaging Library (required)" \
+    TRUE "matplotlib (required)" "Python plotting library (required)" \
+    TRUE "customtkinter (required)" "Custom Tkinter Python package (required)" \
+    TRUE "freecad (required)" "3D CAD modeler" \
+    FALSE "vim" "Text editor" \
+    TRUE "gmsh (required)" "3D finite element grid generator" \
+    TRUE "grace (required)" "2D plotting software" \
+    FALSE "shellcheck" "Shell script static analysis tool" \
+    FALSE "cloc" "Count lines of code" \
+    FALSE "gedit-plugins" "Plugins for Gedit text editor" \
+    TRUE "libxcb-cursor0" "Qt xcb dependencies for GUI support" \
+    TRUE "gnome" "GNOME desktop environment" \
+    TRUE "x11-apps" "X11 applications for GUI testing" \
+    FALSE "locate" "Command to locate files and directories on the system" \
+    FALSE "flutter" "Flutter SDK for building cross-platform applications" \
+    FALSE "build-essential" "Essential build tools (gcc, make, etc.)" \
+    FALSE "cmake" "Cross-platform build system generator" \
+    FALSE "libgl1-mesa-glx" "OpenGL library for 3D rendering" \
+    FALSE "ffmpeg" "Multimedia framework for handling audio and video" \
+    FALSE "gfortran" "Fortran compiler (part of GNU Compiler Collection)" \
+    FALSE "numpy-stl" "Python library for working with STL files" \
+    FALSE "scipy" "Python library for scientific and technical computing" \
+    FALSE "PyQt5" "Python bindings for the Qt application framework" \
+    FALSE "tqdm" "Python library for progress bars" \
+    FALSE "OF_Foundation_v8" "Install OpenFOAM Foundation version 8" \
+    FALSE "OF_Foundation_v9" "Install OpenFOAM Foundation version 9" \
+    FALSE "OF_Foundation_v10" "Install OpenFOAM Foundation version 10" \
+    TRUE "OF_Foundation_v11" "Install OpenFOAM Foundation version 11" \
+    FALSE "OF_Foundation_v12" "Install OpenFOAM Foundation version 12" \
+    FALSE "OF_ESI_openfoam2206-default" "Install OpenFOAM ESI version 2206" \
+    FALSE "OF_ESI_openfoam2212-default" "Install OpenFOAM ESI version 2212" \
+    TRUE "OF_ESI_openfoam2306-default" "Install OpenFOAM ESI version 2306" \
+    FALSE "OF_ESI_openfoam2312-default" "Install OpenFOAM ESI version 2312" \
+    FALSE "OF_ESI_openfoam2406-default" "Install OpenFOAM ESI version 2406" \
+    --separator=":" 2>/dev/null
+}
+
+# Get the user's selection
+SELECTION=$(show_selection_dialog)
+
+# Check if the user pressed Cancel
+if [ $? -ne 0 ]; then
+  echo "Installation cancelled by the user."
+  exit 1
 fi
+
+# Parse the user's selection
+IFS=":" read -r -a APPS <<< "$SELECTION"
+
+# Debugging line to check selected applications
+echo "Selected applications: ${APPS[@]}"  # This will print all the selected applications
+
+# Required applications that must always be installed
+REQUIRED_APPS=("curl (required)" "git (required)" "python3-tk (required)" "python3-pip (required)" "vtk (required)" "pillow (required)" "matplotlib (required)" "customtkinter (required)")
+
+# Revalidate the selection to ensure required applications are included
+for REQUIRED in "${REQUIRED_APPS[@]}"; do
+  if [[ ! " ${APPS[@]} " =~ " $REQUIRED " ]]; then
+    echo "Error: Required application '$REQUIRED' was not selected. Please run the script again and ensure all required applications remain checked."
+    exit 1
+  fi
+done
+
+# Function to check if an application is in the user's selection
+install_if_selected() {
+    local app="$1"
+    local install_command="$2"
+    echo "Processing: $app"  # Debug output
+    if [[ " ${APPS[@]} " =~ " $app " ]]; then
+        echo "Installing $app..."
+        eval "$install_command"
+    else
+        echo "Skipping $app..."
+    fi
+}
+
+## Install curl if not already installed
+install_if_selected "curl" "sudo apt-get install -y curl"
 
 # Install Git if not already installed
-echo "Checking if Git is installed..."
-if ! [ -x "$(command -v git)" ]; then
-  echo "Git is not installed. Installing..."
-  sudo apt-get update
-  sudo apt-get install -y git
+install_if_selected "curl" "sudo apt-get update && sudo apt-get install -y curl"
+install_if_selected "git" "sudo apt-get update && sudo apt-get install -y git"
+
+# Add OpenFOAM Foundation repository if not already added
+if ! grep -q "dl.openfoam.org" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+    echo "Adding OpenFOAM Foundation repository..."
+    sudo sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"
+    sudo add-apt-repository http://dl.openfoam.org/ubuntu
+    sudo apt update
 else
-  echo "Git is already installed."
+    echo "OpenFOAM Foundation repository already exists. Skipping addition."
 fi
 
-# Add OpenFOAM ESI repository and update packages
+# Install selected OpenFOAM Foundation versions
+install_if_selected "OF_Foundation_v8" "sudo apt-get install -y openfoam8"
+install_if_selected "OF_Foundation_v9" "sudo apt-get install -y openfoam9"
+install_if_selected "OF_Foundation_v10" "sudo apt-get install -y openfoam10"
+install_if_selected "OF_Foundation_v11" "sudo apt-get install -y openfoam11"
+install_if_selected "OF_Foundation_v12" "sudo apt -y install openfoam12"
+
+# Add OpenFOAM ESI repository
 echo "Adding OpenFOAM ESI repository..."
 curl -s https://dl.openfoam.com/add-debian-repo.sh | sudo bash
+
+# Install selected OpenFOAM ESI versions
+install_if_selected "OF_ESI_openfoam2206-default" "sudo apt-get install -y openfoam2206-default"
+install_if_selected "OF_ESI_openfoam2212-default" "sudo apt-get install -y openfoam2212-default"
+install_if_selected "OF_ESI_openfoam2306-default" "sudo apt-get install -y openfoam2306-default"
+install_if_selected "OF_ESI_openfoam2312-default" "sudo apt-get install -y openfoam2312-default"
+install_if_selected "OF_ESI_openfoam2406-default" "sudo apt-get install -y openfoam2406-default"
+
+# Update installed packages 
 echo "Updating package list..."
 sudo apt-get update
-
-# Install OpenFOAM ESI versions
-echo "Installing OpenFOAM ESI versions..."
-sudo apt-get install -y openfoam2206-default openfoam2212-default openfoam2306-default openfoam2312-default openfoam2406-default
-
-# Add OpenFOAM Foundation repository and update packages
-echo "Adding OpenFOAM Foundation repository..."
-sudo sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"
-sudo add-apt-repository http://dl.openfoam.org/ubuntu
-echo "Updating package list..."
-sudo apt-get update
-
-# Install OpenFOAM Foundation versions
-echo "Installing OpenFOAM Foundation versions..."
-sudo apt-get install -y openfoam8 openfoam9 openfoam10 openfoam11 openfoam12
 
 # Install other required packages
 echo "Installing FreeCAD..."
@@ -75,8 +175,31 @@ echo "Installing pip..."
 sudo apt-get install -y python3-pip
 echo "Installing or upgrading VTK via pip..."
 pip3 install vtk --upgrade 
+
+# Installing more pip packages
 echo "Installing or pyinstaller, Pillow and matplotlib via pip3..."
-pip3 install Pillow==9.5.0 matplotlib pyinstaller --upgrade
+install_python_package_if_missing() {
+    local package="$1"
+    if ! python3 -c "import $package" 2>/dev/null; then
+        echo "Installing Python package: $package"
+        pip3 install $package --upgrade
+    else
+        echo "Python package '$package' is already installed."
+    fi
+}
+
+# Force installing the main python packages needed
+PYTHON_PACKAGES=("vtk" "Pillow" "matplotlib" "numpy-stl" "scipy" "PyQt5" "tqdm")
+for package in "${PYTHON_PACKAGES[@]}"; do
+    install_python_package_if_missing "$package"
+done
+
+install_python_package_if_missing "vtk"
+install_python_package_if_missing "Pillow"
+install_python_package_if_missing "matplotlib"
+
+echo "Installing other system packages..."
+sudo apt-get install -y curl git python3-tk python3-pip build-essential cmake libgl1-mesa-glx ffmpeg gfortran
 
 # Install gedit plugins
 echo "Installing gedit plugins..."
@@ -99,14 +222,6 @@ sudo apt-get install -y libx11-xcb-dev libxcb-glx0-dev libxcb-util1 libxcb-keysy
 # Provide information for future reference
 echo "Note: Installed Qt xcb dependencies for running Qt-based GUI applications with the xcb platform plugin."
 
-### Install VirtualBox Guest Additions if running on VirtualBox
-##if [ -n "$(which dmidecode)" ] && sudo dmidecode -s system-product-name | grep -q "VirtualBox"; then
-##  echo "Installing VirtualBox Guest Additions..."
-##  sudo apt-get install -y virtualbox-guest-utils virtualbox-guest-x11
-##  echo "Rebooting system..."
-##  sudo reboot
-##fi
-
 # Install GNOME for GTK-based applications 
 echo "Installing gnome..."
 sudo apt-get install -y gnome
@@ -125,6 +240,7 @@ fi
 # Install matplotlib and numpy through pip if not already installed
 echo "Installing Python dependencies (matplotlib, numpy)..."
 pip3 install matplotlib numpy numpy-stl meshio gmsh
+
 
 # Configure DISPLAY variable for WSL or native Linux
 echo "Configuring DISPLAY variable..."
