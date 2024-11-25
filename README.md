@@ -108,17 +108,23 @@ When creating a mesh from scratch, these meshes are generated using [_cfMesh_](h
 
 ### Refinement Regions 
 Splash Mesher offers the option to add refinement objects to the domain. As shown below, by defining the type of refinement object and the number of objects you can add the corresponding block to the background meshing script then you’ll be asked to provide the relevant info for the chosen type. Once done and mesh is created, Splash will automatically remove the refinement object assignment to avoid accumulating unwanted blocks in the underlying meshDict (or any equivalent) script. 
+
 - **Step 1: From Mesh Controls, click on Add Refinement Objects**
+
 ![Screenshot from 2024-11-13 03-23-41](https://github.com/user-attachments/assets/0a904b93-223c-4bf5-ab14-30ee2899e596)
 
 - **Step 2: Choose the refinement objects type and number of repetitions (if any)**
+
 ![Screenshot from 2024-11-15 09-11-41](https://github.com/user-attachments/assets/18413058-35e4-43b6-99cc-c914f30071f9)
 
 - **Step 3: Populate the parameters relevant to that object and click add**
+
 ![Screenshot from 2024-11-13 03-24-59](https://github.com/user-attachments/assets/93a342f6-9623-4955-9ec9-6d61ee10fe14)
 
 - **Step 4: Create the mesh and review in Paraview**
+
 ![Screenshot from 2024-11-13 03-27-19](https://github.com/user-attachments/assets/4ff61616-0f20-47f7-ac4a-2fcf01214ead)
+
 
 ## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
