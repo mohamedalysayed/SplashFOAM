@@ -128,10 +128,12 @@ Splash Mesher offers the option to add refinement objects to the domain. As show
 
 ## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
+![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
 
 - **Case Directory Management**: Seamlessly load, configure and organize case directories.
 - **Simulation Configuration**: Adjust boundary conditions, solvers, and other simulation parameters through a graphical interface.
-- **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case. Note: SplashFOAM does not allow direct changes in boundary condition files. If boundary changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
+- **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case.
+Note: SplashFOAM does not allow direct changes in boundary condition (BC) files. If BC changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
 
 ## Configuration Management
 Easily manage configuration files for different versions of OpenFOAM:
@@ -151,9 +153,25 @@ SplashFOAM can launch a simulation locally or on a remote HPC cluster (Cloud HPC
 ## Post-Processing
 SplashFOAM integrates with popular post-processing tools to streamline analysis:
 
-- **ParaView Integration**: Launch ParaView directly from SplashFOAM to analyze simulation results.
-- **2D Plotting**: Quick access to plot simulation results using Xmgrace.
+- **ParaView**: Currently, results can be analyzed using the visualization tool Paraview. Users can launch ParaView directly from the main SplashFOAM window to post-process simulation results.
+- **Grace**: Quick access to plot simulation results in 2D using Xmgrace.
   
+  ![Screenshot from 2023-10-31 17-05-51](https://github.com/user-attachments/assets/f33aecd2-8bbb-4213-8626-686fde97b557)
+  
+  ![Grace-Example](https://github.com/user-attachments/assets/a89c6591-12f6-4d8c-9c42-4c4adf68f338)
+
+## CFD Album 
+ - **Motorbike OpenFOAM Case - Steady State**
+![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
+
+ - **Ch**
+![Screenshot from 2024-08-08 23-59-18](https://github.com/user-attachments/assets/1783a07f-5466-4b4e-9e44-b4936660b3c7)
+
+![Screenshot from 2024-10-03 22-10-34](https://github.com/user-attachments/assets/2fdf595c-0f7c-4890-aff8-df732484f090)
+
+![641234f5f0f60e00ad86359e_Streamwise_fvel_yz_vel_vectorfield_10e5part_St15_Re150_ts_490k_Vinkovic_comparison](https://github.com/user-attachments/assets/e7660b93-3054-4114-9d9e-49047bc127c0)
+
+
 ## Documentation
 The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
 
