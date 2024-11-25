@@ -121,7 +121,7 @@ Splash Mesher offers the option to add refinement objects to the domain. As show
 
 ![Screenshot from 2024-11-13 03-24-59](https://github.com/user-attachments/assets/93a342f6-9623-4955-9ec9-6d61ee10fe14)
 
-- **Step 4: Create the mesh and review in Paraview**
+- **Step 4: Create the mesh and review the changes in Paraview**
 
 ![Screenshot from 2024-11-13 03-27-19](https://github.com/user-attachments/assets/4ff61616-0f20-47f7-ac4a-2fcf01214ead)
 
