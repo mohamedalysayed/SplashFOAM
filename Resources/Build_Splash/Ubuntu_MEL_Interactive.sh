@@ -36,30 +36,31 @@ show_selection_dialog() {
     --title="SplashFOAM Pre-Installer" \
     --text="Select the applications to install (Note! Required packages are checked and must remain selected):" \
     --column="Install" --column="Application" --column="Description" \
-    TRUE "curl (required)" "Command-line tool for data transfer (required)" \
-    TRUE "git (required)" "Version control system (required)" \
-    TRUE "python3-tk (required)" "Python Tkinter library (required)" \
-    TRUE "python3-pip (required)" "Python package installer (required)" \
-    TRUE "vtk (required)" "Python bindings for VTK (required)" \
-    TRUE "pillow (required)" "Python Imaging Library (required)" \
-    TRUE "matplotlib (required)" "Python plotting library (required)" \
-    TRUE "customtkinter (required)" "Custom Tkinter Python package (required)" \
-    TRUE "freecad (required)" "3D CAD modeler" \
+    TRUE "curl" "Command-line tool for data transfer (required)" \
+    TRUE "git" "Version control system (required)" \
+    TRUE "python3-tk" "Python Tkinter library (required)" \
+    TRUE "python3-pip" "Python package installer (required)" \
+    TRUE "python3-numpy" "System-installed numerical computation library (required)" \
+    TRUE "python3-vtk" "System-installed VTK Python bindings (required)" \
+    TRUE "python3-pillow" "System-installed Python Imaging Library (required)" \
+    TRUE "python3-matplotlib" "System-installed Python plotting library (required)" \
+    TRUE "customtkinter" "Custom Tkinter Python package (required)" \
+    TRUE "freecad" "3D CAD modeler (required)" \
     FALSE "vim" "Text editor" \
-    TRUE "gmsh (required)" "3D finite element grid generator" \
-    TRUE "grace (required)" "2D plotting software" \
+    TRUE "gmsh" "3D finite element grid generator (required)" \
+    TRUE "grace" "2D plotting software (required)" \
     FALSE "shellcheck" "Shell script static analysis tool" \
     FALSE "cloc" "Count lines of code" \
     FALSE "gedit-plugins" "Plugins for Gedit text editor" \
-    TRUE "libxcb-cursor0" "Qt xcb dependencies for GUI support" \
+    TRUE "libxcb-cursor0" "Qt xcb dependencies for GUI support (required)" \
     TRUE "gnome" "GNOME desktop environment" \
-    TRUE "x11-apps" "X11 applications for GUI testing" \
+    TRUE "x11-apps" "X11 applications for GUI testing (required)" \
     FALSE "locate" "Command to locate files and directories on the system" \
     FALSE "flutter" "Flutter SDK for building cross-platform applications" \
     FALSE "build-essential" "Essential build tools (gcc, make, etc.)" \
     FALSE "cmake" "Cross-platform build system generator" \
     FALSE "libgl1-mesa-glx" "OpenGL library for 3D rendering" \
-    FALSE "ffmpeg" "Multimedia framework for handling audio and video" \
+    TRUE "ffmpeg" "Multimedia framework for handling audio and video" \
     FALSE "gfortran" "Fortran compiler (part of GNU Compiler Collection)" \
     FALSE "numpy-stl" "Python library for working with STL files" \
     FALSE "scipy" "Python library for scientific and technical computing" \
@@ -68,11 +69,11 @@ show_selection_dialog() {
     FALSE "OF_Foundation_v8" "Install OpenFOAM Foundation version 8" \
     FALSE "OF_Foundation_v9" "Install OpenFOAM Foundation version 9" \
     FALSE "OF_Foundation_v10" "Install OpenFOAM Foundation version 10" \
-    TRUE "OF_Foundation_v11" "Install OpenFOAM Foundation version 11" \
+    TRUE "OF_Foundation_v11" "Install OpenFOAM Foundation version 11 (required)" \
     FALSE "OF_Foundation_v12" "Install OpenFOAM Foundation version 12" \
     FALSE "OF_ESI_openfoam2206-default" "Install OpenFOAM ESI version 2206" \
     FALSE "OF_ESI_openfoam2212-default" "Install OpenFOAM ESI version 2212" \
-    TRUE "OF_ESI_openfoam2306-default" "Install OpenFOAM ESI version 2306" \
+    TRUE "OF_ESI_openfoam2306-default" "Install OpenFOAM ESI version 2306 (required)" \
     FALSE "OF_ESI_openfoam2312-default" "Install OpenFOAM ESI version 2312" \
     FALSE "OF_ESI_openfoam2406-default" "Install OpenFOAM ESI version 2406" \
     --separator=":" 2>/dev/null
@@ -87,14 +88,34 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Function to print the required packages for running Splash
+print_vertical_list() {
+    local title="$1"
+    shift
+    local items=("$@")
+    echo "__________________________________________"
+    echo "$title"
+    echo "__________________________________________"
+    for item in "${items[@]}"; do
+        echo " - $item"
+    done
+    echo
+}
+
 # Parse the user's selection
 IFS=":" read -r -a APPS <<< "$SELECTION"
 
-# Debugging line to check selected applications
-echo "Selected applications: ${APPS[@]}"  # This will print all the selected applications
-
 # Required applications that must always be installed
-REQUIRED_APPS=("curl (required)" "git (required)" "python3-tk (required)" "python3-pip (required)" "vtk (required)" "pillow (required)" "matplotlib (required)" "customtkinter (required)")
+REQUIRED_APPS=("curl" "git" "freecad" "gmsh" "grace" "x11-apps" "libxcb-cursor0" "python3-tk" "python3-pip" "python3-vtk" "python3-pillow" "python3-matplotlib" "python3-numpy" "customtkinter" "OF_Foundation_v11" "OF_ESI_openfoam2306-default")
+
+# Print required applications
+print_vertical_list "Required Applications (Must Be Installed):" "${REQUIRED_APPS[@]}"
+
+# Print selected applications
+print_vertical_list "Selected Applications (User Choices):" "${APPS[@]}"
+
+# Debugging line to check selected applications
+echo "Selected applications (debug): ${APPS[@]}"  # Optional debugging output
 
 # Revalidate the selection to ensure required applications are included
 for REQUIRED in "${REQUIRED_APPS[@]}"; do
@@ -175,6 +196,11 @@ echo "Installing pip..."
 sudo apt-get install -y python3-pip
 echo "Installing or upgrading VTK via pip..."
 pip3 install vtk --upgrade 
+# The following packages are already included in the default list
+#echo "Installing Python-VTK, pillow and matplotlib..."
+#sudo apt install python3-vtk
+#sudo apt install python3-pillow
+#sudo apt install python3-matplotlib
 
 # Installing more pip packages
 echo "Installing or pyinstaller, Pillow and matplotlib via pip3..."
