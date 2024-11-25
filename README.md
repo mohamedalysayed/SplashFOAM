@@ -164,11 +164,13 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
  - **Motorbike OpenFOAM Case - Steady State**
 ![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
 
- - **Ch**
+ - **Grid wall distance of a 90-degree-bend geometry**
 ![Screenshot from 2024-08-08 23-59-18](https://github.com/user-attachments/assets/1783a07f-5466-4b4e-9e44-b4936660b3c7)
 
+ - **Velocity distribution in a 90-degree-bend at Re=4080**
 ![Screenshot from 2024-10-03 22-10-34](https://github.com/user-attachments/assets/2fdf595c-0f7c-4890-aff8-df732484f090)
 
+ - **Instantaneous velocity and particle distribution at a cross-section of a rectangular channel at shear Re=150**
 ![641234f5f0f60e00ad86359e_Streamwise_fvel_yz_vel_vectorfield_10e5part_St15_Re150_ts_490k_Vinkovic_comparison](https://github.com/user-attachments/assets/e7660b93-3054-4114-9d9e-49047bc127c0)
 
 
