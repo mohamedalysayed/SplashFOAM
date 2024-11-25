@@ -60,9 +60,9 @@ Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.
   cd SplashFOAM/Resources/Build_Splash/
   chmod +x Ubuntu_MEL_Interactive.sh
   ./Ubuntu_MEL_Interactive.sh
-![Pre-Installer](https://github.com/user-attachments/assets/97458aff-18e4-4d99-b101-7c2a5853f138)
+![Splash-PreInstallerII](https://github.com/user-attachments/assets/ca9f7879-b72f-4b4e-9ea5-1ee81fa7fd9a)
 
-This will ensure that all required packages are installed. The user have the option to install other secondary packages according to their need. 
+This will ensure that all required packages are installed. The user can install other secondary packages from the suggested list if needed. 
 
 - **Step 4: Launch SplashFOAM**
 
