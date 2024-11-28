@@ -13,6 +13,7 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
   - [Configuration Management](#configuration-management)
   - [Run Simulation](#run-simulation)
   - [Post-Processing](#post-processing)
+- [Splash Cloud](#splash-cloud)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [CFD Album](#cfd-album)
@@ -161,6 +162,16 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
   
   ![Grace-Example](https://github.com/user-attachments/assets/a89c6591-12f6-4d8c-9c42-4c4adf68f338)
 
+## Splash Cloud [under development...]
+Splash-Cloud is an innovative web-based application currently under development to bring CFD workflows to your browser. Designed to complement SplashFOAM, this tool enables users to interact with their geometries directly online, offering an intuitive way to inspect, modify, and prepare geometries for simulation.
+
+![Screenshot 2024-11-28 at 23 08 51](https://github.com/user-attachments/assets/175bcf96-742d-450a-9756-a5f9aa511aa1)
+
+### Key Features
+- **Browser-Based Geometry Manipulation**: Load, rotate, scale, and inspect geometries (STL, OBJ, STEP) right from your web browser.
+- **Seamless Integration with SplashFOAM**: Prepare OpenFOAM-ready cases effortlessly, as Splash-Cloud outputs configurations that are fully compatible with SplashFOAM.
+- **No Installation Required**: Accessible on any device with an internet connection—eliminating setup hassle.
+- **Collaboration Made Easy**: Share geometries and configurations in real time with teammates.
 
 ## Documentation
 The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
