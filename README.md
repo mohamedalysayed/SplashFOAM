@@ -163,7 +163,7 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
   ![Grace-Example](https://github.com/user-attachments/assets/a89c6591-12f6-4d8c-9c42-4c4adf68f338)
 
 ## Splash Cloud
-Splash-Cloud is an innovative web-based application currently under development to bring CFD workflows to your browser. Designed to complement SplashFOAM, this tool enables users to interact with their geometries directly online, offering an intuitive way to inspect, modify, and prepare geometries for simulation.
+[[Splash-Cloud](https://splash-foam-cloud-9h9d.vercel.app/)] is an innovative web-based application currently under development to bring CFD workflows to your browser. Designed to complement SplashFOAM, this tool enables users to interact with their geometries directly online, offering an intuitive way to inspect, modify, and prepare geometries for simulation.
 
 ![Screenshot 2024-11-28 at 23 08 51](https://github.com/user-attachments/assets/175bcf96-742d-450a-9756-a5f9aa511aa1)
 
