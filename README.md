@@ -15,6 +15,7 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
   - [Post-Processing](#post-processing)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
+- [CFD Album](#cfd-album)
 
 ## Overview
 SplashFOAM is a modular GUI for the Computational Fluid Dynamics (CFD) code OpenFOAM. The main impetus behind building SplashFOAM has been to increase the efficiency of CFD production, remove unnecessary friction, and allow engineers to focus on the physics of the problem rather than coding syntax. 
@@ -58,10 +59,11 @@ Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.
 
   ```bash
   cd SplashFOAM/Resources/Build_Splash/
-  chmod +x Ubuntu_MEL.sh
-  ./Ubuntu_MEL.sh
+  chmod +x Ubuntu_MEL_Interactive.sh
+  ./Ubuntu_MEL_Interactive.sh
+![Splash-PreInstallerII](https://github.com/user-attachments/assets/ca9f7879-b72f-4b4e-9ea5-1ee81fa7fd9a)
 
-This will ensure that all required packages are installed.
+This will ensure that all required packages are installed. The user can install other secondary packages from the suggested list if needed. 
 
 - **Step 4: Launch SplashFOAM**
 
@@ -93,7 +95,6 @@ Import Geometry enables the user to view their CAD in one of five options:
 ![Screenshot from 2024-10-23 23-36-41](https://github.com/user-attachments/assets/0e3c72f3-6224-419f-8c2c-9b45f402c4ed)
 
 
-
 ## Meshing Tools
 SplashFOAM offers a range of meshing capabilities:
 
@@ -104,14 +105,36 @@ Currently, SplashFOAM supports three types of meshes:
 - **Polyhedral**: Create meshes with polyhedral elements that benefit complex geometries.
 - **Tetrahedral**: Flexible tetrahedral meshing for various applications.
 
-These meshes are generated using [_cfMesh_](https://cfmesh.com/) when creating a mesh from scratch. Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
+When creating a mesh from scratch, these meshes are generated using [_cfMesh_](https://cfmesh.com/). Additionally, SplashFOAM handles cases with SnappyHexMesh scripts, making it versatile in handling different meshing setups.
+
+### Refinement Regions 
+Splash Mesher offers the option to add refinement objects to the domain. As shown below, by defining the type of refinement object and the number of objects you can add the corresponding block to the background meshing script then you’ll be asked to provide the relevant info for the chosen type. Once done and mesh is created, Splash will automatically remove the refinement object assignment to avoid accumulating unwanted blocks in the underlying meshDict (or any equivalent) script. 
+
+- **Step 1: From Mesh Controls, click on Add Refinement Objects**
+
+![Screenshot from 2024-11-13 03-23-41](https://github.com/user-attachments/assets/0a904b93-223c-4bf5-ab14-30ee2899e596)
+
+- **Step 2: Choose the refinement objects type and number of repetitions (if any)**
+
+![Screenshot from 2024-11-15 09-11-41](https://github.com/user-attachments/assets/18413058-35e4-43b6-99cc-c914f30071f9)
+
+- **Step 3: Populate the parameters relevant to that object and click add**
+
+![Screenshot from 2024-11-13 03-24-59](https://github.com/user-attachments/assets/93a342f6-9623-4955-9ec9-6d61ee10fe14)
+
+- **Step 4: Create the mesh and review the changes in Paraview**
+
+![Screenshot from 2024-11-13 03-27-19](https://github.com/user-attachments/assets/4ff61616-0f20-47f7-ac4a-2fcf01214ead)
+
 
 ## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
+![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
 
-- **Case Directory Management**: Seamlessly load, configure, and organize case directories.
+- **Case Directory Management**: Seamlessly load, configure and organize case directories.
 - **Simulation Configuration**: Adjust boundary conditions, solvers, and other simulation parameters through a graphical interface.
-- **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case. Note: SplashFOAM does not allow direct changes in boundary condition files. If boundary changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
+- **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case.
+Note: SplashFOAM does not allow direct changes in boundary condition (BC) files. If BC changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
 
 ## Configuration Management
 Easily manage configuration files for different versions of OpenFOAM:
@@ -131,11 +154,33 @@ SplashFOAM can launch a simulation locally or on a remote HPC cluster (Cloud HPC
 ## Post-Processing
 SplashFOAM integrates with popular post-processing tools to streamline analysis:
 
-- **ParaView Integration**: Launch ParaView directly from SplashFOAM to analyze simulation results.
-- **2D Plotting**: Quick access to plot simulation results using Xmgrace.
+- **ParaView**: Currently, results can be analyzed using the visualization tool Paraview. Users can launch ParaView directly from the main SplashFOAM window to post-process simulation results.
+- **Grace**: Quick access to plot simulation results in 2D using Xmgrace.
   
+  ![Screenshot from 2023-10-31 17-05-51](https://github.com/user-attachments/assets/f33aecd2-8bbb-4213-8626-686fde97b557)
+  
+  ![Grace-Example](https://github.com/user-attachments/assets/a89c6591-12f6-4d8c-9c42-4c4adf68f338)
+
+
 ## Documentation
 The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
 
 ## Contributing
 Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Feedback is super valuable here ;) 
+
+## CFD Album 
+ - **Motorbike OpenFOAM Case - Steady State**
+   
+![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
+
+ - **Grid wall distance of a 90-degree-bend geometry**
+   
+![Screenshot from 2024-08-08 23-59-18](https://github.com/user-attachments/assets/1783a07f-5466-4b4e-9e44-b4936660b3c7)
+
+ - **Velocity distribution in a 90-degree-bend at Re=4080**
+   
+![Screenshot from 2024-10-03 22-10-34](https://github.com/user-attachments/assets/2fdf595c-0f7c-4890-aff8-df732484f090)
+
+ - **Instantaneous velocity and particle distribution at a cross-section of a rectangular channel at shear Re=150**
+
+![641234f5f0f60e00ad86359e_Streamwise_fvel_yz_vel_vectorfield_10e5part_St15_Re150_ts_490k_Vinkovic_comparison](https://github.com/user-attachments/assets/e7660b93-3054-4114-9d9e-49047bc127c0)
