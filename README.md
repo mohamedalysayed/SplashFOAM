@@ -15,6 +15,7 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
   - [Post-Processing](#post-processing)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
+- [CFD Album](#cfd-album)
 
 ## Overview
 SplashFOAM is a modular GUI for the Computational Fluid Dynamics (CFD) code OpenFOAM. The main impetus behind building SplashFOAM has been to increase the efficiency of CFD production, remove unnecessary friction, and allow engineers to focus on the physics of the problem rather than coding syntax. 
@@ -160,6 +161,13 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
   
   ![Grace-Example](https://github.com/user-attachments/assets/a89c6591-12f6-4d8c-9c42-4c4adf68f338)
 
+
+## Documentation
+The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
+
+## Contributing
+Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Feedback is super valuable here ;) 
+
 ## CFD Album 
  - **Motorbike OpenFOAM Case - Steady State**
 ![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
@@ -172,10 +180,3 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
 
  - **Instantaneous velocity and particle distribution at a cross-section of a rectangular channel at shear Re=150**
 ![641234f5f0f60e00ad86359e_Streamwise_fvel_yz_vel_vectorfield_10e5part_St15_Re150_ts_490k_Vinkovic_comparison](https://github.com/user-attachments/assets/e7660b93-3054-4114-9d9e-49047bc127c0)
-
-
-## Documentation
-The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
-
-## Contributing
-Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Feedback is super valuable here ;) 
