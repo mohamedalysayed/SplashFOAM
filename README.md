@@ -15,7 +15,8 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
   - [Post-Processing](#post-processing)
 - [Splash Cloud](#splash-cloud)
 - [Documentation](#documentation)
-- [Contributing](#contributing)
+- [Code Developers](#code-developers)
+- [Feedback](#feedback)
 - [CFD Album](#cfd-album)
 
 ## Overview
@@ -180,8 +181,8 @@ The manual is currently under development. In the meantime, please check the rep
 - **[Mohamed Aly Sayed](https://www.linkedin.com/in/mohamedsayedh/)** | muhammmedaly@gmail.com
 - **[Thaw Tar](https://www.linkedin.com/in/thaw-tar-8bb34a73/)** | mr.thaw.tar1990@gmail.com 
 
-## Want to be part of the story?! 
-Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Your feedback is super valuable here ;) 
+## Feedback 
+Feel free to contribute to SplashFOAM by submitting issues or feature suggestions. Your feedback is super valuable here ;) 
 
 ## CFD Album* 
  [*_Please refer to this GitHub repository when using any of the images below (proper referencing is required)_]
