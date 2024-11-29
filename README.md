@@ -17,7 +17,7 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
 - [Documentation](#documentation)
 - [Code Developers](#code-developers)
 - [Feedback](#feedback)
-- [CFD Album](#cfd-album)
+- [CFD Dose Album](#cfd-dose-album)
 
 ## Overview
 SplashFOAM is a modular GUI for the Computational Fluid Dynamics (CFD) code OpenFOAM. The main impetus behind building SplashFOAM has been to increase the efficiency of CFD production, remove unnecessary friction, and allow engineers to focus on the physics of the problem rather than coding syntax. 
@@ -184,7 +184,7 @@ The manual is currently under development. In the meantime, please check the rep
 ## Feedback 
 Feel free to contribute to SplashFOAM by submitting issues or feature suggestions. Your feedback is super valuable here ;) 
 
-## CFD Album* 
+## CFD Dose Album* 
  [*_Please refer to this GitHub repository when using any of the images below (proper referencing is required)_]
  
  - **Motorbike OpenFOAM Case - Steady State**
