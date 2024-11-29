@@ -176,10 +176,15 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
 ## Documentation
 The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
 
-## Contributing
-Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Feedback is super valuable here ;) 
+## Code Developers 
+- **[Mohamed Aly Sayed](https://www.linkedin.com/in/mohamedsayedh/)** | E-mail: muhammmedaly@gmail.com
+- **[Thaw Tar](https://www.linkedin.com/in/thaw-tar-8bb34a73/)** | E-mail: mr.thaw.tar1990@gmail.com 
 
-## CFD Album 
+## Want to be part of the story?! 
+Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Your feedback is super valuable here ;) 
+
+## CFD Album* 
+ [*_Please refer to this GitHub repository when using any of the images below (proper referencing is required)!_]
  - **Motorbike OpenFOAM Case - Steady State**
    
 ![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
