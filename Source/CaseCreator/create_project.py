@@ -28,6 +28,9 @@ def create_project():
     os.system('cls' if os.name == 'nt' else 'clear')
     ampersandIO.printMessage(get_ampersand_header())
     project.set_project_directory(ampersandPrimitives.ask_for_directory())
+    if project.project_directory_path == None:
+        ampersandIO.printMessage("No project directory selected. Exiting...")
+        exit()
     project_name = ampersandIO.get_input("Enter the project name: ")
     project.set_project_name(project_name)
     #user_name = input("Enter the user name: ")

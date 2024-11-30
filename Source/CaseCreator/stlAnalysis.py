@@ -23,6 +23,7 @@ import numpy as np
 import math
 from stlToOpenFOAM import find_inside_point, is_point_inside, read_stl_file
 from stlToOpenFOAM import extract_curvature_data, compute_curvature
+from primitives import ampersandIO
 
 class stlAnalysis:
     def __init__(self):
@@ -329,7 +330,7 @@ class stlAnalysis:
     @staticmethod
     def calc_mesh_settings(stlBoundingBox,nu=1e-6,rho=1000.,U=1.0,maxCellSize=0.5,sizeFactor=1.0,
                            expansion_ratio=1.5,onGround=False,internalFlow=False,refinement=1,
-                           nLayers=5,halfModel=False,thicknessRatio=0.3):
+                           nLayers=5,halfModel=False,thicknessRatio=0.3,GUI=False,window=None):
         maxSTLLength = stlAnalysis.getMaxSTLDim(stlBoundingBox)
         minSTLLength = stlAnalysis.getMinSTLDim(stlBoundingBox)
         if(maxCellSize < 0.001):
@@ -407,23 +408,22 @@ class stlAnalysis:
        
         #minVolumeSize = backgroundCellSize**3/(8.**refLevel*20.)
         # print the summary of results
-        print("\n-----------------Mesh Settings-----------------")
-        print(f"Domain size: x({domain_size[0]:6.3f}~{domain_size[1]:6.3f}) y({domain_size[2]:6.3f}~{domain_size[3]:6.3f}) z({domain_size[4]:6.3f}~{domain_size[5]:6.3f})")
-        print(f"Nx Ny Nz: {nx},{ny},{nz}")
-        print(f"Max cell size: {backgroundCellSize}")
-        print(f"Min cell size: {targetCellSize}")
-        print(f"Refinement Level:{refLevel}")
-        #print(f"Max volume size: {backgroundCellSize**3}")
-        #print(f"Min volume size: {minVolumeSize}")
-        print("\n-----------------Turbulence-----------------")
-        print(f"Target yPlus:{target_yPlus}")
-        print(f'Reynolds number:{U*L/nu}')
-        print(f"Boundary layer thickness:{delta}")
-        print(f"First layer thickness:{adjustedNearWallThickness}")
-        print(f"Final layer thickness:{finalLayerThickness}")
-        print(f"YPlus:{adjustedYPlus}")
+        ampersandIO.printMessage("\n-----------------Mesh Settings-----------------",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"Domain size: x({domain_size[0]:6.3f}~{domain_size[1]:6.3f}) y({domain_size[2]:6.3f}~{domain_size[3]:6.3f}) z({domain_size[4]:6.3f}~{domain_size[5]:6.3f})",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"Nx Ny Nz: {nx},{ny},{nz}",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"Max cell size: {backgroundCellSize}",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"Min cell size: {targetCellSize}",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"Refinement Level:{refLevel}",GUIMode=GUI,window=window)
         
-        print(f"Number of layers:{nLayers}")
+        ampersandIO.printMessage("\n-----------------Turbulence-----------------",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"Target yPlus:{target_yPlus}",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f'Reynolds number:{U*L/nu}',GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"Boundary layer thickness:{delta}",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"First layer thickness:{adjustedNearWallThickness}",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"Final layer thickness:{finalLayerThickness}",GUIMode=GUI,window=window)
+        ampersandIO.printMessage(f"YPlus:{adjustedYPlus}",GUIMode=GUI,window=window)
+        
+        ampersandIO.printMessage(f"Number of layers:{nLayers}",GUIMode=GUI,window=window)
         return domain_size, nx, ny, nz, refLevel,finalLayerThickness,nLayers
     
     @staticmethod
@@ -490,7 +490,7 @@ class stlAnalysis:
     
     @staticmethod
     def set_stl_solid_name(stl_file='input.stl'):
-        print(f"Setting solid name for {stl_file}")
+        ampersandIO.printMessage(f"Setting solid name for {stl_file}")
         # if the file does not exist, return -1
         if not os.path.exists(stl_file):
             print(f"File not found: {stl_file}")

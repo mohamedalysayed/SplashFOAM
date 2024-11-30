@@ -22,6 +22,8 @@ import yaml
 import sys
 from tkinter import filedialog, Tk
 from headers import get_ampersand_header
+from PySide6.QtWidgets import QMessageBox
+from dialogBoxes import sphereDialogDriver, inputDialogDriver, vectorInputDialogDriver
 
 class ampersandPrimitives:
     def __init__(self):
@@ -30,7 +32,13 @@ class ampersandPrimitives:
     
     
     @staticmethod
-    def list_stl_files(stl_files):
+    def list_stl_files(stl_files, GUIMode=False, window=None):
+        if GUIMode:
+            stl_names = [stl_file['name'] for stl_file in stl_files]
+            #window.listWidgetObjList.clear()
+            for i in range(len(stl_names)):
+                ampersandIO.printMessage(f"{i+1}. {stl_names[i]}",GUIMode=GUIMode,window=window) 
+            return 0
         i = 1
         ampersandIO.show_title("STL Files")
         
@@ -166,18 +174,28 @@ class ampersandPrimitives:
 
 
     @staticmethod
-    def ask_for_directory():
-        root = Tk()
-        root.withdraw()  # Hide the main window
-        directory = filedialog.askdirectory(title="Select Project Directory")
-        return directory if directory else None
+    def ask_for_directory(qt=False):
+        if qt:
+            from PySide6.QtWidgets import QFileDialog
+            directory = QFileDialog.getExistingDirectory(None, "Select Project Directory")
+            return directory if directory else None
+        else:
+            root = Tk()
+            root.withdraw()  # Hide the main window
+            directory = filedialog.askdirectory(title="Select Project Directory")
+            return directory if directory else None
     
     @staticmethod
-    def ask_for_file(filetypes=[("STL Geometry", "*.stl")]):
-        root = Tk()
-        root.withdraw()
-        file = filedialog.askopenfilename(title="Select File", filetypes=filetypes)
-        return file if file else None
+    def ask_for_file(filetypes=[("STL Geometry", "*.stl")], qt=False):
+        if qt:
+            from PySide6.QtWidgets import QFileDialog
+            file = QFileDialog.getOpenFileName(None, "Select File", filter="STL Geometry (*.stl)")
+            return file[0] if file[0] else None
+        else:
+            root = Tk()
+            root.withdraw()
+            file = filedialog.askopenfilename(title="Select File", filetypes=filetypes)
+            return file if file else None
     
     @staticmethod
     def check_dict(dict_):
@@ -319,16 +337,44 @@ class ampersandIO:
         pass
 
     @staticmethod
-    def printMessage(*args):
-        print(*args)
+    def printMessage(*args,GUIMode=False,window=None):
+        if GUIMode and window!=None:
+            window.updateTerminal(*args)
+        else:
+            print(*args)
+
+    @staticmethod
+    def printWarning(*args, GUIMode=False):
+        if GUIMode:
+            #ampersandIO.printMessage(*args)
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("Warning")
+            msg.setInformativeText(*args)
+            msg.setWindowTitle("Warning")
+            msg.exec_()
+        else:
+            print(*args)
     
     @staticmethod
-    def printError(*args):
-        print(*args, file=sys.stderr)
+    def printError(*args, GUIMode=False):
+        if GUIMode:
+            #ampersandIO.printMessage(*args)
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(*args)
+            msg.setWindowTitle("Error")
+            msg.exec_()
+        else:
+            print(*args, file=sys.stderr)
     
     @staticmethod
-    def get_input(prompt):
-        return input(prompt)
+    def get_input(prompt, GUIMode=False):
+        if GUIMode:
+            return inputDialogDriver(prompt)
+        else:
+            return input(prompt)
     
     @staticmethod
     def print_dict(data):
@@ -336,20 +382,26 @@ class ampersandIO:
             print(f"{key}: {value}")
     
     @staticmethod
-    def get_input_int(prompt):
-        try:
-            return int(input(prompt))
-        except:
-            ampersandIO.printError("Invalid input. Please enter an integer.")
-            return ampersandIO.get_input_int(prompt)
+    def get_input_int(prompt, GUIMode=False):
+        if GUIMode:
+            return int(inputDialogDriver(prompt, input_type="int"))
+        else: 
+            try:
+                return int(input(prompt))
+            except:
+                ampersandIO.printError("Invalid input. Please enter an integer.")
+                return ampersandIO.get_input_int(prompt)
     
     @staticmethod  
-    def get_input_float(prompt):
-        try:
-            return float(input(prompt))
-        except:
-            ampersandIO.printError("Invalid input. Please enter a number.")
-            return ampersandIO.get_input_float(prompt)
+    def get_input_float(prompt, GUIMode=False):
+        if GUIMode:
+            return float(inputDialogDriver(prompt, input_type="float"))
+        else:
+            try:
+                return float(input(prompt))
+            except:
+                ampersandIO.printError("Invalid input. Please enter a number.")
+                return ampersandIO.get_input_float(prompt)
         
     @staticmethod
     def show_list(lst):
@@ -363,21 +415,24 @@ class ampersandIO:
             print(f"{i+1}. {lst[i]}")
     
     @staticmethod
-    def get_input_vector(prompt):
-        inp = input(prompt).split()
-        #output = [0.,0.,0.]
-        # Check if the input is a list of floats
-        try:
-            vec = list(map(float, inp))
-            if len(vec)!=3:
-                ampersandIO.printError("Invalid input. Please enter 3 numbers.")
+    def get_input_vector(prompt, GUIMode=False):
+        if GUIMode:
+            return vectorInputDialogDriver(prompt)
+        else:
+            inp = input(prompt).split()
+            #output = [0.,0.,0.]
+            # Check if the input is a list of floats
+            try:
+                vec = list(map(float, inp))
+                if len(vec)!=3:
+                    ampersandIO.printError("Invalid input. Please enter 3 numbers.")
+                    # Recursively call the function until a valid input is given
+                    return ampersandIO.get_input_vector(prompt)
+                return vec
+            except:
+                ampersandIO.printError("Invalid input. Please enter a list of numbers.")
                 # Recursively call the function until a valid input is given
                 return ampersandIO.get_input_vector(prompt)
-            return vec
-        except:
-            ampersandIO.printError("Invalid input. Please enter a list of numbers.")
-            # Recursively call the function until a valid input is given
-            return ampersandIO.get_input_vector(prompt)
         #return list(map(float, input(prompt).split()))
 
     
@@ -413,8 +468,11 @@ class ampersandIO:
         ampersandIO.printMessage("-"*60)
 
     @staticmethod
-    def printFormat(item_name, item_value):
-        print(f"{item_name:12}\t{item_value}")
+    def printFormat(item_name, item_value, GUIMode=False, window=None):
+        if GUIMode:
+            window.updateStatusBar(f"{item_name}: {item_value}")
+        else:
+            print(f"{item_name:12}\t{item_value}")
 
 
 class ampersandDataInput:
