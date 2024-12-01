@@ -168,7 +168,7 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
 
 ![SplashCloud-Landing](https://github.com/user-attachments/assets/20c3e645-6b99-4b37-9b70-cde63ffc5f2d)
 
-<img width="1663" alt="SplashCloud-Starter" src="https://github.com/user-attachments/assets/b4b12466-98ce-4436-ba79-af0ac6bebe0d">
+![SplashCloud-i](https://github.com/user-attachments/assets/4d2c65b1-5e99-4a75-9b7c-07e00fab187f)
 
 ### Key Features
 - **Browser-Based Geometry Manipulation**: Load, rotate, scale, and inspect geometries (STL, OBJ, STEP) right from your web browser.
