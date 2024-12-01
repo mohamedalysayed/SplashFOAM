@@ -20,7 +20,7 @@
       <x>10</x>
       <y>10</y>
       <width>251</width>
-      <height>581</height>
+      <height>621</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -452,9 +452,9 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>520</y>
+       <y>570</y>
        <width>191</width>
-       <height>51</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -474,6 +474,19 @@
       <string>Manual</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButtonSave">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>520</y>
+       <width>191</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save case</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
@@ -481,7 +494,7 @@
       <x>270</x>
       <y>10</y>
       <width>271</width>
-      <height>581</height>
+      <height>621</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -526,13 +539,13 @@
       <string>Property</string>
      </property>
     </widget>
-    <widget class="QTableView" name="tableViewProperties">
+    <widget class="QTableWidget" name="tableViewProperties">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>250</y>
        <width>251</width>
-       <height>321</height>
+       <height>361</height>
       </rect>
      </property>
     </widget>

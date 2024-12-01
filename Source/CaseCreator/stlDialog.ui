@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>STL Properties</string>
   </property>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="comboBoxUsage">
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -172,7 +172,7 @@
     <string>RefLevel</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEditRefMax_2">
+  <widget class="QLineEdit" name="lineEditRefLevel">
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -198,17 +198,17 @@
     <string>(Refinement surface/region)</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButtonSetVelocity">
+  <widget class="QCheckBox" name="checkBoxAMI">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>10</x>
      <y>140</y>
-     <width>211</width>
-     <height>24</height>
+     <width>141</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Set velocity (Inlet)</string>
+    <string>Create AMI Patches</string>
    </property>
   </widget>
  </widget>

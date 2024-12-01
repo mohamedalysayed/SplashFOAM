@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QMainWindow
 from PySide6 import QtWidgets
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from dialogBoxes import sphereDialogDriver, yesNoDialogDriver, yesNoCancelDialogDriver
+from dialogBoxes import vectorInputDialogDriver, STLDialogDriver
 # ----------------- VTK Libraries ----------------- #
 import vtk
 import vtkmodules.vtkInteractionStyle
@@ -24,13 +25,14 @@ from vtkmodules.vtkRenderingCore import (
 )
 # ------------------------------------------------- #
 import sys
+import os
 from time import sleep
 
 # Connection to the Ampersand Backend
 from project import ampersandProject
 from primitives import ampersandPrimitives, ampersandIO
 
-
+os.chdir(r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src")
 loader = QUiLoader()
 
 # This function reads STL file and extracts the surface patch names.
@@ -61,6 +63,7 @@ class mainWindow(QMainWindow):
         self.minx,self.miny,self.minz = 0.0,0.0,0.0
         self.maxx,self.maxy,self.maxz = 0.0,0.0,0.0
         self.nx,self.ny,self.nz = 0,0,0
+        self.current_stl_file = None
         # disable all the buttons and input fields
         self.disableButtons()
 
@@ -82,6 +85,7 @@ class mainWindow(QMainWindow):
         #self.window.pushButtonCreate.setEnabled(False)
         #self.window.pushButtonOpen.setEnabled(False)
         self.window.pushButtonGenerate.setEnabled(False)
+        self.window.pushButtonSave.setEnabled(False)
         self.window.lineEditMinX.setEnabled(False)
         self.window.lineEditMinY.setEnabled(False)
         self.window.lineEditMinZ.setEnabled(False)
@@ -93,14 +97,7 @@ class mainWindow(QMainWindow):
         self.window.lineEdit_nZ.setEnabled(False)
         # change color of widget 
         self.window.widget.setStyleSheet('''background-color: lightgrey;''')
-        # change color of text box
-        
-        #self.window.plainTextTerminal.setStyleSheet('''
-        #    QPlainTextEdit {
-        #        background-color: lightgrey;
-        #        color: green;
-        #                                            }''')
-        self.window.plainTextTerminal.appendPlainText("Welcome to Ampersand CFD GUI")
+        self.window.plainTextTerminal.appendPlainText("Welcome to SplashFOAM Case Creator")
        
     def enableButtons(self):
         self.window.pushButtonSTLImport.setEnabled(True)
@@ -118,6 +115,7 @@ class mainWindow(QMainWindow):
         self.window.pushButtonCreate.setEnabled(True)
         self.window.pushButtonOpen.setEnabled(True)
         self.window.pushButtonGenerate.setEnabled(True)
+        self.window.pushButtonSave.setEnabled(True)
         self.window.pushButtonDomainAuto.setEnabled(True)
         self.window.pushButtonDomainManual.setEnabled(True)
         self.window.lineEditMinX.setEnabled(True)
@@ -149,7 +147,7 @@ class mainWindow(QMainWindow):
         if(fname==""):
             return -1 # CAD file not loaded
         else:
-            print("Current CAD File: ",fname)
+            #print("Current CAD File: ",fname)
             return fname
         
     def openSTLDialog(self):
@@ -237,6 +235,9 @@ class mainWindow(QMainWindow):
         self.iren.Initialize()
         # add coordinate axes
         axes = vtk.vtkAxesActor()
+        self.ren.AddActor(axes)
+        self.iren.Start()
+        """
         widget = vtkOrientationMarkerWidget()
         #renderWindowInteractor = vtkRenderWindowInteractor()
         rgba = [0] * 4
@@ -247,8 +248,8 @@ class mainWindow(QMainWindow):
         widget.SetViewport(0.0, 0.0, 0.4, 0.4)
         widget.SetEnabled(1)
         widget.InteractiveOn()
-        self.ren.AddActor(axes)
-        self.iren.Start()
+        """
+        
 
     def render3D(self):  # self.ren and self.iren must be used. other variables are local variables
         # Create a mapper
@@ -262,6 +263,8 @@ class mainWindow(QMainWindow):
         
         actor.GetProperty().SetColor(0.5,0.5,0.5)
         self.ren.AddActor(actor)
+        axes = vtk.vtkAxesActor()
+        self.ren.AddActor(axes)
         
         #self.iren.Start()
 
@@ -338,14 +341,32 @@ class mainWindow(QMainWindow):
         for i in range(len(self.project.stl_files)):
             self.window.listWidgetObjList.insertItem(i,self.project.stl_files[i]['name'])
 
-
     def updatePropertyBox(self):
         # find the selected item in the list
         item = self.window.listWidgetObjList.currentItem()
         idx = self.window.listWidgetObjList.row(item)
-        print("Selected Item: ",item.text())
-
-
+        
+        self.current_stl_file = item.text()
+        #print("Selected Item: ",self.current_stl_file)
+        # find the properties of the selected item
+        #print("Current STL File: ",self.current_stl_file)
+        #print(self.project.stl_files)
+        stl_properties = self.project.get_stl_properties(self.current_stl_file)
+        if stl_properties==None:
+            return
+        purpose,refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds = stl_properties
+        #print("STL Properties: ",refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds)
+        return
+        # update the property box
+        self.window.tableViewProperties.setItem(0,0,QtWidgets.QTableWidgetItem("Refinement Min"))
+        #self.window.tableViewProperties.setItem(0,0,QtWidgets.QTableWidgetItem(str(refMin)))
+        self.window.tableViewProperties.setItem(0,1,QtWidgets.QTableWidgetItem(str(refMax)))
+        self.window.tableViewProperties.setItem(1,0,QtWidgets.QTableWidgetItem(str(featureEdges)))
+        self.window.tableViewProperties.setItem(1,1,QtWidgets.QTableWidgetItem(str(featureLevel)))
+        self.window.tableViewProperties.setItem(2,0,QtWidgets.QTableWidgetItem(str(nLayers)))
+        self.window.tableViewProperties.setItem(2,1,QtWidgets.QTableWidgetItem(str(property)))
+        self.window.tableViewProperties.setItem(3,0,QtWidgets.QTableWidgetItem(str(bounds[0])))
+        
     def updateStatusBar(self,message="Go!"):
         self.window.statusbar.showMessage(message)
         self.window.plainTextTerminal.appendPlainText(message)
@@ -364,15 +385,18 @@ class mainWindow(QMainWindow):
         self.window.pushButtonSphere.clicked.connect(self.createSphere)
         self.window.actionNew_Case.triggered.connect(self.createCase)
         self.window.actionOpen_Case.triggered.connect(self.openCase)
+        self.window.actionSave_Case.triggered.connect(self.saveCase)
         self.window.pushButtonCreate.clicked.connect(self.createCase)
         self.window.pushButtonOpen.clicked.connect(self.openCase)
         self.window.actionExit.triggered.connect(self.close)
         self.window.pushButtonGenerate.clicked.connect(self.generateCase)
+        self.window.pushButtonSave.clicked.connect(self.saveCase)
         self.window.radioButtonInternal.clicked.connect(self.chooseInternalFlow)
         self.window.radioButtonExternal.clicked.connect(self.chooseExternalFlow)
         self.window.listWidgetObjList.itemClicked.connect(self.updatePropertyBox)
         self.window.pushButtonDomainAuto.clicked.connect(self.autoDomain)
         self.window.pushButtonDomainManual.clicked.connect(self.manualDomain)
+        self.window.pushButtonSTLProperties.clicked.connect(self.stlPropertiesDialog)
         #self.window.checkBoxOnGround.clicked.connect(self.chooseExternalFlow)
         self.window.statusbar.showMessage("Ready")
 
@@ -409,9 +433,10 @@ class mainWindow(QMainWindow):
         #print("Choose Internal Flow")
         self.project.internalFlow = True
         self.project.meshSettings['internalFlow'] = True
+        self.project.onGround = False
         self.window.checkBoxOnGround.setEnabled(False)
         self.updateStatusBar("Choosing Internal Flow")
-        sleep(0.001)
+        #sleep(0.001)
         self.readyStatusBar()
 
     def chooseExternalFlow(self):
@@ -454,11 +479,13 @@ class mainWindow(QMainWindow):
         self.project.set_project_directory(ampersandPrimitives.ask_for_directory(qt=True))
         if self.project.project_directory_path == None:
             ampersandIO.printMessage("No project directory selected.",GUIMode=True,window=self)
+            self.updateTerminal("Canceled creating new case")
             self.readyStatusBar()
             return
         project_name = ampersandIO.get_input("Enter the project name: ",GUIMode=True)
         if project_name == None:
             ampersandIO.printError("Project Name not entered",GUIMode=True)
+            self.updateTerminal("Canceled creating new case")
             self.readyStatusBar()
             return
         self.project.set_project_name(project_name)
@@ -510,6 +537,8 @@ class mainWindow(QMainWindow):
         
         if projectFound==-1:
             ampersandIO.printWarning("No project found. Failed to open case directory.",GUIMode=True)
+            self.updateTerminal("No project found. Failed to open case directory.")
+            
             self.readyStatusBar()
             return -1
         ampersandIO.printMessage(f"Project path: {self.project.project_path}",GUIMode=True,window=self)
@@ -527,6 +556,12 @@ class mainWindow(QMainWindow):
         for stl_file in stl_file_paths:
             self.showSTL(stlFile=stl_file)
         self.readyStatusBar()
+        if self.project.internalFlow:
+            self.window.radioButtonInternal.setChecked(True)
+            self.window.checkBoxOnGround.setEnabled(False)
+        else:
+            self.window.radioButtonExternal.setChecked(True)
+            self.window.checkBoxOnGround.setChecked(self.project.onGround)
         self.project_opened = True
         ampersandIO.printMessage(f"Project {self.project.project_name} created",GUIMode=True,window=self)
         
@@ -547,17 +582,43 @@ class mainWindow(QMainWindow):
     
         self.project.write_settings()
         self.project.create_project_files()
+        self.updateTerminal("--------------------")
+        self.updateTerminal("Case generated")
+        self.updateTerminal("--------------------")
+        self.readyStatusBar()
+
+    def saveCase(self):
+        self.updateStatusBar("Analyzing case before saving")
+        if(len(self.project.stl_files)>0):
+            self.project.analyze_stl_file()
+        self.updateStatusBar("Saving Case")
+        self.updateTerminal("Saving Case")
+        self.project.useFOs = True
+        self.project.set_post_process_settings()
+        self.project.write_settings()
+        self.updateTerminal("--------------------")
+        self.updateTerminal("Case saved")
+        self.updateTerminal("--------------------")
         self.readyStatusBar()
 
     
     def autoDomain(self):
-        #self.project.adjust_domain_size()
-        #if self.project.internalFlow==False:
-        onGround = self.window.checkBoxOnGround.isChecked()
+        
+        #internalFlow = self.window.radioButtonInternal.isChecked()
+        #self.project.meshSettings['internalFlow'] = internalFlow
+        #self.project.internalFlow = internalFlow
+        if self.project.internalFlow==True:
+            onGround = False
+        else:
+            onGround = self.window.checkBoxOnGround.isChecked()
         self.project.meshSettings['onGround'] = onGround
         self.project.onGround = onGround
+        if len(self.project.stl_files)==0:
+            self.updateTerminal("No STL files loaded")
+            self.readyStatusBar()
+            return
         self.project.analyze_stl_file()
-        print("On Ground: ",onGround)
+        #print("On Ground: ",onGround)
         minx = self.project.meshSettings['domain']['minx']
         miny = self.project.meshSettings['domain']['miny']
         minz = self.project.meshSettings['domain']['minz']
@@ -610,7 +671,26 @@ class mainWindow(QMainWindow):
         self.readyStatusBar()
         #print("Domain: ",minx,miny,minz,maxx,maxy,maxz,nx,ny,nz)
 
-        
+    def stlPropertiesDialog(self):
+        stl = self.current_stl_file
+        if stl==None:
+            return
+        currentStlProperties = self.project.get_stl_properties(stl)
+        # open STL properties dialog
+        stlProperties = STLDialogDriver(stl,stlProperties=currentStlProperties)
+        # The properties are:
+        #refMin,refMax,refLevel,nLayers,usage,edgeRefine,ami,None
+        print(stlProperties)
+        if stlProperties==None:
+            return
+        # update the properties
+        status = self.project.set_stl_properties(stl,stlProperties)
+        if status==-1:
+            ampersandIO.printError("STL Properties not updated",GUIMode=True)   
+        else:
+            #self.updateStatusBar(f"{stl}: Properties Updated")
+            self.updateTerminal(f"{stl} Properties Updated")
+            self.readyStatusBar()
 #-------------- End of Event Handlers -------------#
 
 

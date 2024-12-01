@@ -148,20 +148,139 @@ class vectorInputDialog(QDialog):
         self.window.close()
 
 class STLDialog(QDialog):
-    def __init__(self, prompt="Enter Input"):
+    def __init__(self, stl_name="stl_file.stl",stlProperties=None):
         super().__init__()
         self.load_ui()
+        self.stl_name = stl_name
+        self.OK_clicked = False
+        self.stl_properties = stlProperties
+        self.set_initial_values()
+        self.show_stl_properties()
+        self.prepare_events()
+
+    def show_stl_properties(self):
+        purposeUsage = {"wall":"Wall","inlet":"Inlet","outlet":"Outlet","symmetry":"Symmetry",
+                        "refinementSurface":"Refinement_Surface","refinementRegion":"Refinement_Region",
+                        "cellZone":"Cell_Zone","baffles":"Baffle","interface":"Interface"}
+        if self.stl_properties != None:
+            purpose,refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds = self.stl_properties
+            self.window.lineEditRefMin.setText(str(refMin))
+            self.window.lineEditRefMax.setText(str(refMax))
+            self.window.lineEditRefLevel.setText(str(refMax))
+            self.window.lineEditNLayers.setText(str(nLayers))
+            if purpose in purposeUsage.keys():
+                self.window.comboBoxUsage.setCurrentText(purposeUsage[purpose])
+            else:
+                self.window.comboBoxUsage.setCurrentText("Wall")
+
 
     def load_ui(self):
-        ui_path = r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src\vectorInputDialog.ui"
+        ui_path = r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src\stlDialog.ui"
         ui_file = QFile(ui_path)
         #ui_file = QFile("inputDialog.ui")
         ui_file.open(QFile.ReadOnly)
         self.window = loader.load(ui_file, None)
         ui_file.close()
 
+    def set_initial_values(self):
+        # change window title
+        self.window.setWindowTitle(f"STL Properties: {self.stl_name}")
+        self.window.comboBoxUsage.addItem("Wall")
+        self.window.comboBoxUsage.addItem("Inlet")
+        self.window.comboBoxUsage.addItem("Outlet")
+        self.window.comboBoxUsage.addItem("Symmetry")
+        self.window.comboBoxUsage.addItem("Refinement_Surface")
+        self.window.comboBoxUsage.addItem("Refinement_Region")
+        self.window.comboBoxUsage.addItem("Cell_Zone")
+        self.window.comboBoxUsage.addItem("Baffle")
+        self.window.comboBoxUsage.addItem("Interface")
+        self.window.lineEditRefMin.setText("1")
+        self.window.lineEditRefMax.setText("1")
+        self.window.lineEditRefMin.setValidator(QIntValidator())
+        self.window.lineEditRefMax.setValidator(QIntValidator())
+        self.window.lineEditRefLevel.setText("1")
+        self.window.lineEditRefLevel.setValidator(QIntValidator())
+        self.window.lineEditRefLevel.setEnabled(False)
+        self.window.lineEditNLayers.setText("0")
+        self.window.checkBoxAMI.setChecked(False)
+        self.window.checkBoxAMI.setEnabled(False)
 
+    def prepare_events(self):
+        self.window.pushButtonOK.clicked.connect(self.on_pushButtonOK_clicked)
+        self.window.pushButtonCancel.clicked.connect(self.on_pushButtonCancel_clicked)
+        self.window.comboBoxUsage.currentIndexChanged.connect(self.changeUsage)
+        # when closed the dialog box
+        self.window.closeEvent = self.on_pushButtonCancel_clicked
 
+    def on_pushButtonOK_clicked(self):
+        print("Push Button OK Clicked")
+        self.refMin = int(self.window.lineEditRefMin.text())
+        self.refMax = int(self.window.lineEditRefMax.text())
+        self.refLevel = int(self.window.lineEditRefLevel.text())
+        self.nLayers = int(self.window.lineEditNLayers.text())
+        self.usage = self.window.comboBoxUsage.currentText()
+        self.edgeRefine = self.window.checkBoxEdgeRefine.isChecked()
+        self.ami = self.window.checkBoxAMI.isChecked()
+
+        #print("Refinement Min: ",self.refMin)
+        #print("Refinement Max: ",self.refMax)
+        #print("Refinement Level: ",self.refLevel)
+        #print("Number of Layers: ",self.nLayers)
+        #print("Usage: ",self.usage)
+        #print("Edge Refine: ",self.edgeRefine)
+        #print("AMI: ",self.ami)
+        if(self.usage=="Inlet"):
+            xx,yy,zz = vectorInputDialogDriver(prompt="Enter Inlet Velocity Vector",input_type="float")
+            print("Inlet Velocity: ",xx,yy,zz)
+            self.xx = xx
+            self.yy = yy
+            self.zz = zz
+        self.OK_clicked = True
+        self.window.close()
+
+    def on_pushButtonCancel_clicked(self):
+        #print("Push Button Cancel Clicked")
+        self.OK_clicked = False
+        self.window.close()
+
+    def changeUsage(self):
+        if(self.window.comboBoxUsage.currentText()=="Wall"):
+            self.window.lineEditRefLevel.setEnabled(False)
+            self.window.checkBoxAMI.setEnabled(False)
+            self.window.checkBoxEdgeRefine.setEnabled(True)
+        elif(self.window.comboBoxUsage.currentText()=="Baffle"):
+            self.window.lineEditRefLevel.setEnabled(False)
+            self.window.checkBoxAMI.setEnabled(False)
+            self.window.checkBoxEdgeRefine.setEnabled(True)
+        elif(self.window.comboBoxUsage.currentText()=="Inlet"):
+            self.window.lineEditRefLevel.setEnabled(False)
+            self.window.checkBoxAMI.setEnabled(False)
+            self.window.checkBoxEdgeRefine.setEnabled(True)
+        elif(self.window.comboBoxUsage.currentText()=="Outlet"):
+            self.window.lineEditRefLevel.setEnabled(False)
+            self.window.checkBoxAMI.setEnabled(False)
+            self.window.checkBoxEdgeRefine.setEnabled(True)
+        elif(self.window.comboBoxUsage.currentText()=="Symmetry"):
+            self.window.lineEditRefLevel.setEnabled(False)
+            self.window.checkBoxAMI.setEnabled(False)
+            self.window.checkBoxEdgeRefine.setEnabled(True)
+        elif(self.window.comboBoxUsage.currentText()=="Refinement_Surface"):
+            self.window.lineEditRefLevel.setEnabled(True)
+            self.window.checkBoxAMI.setEnabled(False)
+            self.window.checkBoxEdgeRefine.setEnabled(False)
+        elif(self.window.comboBoxUsage.currentText()=="Refinement_Region"):
+            self.window.lineEditRefLevel.setEnabled(True)
+            self.window.checkBoxAMI.setEnabled(False)
+            self.window.checkBoxEdgeRefine.setEnabled(False)
+        elif(self.window.comboBoxUsage.currentText()=="Cell_Zone"):
+            self.window.lineEditRefLevel.setEnabled(True)
+            self.window.checkBoxAMI.setEnabled(True)
+            self.window.checkBoxEdgeRefine.setEnabled(True)
+        else:
+            self.window.lineEditRefLevel.setEnabled(False)
+            self.window.checkBoxAMI.setEnabled(True)
+            self.window.checkBoxEdgeRefine.setEnabled(True)
+        
 #---------------------------------------------------------
 # Driver function for different dialog boxes
 #---------------------------------------------------------
@@ -211,6 +330,27 @@ def vectorInputDialogDriver(prompt="Enter Input",input_type="float"):
     xx,yy,zz = dialog.xx,dialog.yy,dialog.zz
     return (xx,yy,zz)
     
+
+def STLDialogDriver(stl_name="stl_file.stl",stlProperties=None):
+    dialog = STLDialog(stl_name=stl_name,stlProperties=stlProperties)
+    dialog.window.exec()
+    dialog.window.show()
+    if(dialog.OK_clicked==False):
+        return None
+    refMin = dialog.refMin
+    refMax = dialog.refMax
+    refLevel = dialog.refLevel
+    nLayers = dialog.nLayers
+    usage = dialog.usage
+    edgeRefine = dialog.edgeRefine
+    ami = dialog.ami
+    if(dialog.usage=="Inlet"):
+        xx = dialog.xx
+        yy = dialog.yy
+        zz = dialog.zz
+        U = (xx,yy,zz)
+        return (refMin,refMax,refLevel,nLayers,usage,edgeRefine,ami,U)
+    return (refMin,refMax,refLevel,nLayers,usage,edgeRefine,ami,None)
 
 def main():
     pass

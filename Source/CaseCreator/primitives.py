@@ -480,8 +480,12 @@ class ampersandDataInput:
         pass
 
     @staticmethod
-    def get_inlet_values():
-        U = ampersandIO.get_input_vector("Enter the velocity vector at the inlet (m/s): ")
+    def get_inlet_values(GUIMode=False):
+        if GUIMode:
+            U = vectorInputDialogDriver("Enter the velocity vector at the inlet (m/s): ")
+            return U
+        else:
+            U = ampersandIO.get_input_vector("Enter the velocity vector at the inlet (m/s): ")
         return U
     
     @staticmethod

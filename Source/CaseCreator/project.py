@@ -631,6 +631,25 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             property = None
         return property
     
+    def set_property_gui(self,purpose='wall'):
+        if purpose == 'inlet':
+            U = ampersandDataInput.get_inlet_values(GUIMode=self.GUIMode,window=self.window)
+            property = tuple(U)
+            ampersandIO.printMessage(f"Setting property of {purpose} to {property}")
+        elif purpose == 'refinementRegion' :
+            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
+            property = refLevel
+        elif purpose == 'cellZone':
+            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
+            createPatches = ampersandIO.get_input_bool("Create patches for this cellZone? (y/N): ")
+            property = (refLevel, createPatches,0) # 0 is just a placeholder for listing the patches
+        elif purpose == 'refinementSurface':
+            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
+            property = refLevel
+        else:
+            property = None
+        return property
+    
    
     def ask_stl_settings(self,stl_file):
         ampersandIO.printMessage(f"Settings of the {stl_file['name']} file")
@@ -644,6 +663,52 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         stl_file['featureLevel'] = ampersandIO.get_input("Feature Level: ")
         stl_file['nLayers'] = ampersandIO.get_input("Number of Layers: ")
 
+    def change_stl_property(self,stl_file_name,property):
+        for stl in self.meshSettings['geometry']:
+            if stl['name'] == stl_file_name: 
+                stl['property'] = property
+        
+    def get_stl_properties(self,stl_file_name):
+        #print(stl_file_name)
+        
+        for stl in self.stl_files:
+            #print(stl)
+            if stl['name'] == stl_file_name:
+                #print("Found")
+                purpose = stl['purpose']
+                refMin = stl['refineMin']
+                refMax = stl['refineMax']
+                featureEdges = stl['featureEdges']
+                featureLevel = stl['featureLevel']
+                
+                if isinstance(stl['nLayers'],int):
+                    nLayers = stl['nLayers']
+                else:
+                    nLayers = 0
+                property = stl['property']
+                bounds = stl['bounds']
+                return purpose,refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds
+        return None
+    
+    def set_stl_properties(self,stl_file_name,stl_properties):
+        refMin,refMax,refLevel,nLayers,usage,edgeRefine,ami,property = stl_properties
+        #refMin,refMax,featureLevel,nLayers,property,bounds = stl_properties
+        usageToPurpose = {'Wall':'wall', 'Inlet':'inlet','Outlet':'outlet','Refinement_Region':'refinementRegion',
+                          'Refinement_Surface':'refinementSurface','Cell_Zone':'cellZone','Baffles':'baffles',
+                          'Symmetry':'symmetry','Cyclic':'cyclic','Empty':'empty'}
+        for stl in self.meshSettings['geometry']:
+            if stl['name'] == stl_file_name:
+                stl['purpose'] = usageToPurpose[usage]
+                stl['refineMin'] = refMin
+                stl['refineMax'] = refMax
+                stl['featureEdges'] = edgeRefine
+                stl['featureLevel'] = refMin
+                stl['nLayers'] = nLayers
+                stl['property'] = property
+                #stl['bounds'] = bounds
+                return 0
+        return -1
+
     def add_stl_to_project(self):
         for stl_file in self.stl_files:
             #self.ask_stl_settings(stl_file)
@@ -653,7 +718,8 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     def add_stl_file(self): # to only copy the STL file to the project directory and add it to the STL list
         stl_file = ampersandPrimitives.ask_for_file([("STL Geometry", "*.stl"), ("OBJ Geometry", "*.obj")],self.GUIMode)
         if stl_file is None:
-            ampersandIO.printWarning("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode)
+            #ampersandIO.printWarning("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode)
+            ampersandIO.printMessage("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode,window=self.window)
             return -1
         if os.path.exists(stl_file):
             # add the stl file to the project
@@ -662,7 +728,8 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             file_path_to_token = stl_file.split("/")
             stl_name = file_path_to_token[-1]
             if stl_name in self.stl_names:
-                ampersandIO.printWarning(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode)
+                #ampersandIO.printWarning(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode)
+                ampersandIO.printMessage(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode,window=self.window)
                 return -1
             else: # this is to prevent the bug of having the same file added multiple times
                 if self.GUIMode:
