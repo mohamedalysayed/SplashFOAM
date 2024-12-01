@@ -13,7 +13,7 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
   - [Configuration Management](#configuration-management)
   - [Run Simulation](#run-simulation)
   - [Post-Processing](#post-processing)
-- [Splash Cloud](#splash-cloud)
+  - [Splash Cloud](#splash-cloud)
 - [Documentation](#documentation)
 - [Code Developers](#code-developers)
 - [Feedback](#feedback)
