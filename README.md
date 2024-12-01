@@ -164,13 +164,14 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
   ![Grace-Example](https://github.com/user-attachments/assets/a89c6591-12f6-4d8c-9c42-4c4adf68f338)
 
 ## Splash Cloud
-[**Splash-Cloud**](https://splash-foam-cloud-9h9d.vercel.app/) is an innovative web-based application [_currently under development_](https://github.com/mohamedalysayed/SplashFOAM-Cloud) to bring CFD workflows to your browser. Designed to complement SplashFOAM, this tool enables users to interact with their geometries directly online, offering an intuitive way to inspect, modify, and prepare geometries for simulation.
+[**Splash-Cloud**](https://splash-foam-cloud-9h9d.vercel.app/) is an innovative web-based application [_currently under development_](https://github.com/mohamedalysayed/SplashFOAM-Cloud) to bring CFD workflows to your browser. Designed to complement SplashFOAM, this tool enables users to interact with their geometries directly online, offering an intuitive way to inspect, modify, and prepare geometries for simulation and exports seamless OpenFOAM cases.
 
 ![SplashCloud-ii](https://github.com/user-attachments/assets/65097e71-2bce-44e2-8ee3-b9dcef17e00b)
 ![SplashCloud-i](https://github.com/user-attachments/assets/4d2c65b1-5e99-4a75-9b7c-07e00fab187f)
 
 ### Key Features
 - **Browser-Based Geometry Manipulation**: Load, rotate, scale, and inspect geometries (STL, OBJ, STEP) right from your web browser.
+- **Advanced 3D Rendering**: Experience glossy, interactive 3D rendering for geometries in formats like STL, OBJ, and STEP, with seamless camera control and enhanced lighting for precision inspections.
 - **Seamless Integration with SplashFOAM**: Prepare OpenFOAM-ready cases effortlessly, as Splash-Cloud outputs configurations that are fully compatible with SplashFOAM.
 - **No Installation Required**: Accessible on any device with an internet connection—eliminating setup hassle.
 - **Collaboration Made Easy**: Share geometries and configurations in real time with teammates.
