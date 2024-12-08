@@ -215,7 +215,7 @@ install_python_package_if_missing() {
 }
 
 # Force installing the main python packages needed
-PYTHON_PACKAGES=("vtk" "Pillow" "matplotlib" "numpy-stl" "scipy" "PyQt5" "tqdm")
+PYTHON_PACKAGES=("vtk" "Pillow" "matplotlib" "numpy-stl" "scipy" "PyQt5" "tqdm" "PySide6" "pyyaml" "meshio")
 for package in "${PYTHON_PACKAGES[@]}"; do
     install_python_package_if_missing "$package"
 done
@@ -244,6 +244,8 @@ sudo apt-get install -y libxcb-cursor0
 sudo apt-get install -y libxcb-xinerama0 libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
 # Other xcb-related dependencies
 sudo apt-get install -y libx11-xcb-dev libxcb-glx0-dev libxcb-util1 libxcb-keysyms1-dev libxcb-image0-dev libxcb-icccm4-dev libxcb-sync-dev
+# Additional System Libraries for Qt/VTK
+sudo apt-get install -y qttools5-dev-tools libqt5svg5 libgl1-mesa-dri libgl1-mesa-dev python3-pyqt5.qtsvg
 
 # Provide information for future reference
 echo "Note: Installed Qt xcb dependencies for running Qt-based GUI applications with the xcb platform plugin."
@@ -298,18 +300,42 @@ add_alias_to_bashrc() {
     fi
 }
 
-# Add aliases for OpenFOAM versions in .bashrc
-echo "Adding aliases for OpenFOAM versions in .bashrc..."
-add_alias_to_bashrc "alias of8='source /opt/openfoam8/etc/bashrc'"
-add_alias_to_bashrc "alias of9='source /opt/openfoam9/etc/bashrc'"
-add_alias_to_bashrc "alias of10='source /opt/openfoam10/etc/bashrc'"
-add_alias_to_bashrc "alias of11='source /opt/openfoam11/etc/bashrc'"
-add_alias_to_bashrc "alias of12='source /opt/openfoam12/etc/bashrc'"
-add_alias_to_bashrc "alias of2206='source /usr/lib/openfoam/openfoam2206/etc/bashrc'"
-add_alias_to_bashrc "alias of2212='source /usr/lib/openfoam/openfoam2212/etc/bashrc'"
-add_alias_to_bashrc "alias of2306='source /usr/lib/openfoam/openfoam2306/etc/bashrc'"
-add_alias_to_bashrc "alias of2312='source /usr/lib/openfoam/openfoam2312/etc/bashrc'"
-add_alias_to_bashrc "alias of2406='source /usr/lib/openfoam/openfoam2406/etc/bashrc'"
+# List of OpenFOAM versions and their alias commands
+OPENFOAM_ALIASES=(
+    "OF_Foundation_v8:alias of8='source /opt/openfoam8/etc/bashrc'"
+    "OF_Foundation_v9:alias of9='source /opt/openfoam9/etc/bashrc'"
+    "OF_Foundation_v10:alias of10='source /opt/openfoam10/etc/bashrc'"
+    "OF_Foundation_v11:alias of11='source /opt/openfoam11/etc/bashrc'"
+    "OF_Foundation_v12:alias of12='source /opt/openfoam12/etc/bashrc'"
+    "OF_ESI_openfoam2206-default:alias of2206='source /usr/lib/openfoam/openfoam2206/etc/bashrc'"
+    "OF_ESI_openfoam2212-default:alias of2212='source /usr/lib/openfoam/openfoam2212/etc/bashrc'"
+    "OF_ESI_openfoam2306-default:alias of2306='source /usr/lib/openfoam/openfoam2306/etc/bashrc'"
+    "OF_ESI_openfoam2312-default:alias of2312='source /usr/lib/openfoam/openfoam2312/etc/bashrc'"
+    "OF_ESI_openfoam2406-default:alias of2406='source /usr/lib/openfoam/openfoam2406/etc/bashrc'"
+)
+
+# Add a comment marking the OpenFOAM aliases section if not already present
+if ! grep -q "# OpenFOAM aliases" "$HOME/.bashrc"; then
+    echo -e "\n# #================#" >> "$HOME/.bashrc"
+    echo -e "#  OpenFOAM aliases" >> "$HOME/.bashrc"
+    echo -e "# #================#" >> "$HOME/.bashrc"
+    echo "Added comment section: # OpenFOAM aliases"
+fi
+
+# Add aliases for selected OpenFOAM versions
+echo "Adding aliases for selected OpenFOAM versions to .bashrc..."
+for ALIAS_ENTRY in "${OPENFOAM_ALIASES[@]}"; do
+    IFS=":" read -r APP ALIAS_CMD <<< "$ALIAS_ENTRY"
+    if [[ " ${APPS[@]} " =~ " $APP " ]]; then
+        # Check if alias already exists in .bashrc
+        if ! grep -Fxq "$ALIAS_CMD" "$HOME/.bashrc"; then
+            echo "$ALIAS_CMD" >> "$HOME/.bashrc"
+            echo "Added alias: $ALIAS_CMD"
+        else
+            echo "Alias already exists: $ALIAS_CMD"
+        fi
+    fi
+done
 
 # Reload .bashrc to apply changes
 source "$HOME/.bashrc" 2>/dev/null || . "$HOME/.bashrc"
