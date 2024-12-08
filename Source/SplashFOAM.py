@@ -32,9 +32,6 @@ from ReplaceControlDictParameters import ReplaceControlDictParameters
 from ReplaceSimulationSetupParameters import ReplaceSimulationSetupParameters
 
 # Define menu functions
-def file_new():
-    print("In the work")
-
 def edit_undo():
     print("In the works")
 
@@ -68,6 +65,7 @@ class SplashFOAM:
         # File menu
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="New File", command=self.file_new)
+        file_menu.add_command(label="Create Case", command=self.case_creator)
         file_menu.add_command(label="Analyze STL file", command=self.process_stl)
         file_menu.add_command(label="Profile theme", command=self.change_theme)
         file_menu.add_separator()
@@ -411,6 +409,36 @@ class SplashFOAM:
         gedit_thread = threading.Thread(target=open_in_gedit)
         gedit_thread.start()
     
+    def case_creator(self):
+        """Launch the Case Creator GUI built with PySide."""
+        # Script path for ampersand_gui.py
+        script_path = os.path.abspath(os.path.join("CaseCreator", "ampersand_gui.py"))
+
+        try:
+            print(f"Launching Case Creator at: {script_path}")
+            # Set environment variable to force Qt to use X11
+            env = os.environ.copy()
+            env["QT_QPA_PLATFORM"] = "xcb"
+
+            # Set the working directory to CaseCreator to ensure the .ui file can be accessed
+            process = subprocess.Popen(
+                ["python3", script_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=env,
+                cwd=os.path.abspath("CaseCreator")
+            )
+            stdout, stderr = process.communicate()
+
+            if process.returncode != 0:
+                print(f"Error launching Case Creator: {stderr.decode().strip()}")
+                messagebox.showerror("Error", f"Case Creator failed to launch. See console for details.")
+            else:
+                print(f"Case Creator launched successfully: {stdout.decode().strip()}")
+        except FileNotFoundError:
+            messagebox.showerror("Error", f"Script not found: {script_path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to launch Case Creator: {e}")
     # -------------- Main logos -------------------------->    
     def add_logos(self):
     
