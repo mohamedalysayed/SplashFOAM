@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Physical Properties</string>
   </property>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QCheckBox" name="checkBoxTurbulenceOn">
    <property name="geometry">
     <rect>
      <x>230</x>
@@ -42,7 +42,7 @@
     <string>Turbulence Modeling</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_2">
+  <widget class="QComboBox" name="comboBoxTurbulenceModels">
    <property name="geometry">
     <rect>
      <x>230</x>
@@ -93,7 +93,7 @@
      <string>Advanced Physics</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_2">
+   <widget class="QCheckBox" name="checkBoxDynamicMesh">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -106,7 +106,7 @@
      <string>Mesh motion</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_3">
+   <widget class="QCheckBox" name="checkBoxCompressibleFluid">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -119,7 +119,7 @@
      <string>Compressible Fluid</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_4">
+   <widget class="QCheckBox" name="checkBoxMultiphase">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -133,7 +133,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="pushButtonOK">
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -146,7 +146,7 @@
     <string>OK</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="pushButtonCancel">
    <property name="geometry">
     <rect>
      <x>150</x>
@@ -174,11 +174,11 @@
    <property name="frameShadow">
     <enum>QFrame::Sunken</enum>
    </property>
-   <widget class="QLineEdit" name="lineEdit_2">
+   <widget class="QLineEdit" name="lineEditNu">
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>80</y>
+      <y>110</y>
       <width>81</width>
       <height>22</height>
      </rect>
@@ -188,23 +188,23 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>80</y>
+      <y>110</y>
       <width>101</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Kinematic viscosity</string>
+     <string>Viscosity [kg/(m s)]</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="lineEditRho">
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>50</y>
+      <y>80</y>
       <width>81</width>
       <height>22</height>
      </rect>
@@ -213,27 +213,27 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>50</y>
-      <width>41</width>
-      <height>16</height>
+      <x>20</x>
+      <y>80</y>
+      <width>91</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Density</string>
+     <string>Density [kg/m3]</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>110</y>
+      <y>140</y>
       <width>101</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Cp</string>
+     <string>Cp [J/(kg K)]</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -249,10 +249,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Fluid Properties</string>
+     <string>Fluid</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="comboBoxFluids">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -265,11 +265,11 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
+   <widget class="QLineEdit" name="lineEditCp">
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>110</y>
+      <y>140</y>
       <width>81</width>
       <height>22</height>
      </rect>
@@ -278,6 +278,32 @@
      <string/>
     </property>
    </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Fluid Properties</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="pushButtonApply">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>260</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Apply</string>
+   </property>
   </widget>
  </widget>
  <resources/>

@@ -6,7 +6,8 @@ from PySide6.QtWidgets import QMainWindow
 from PySide6 import QtWidgets
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from dialogBoxes import sphereDialogDriver, yesNoDialogDriver, yesNoCancelDialogDriver
-from dialogBoxes import vectorInputDialogDriver, STLDialogDriver
+from dialogBoxes import vectorInputDialogDriver, STLDialogDriver, physicalPropertiesDialogDriver
+from dialogBoxes import boundaryConditionDialogDriver, numericsDialogDriver, controlsDialogDriver
 # ----------------- VTK Libraries ----------------- #
 import vtk
 import vtkmodules.vtkInteractionStyle
@@ -64,6 +65,8 @@ class mainWindow(QMainWindow):
         self.maxx,self.maxy,self.maxz = 0.0,0.0,0.0
         self.nx,self.ny,self.nz = 0,0,0
         self.current_stl_file = None
+        self.colorCounter = 0
+        self.listOfColors = ["Pink","Red","Green","Blue","Yellow","Orange","Purple","Cyan","Magenta","Brown",]
         # disable all the buttons and input fields
         self.disableButtons()
 
@@ -149,26 +152,7 @@ class mainWindow(QMainWindow):
         else:
             #print("Current CAD File: ",fname)
             return fname
-        
-    def openSTLDialog(self):
-        fname,ftype = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file', 
-        'c:\\',"STL files (*.stl *.obj)")
-        if(fname==""):
-            return -1 # STL file not loaded
-        else:
-            #print("Current STL File: ",fname)
-            return fname
-
-    def openSTL(self):
-        stlFileName = self.openSTLDialog()
-        if(stlFileName==-1):
-            pass
-        else:
-            #print("Copying stl file")
-            stl = stlFileName #self.copySTL(stlFileName=stlFileName)
-            if(stl!=-1):
-                self.showSTL(stlFile=stl)
-                
+                       
     # manage sub windows
     def prepare_subWindows(self):
         self.createCaseWindow = None
@@ -203,7 +187,9 @@ class mainWindow(QMainWindow):
         try:
             self.reader = vtk.vtkSTLReader()
             self.reader.SetFileName(stlFile)
-            self.render3D()
+            stl_name = os.path.basename(stlFile)
+            print("STL Name: ",stl_name)
+            self.render3D(actorName=stl_name)
         except:
             print("Reading STL not successful. Try again")
 
@@ -216,7 +202,7 @@ class mainWindow(QMainWindow):
         #actor.SetMapper(mapper)
         actor.GetProperty().EdgeVisibilityOn()
         colors = vtk.vtkNamedColors()
-        whiteColor = colors.GetColor3d("White")
+        whiteColor = colors.GetColor3d("Grey")
         blackColor = colors.GetColor3d("Black")
         #deepBlue = colors.GetColor3d("DeepBlue")
         #self.ren.SetBackground(colors.GetColor3d("SlateGray"))
@@ -235,6 +221,7 @@ class mainWindow(QMainWindow):
         self.iren.Initialize()
         # add coordinate axes
         axes = vtk.vtkAxesActor()
+        axes.SetTotalLength(0.1, 0.1, 0.1)
         self.ren.AddActor(axes)
         self.iren.Start()
         """
@@ -251,20 +238,30 @@ class mainWindow(QMainWindow):
         """
         
 
-    def render3D(self):  # self.ren and self.iren must be used. other variables are local variables
+    def render3D(self,actorName=None):  # self.ren and self.iren must be used. other variables are local variables
         # Create a mapper
         mapper = vtk.vtkPolyDataMapper()
         mapper.SetInputConnection(self.reader.GetOutputPort())
         # Create an actor
         actor = vtk.vtkActor()
         actor.SetMapper(mapper)
-        actor.GetProperty().EdgeVisibilityOn()
+        if actorName:
+            actor.SetObjectName(actorName)
+            print("Actor Name: ",actor.GetObjectName())
+        #actor.GetProperty().EdgeVisibilityOn()
         # set random colors to the actor
+        colors = vtk.vtkNamedColors()
         
-        actor.GetProperty().SetColor(0.5,0.5,0.5)
+        if(self.colorCounter>9):
+            self.colorCounter = 0
+        actor.GetProperty().SetColor(colors.GetColor3d(self.listOfColors[self.colorCounter]))
         self.ren.AddActor(actor)
         axes = vtk.vtkAxesActor()
+        charLen = min(self.project.lenX,self.project.lenY,self.project.lenZ)*1.0
+        axes.SetTotalLength(charLen, charLen, charLen)
         self.ren.AddActor(axes)
+        
+        self.colorCounter += 1
         
         #self.iren.Start()
 
@@ -341,16 +338,18 @@ class mainWindow(QMainWindow):
         for i in range(len(self.project.stl_files)):
             self.window.listWidgetObjList.insertItem(i,self.project.stl_files[i]['name'])
 
-    def updatePropertyBox(self):
+    
+
+    def listClicked(self):
         # find the selected item in the list
         item = self.window.listWidgetObjList.currentItem()
         idx = self.window.listWidgetObjList.row(item)
         
         self.current_stl_file = item.text()
-        #print("Selected Item: ",self.current_stl_file)
-        # find the properties of the selected item
-        #print("Current STL File: ",self.current_stl_file)
-        #print(self.project.stl_files)
+        print("Selected Item: ",self.current_stl_file)
+        #actors = self.ren.GetActors()
+        self.vtkHilightSTL(self.current_stl_file)
+        
         stl_properties = self.project.get_stl_properties(self.current_stl_file)
         if stl_properties==None:
             return
@@ -380,6 +379,8 @@ class mainWindow(QMainWindow):
         self.window.statusbar.showMessage("Ready")
 
     def prepare_events(self):
+        #self.window.resizeEvent = self.resizeEventTriggered
+        #self.window.closeEvent = self.closeEventTriggered
         # Initiate the button click maps
         self.window.pushButtonSTLImport.clicked.connect(self.importSTL)
         self.window.pushButtonSphere.clicked.connect(self.createSphere)
@@ -393,11 +394,29 @@ class mainWindow(QMainWindow):
         self.window.pushButtonSave.clicked.connect(self.saveCase)
         self.window.radioButtonInternal.clicked.connect(self.chooseInternalFlow)
         self.window.radioButtonExternal.clicked.connect(self.chooseExternalFlow)
-        self.window.listWidgetObjList.itemClicked.connect(self.updatePropertyBox)
+        self.window.listWidgetObjList.itemClicked.connect(self.listClicked)
         self.window.pushButtonDomainAuto.clicked.connect(self.autoDomain)
         self.window.pushButtonDomainManual.clicked.connect(self.manualDomain)
         self.window.pushButtonSTLProperties.clicked.connect(self.stlPropertiesDialog)
+        self.window.pushButtonPhysicalProperties.clicked.connect(self.physicalPropertiesDialog)
+        self.window.pushButtonBoundaryCondition.clicked.connect(self.boundaryConditionDialog)
+        self.window.pushButtonNumerics.clicked.connect(self.numericsDialog)
+        self.window.pushButtonControls.clicked.connect(self.controlsDialog)
         #self.window.checkBoxOnGround.clicked.connect(self.chooseExternalFlow)
+        # change view on the VTK widget
+        self.window.pushButtonFitAll.clicked.connect(self.vtkFitAll)
+        self.window.pushButtonPlusX.clicked.connect(self.vtkPlusX)
+        self.window.pushButtonPlusY.clicked.connect(self.vtkPlusY)
+        self.window.pushButtonPlusZ.clicked.connect(self.vtkPlusZ)
+        self.window.pushButtonMinusX.clicked.connect(self.vtkMinusX)
+        self.window.pushButtonMinusY.clicked.connect(self.vtkMinusY)
+        self.window.pushButtonMinusZ.clicked.connect(self.vtkMinusZ)
+        self.window.pushButtonShowWire.clicked.connect(self.vtkShowWire)
+        self.window.pushButtonShowSurface.clicked.connect(self.vtkShowSurface)
+        self.window.pushButtonShowEdges.clicked.connect(self.vtkShowEdges)
+
+        #self.window.resizeEvent = self.resizeEvent
+        #self.window.closeEvent = self.closeEvent
         self.window.statusbar.showMessage("Ready")
 
 #----------------- Event Handlers -----------------#
@@ -414,6 +433,25 @@ class mainWindow(QMainWindow):
         self.showSTL(stlFile=self.project.current_stl_file)
         self.update_list()
         #self.project.list_stl_files()
+
+    def importMultipleSTL(self):
+        # show the file dialog
+        filters = "STL files (*.stl)"
+        fileDialog = QtWidgets.QFileDialog()
+        fileDialog.setFileMode(QtWidgets.QFileDialog.ExistingFiles)
+        stlList = fileDialog.getOpenFileNames(self,"Open STL files",r"C:\Users\mrtha\Desktop\GitHub\foamAutoGUI\src",filters)
+        print(stlList[0])
+        if(len(stlList[0])==0):
+            return
+        for stl in stlList[0]:
+            status = self.project.add_one_stl_file(stl)
+            if status==-1:
+                ampersandIO.printError(f"STL file {stl} not loaded",GUIMode=True,window=self)
+                #return
+            self.project.add_stl_to_project()
+            self.showSTL(stlFile=stl)
+        self.update_list()
+        self.readyStatusBar()
     
     def createSphere(self):
         #print("Create Sphere")
@@ -428,7 +466,16 @@ class mainWindow(QMainWindow):
             print("Radius: ",r)
         self.readyStatusBar()
 
-    
+    def resizeEvent(self, event):
+        print("Resizing")
+        self.window.resizeEvent(event)
+        #QtWidgets.QMainWindow.resizeEvent(self.window, event)
+        #self.vtkWidget.resize(self.window.widget.size())
+
+    def closeEventTriggered(self, event):
+        print("Closing")
+        self.close()
+
     def chooseInternalFlow(self):
         #print("Choose Internal Flow")
         self.project.internalFlow = True
@@ -564,15 +611,15 @@ class mainWindow(QMainWindow):
             self.window.checkBoxOnGround.setChecked(self.project.onGround)
         self.project_opened = True
         ampersandIO.printMessage(f"Project {self.project.project_name} created",GUIMode=True,window=self)
-        
+        self.window.setWindowTitle(f"Case Creator: {self.project.project_name}")
         # change window title
         self.setWindowTitle(f"Case Creator: {self.project.project_name}")
         self.readyStatusBar()
 
     def generateCase(self):
         self.updateStatusBar("Analyzing Case")
-        if(len(self.project.stl_files)>0):
-            self.project.analyze_stl_file()
+        #if(len(self.project.stl_files)>0):
+        #    self.project.analyze_stl_file()
         self.updateStatusBar("Creating Project Files")
         self.project.useFOs = True
         self.project.set_post_process_settings()
@@ -589,8 +636,8 @@ class mainWindow(QMainWindow):
 
     def saveCase(self):
         self.updateStatusBar("Analyzing case before saving")
-        if(len(self.project.stl_files)>0):
-            self.project.analyze_stl_file()
+        #if(len(self.project.stl_files)>0):
+        #    self.project.analyze_stl_file()
         self.updateStatusBar("Saving Case")
         self.updateTerminal("Saving Case")
         self.project.useFOs = True
@@ -600,7 +647,6 @@ class mainWindow(QMainWindow):
         self.updateTerminal("Case saved")
         self.updateTerminal("--------------------")
         self.readyStatusBar()
-
     
     def autoDomain(self):
         
@@ -691,6 +737,117 @@ class mainWindow(QMainWindow):
             #self.updateStatusBar(f"{stl}: Properties Updated")
             self.updateTerminal(f"{stl} Properties Updated")
             self.readyStatusBar()
+
+    def physicalPropertiesDialog(self):
+        physicalProperties = physicalPropertiesDialogDriver()
+
+    def boundaryConditionDialog(self):
+        boundaryConditions = boundaryConditionDialogDriver()
+
+    def numericsDialog(self):
+        numerics = numericsDialogDriver()  
+
+    def controlsDialog(self):
+        controls = controlsDialogDriver()
+
+    def vtkFitAll(self):
+        #print("Fitting all")
+        self.ren.ResetCamera()
+        self.vtkWidget.GetRenderWindow().Render()
+        #self.ren.ResetCamera()
+        #self.iren.Start()
+
+    def vtkPlusX(self):
+        #print("Plus X side")
+        self.ren.GetActiveCamera().SetPosition(1, 0, 0)
+        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
+        self.ren.ResetCamera()
+        self.vtkWidget.GetRenderWindow().Render()
+    
+    def vtkPlusY(self):
+        #print("Plus Y side")
+        self.ren.GetActiveCamera().SetPosition(0, 1, 0)
+        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
+        self.ren.ResetCamera()
+        self.vtkWidget.GetRenderWindow().Render()
+
+    def vtkPlusZ(self):
+        #print("Plus Z side")
+        self.ren.GetActiveCamera().SetPosition(0, 0, 1)
+        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
+        self.ren.ResetCamera()
+        self.vtkWidget.GetRenderWindow().Render()
+    
+    def vtkMinusX(self):
+        #print("Minus X side")
+        self.ren.GetActiveCamera().SetPosition(-1, 0, 0)
+        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
+        self.ren.ResetCamera()
+        self.vtkWidget.GetRenderWindow().Render()
+    
+    def vtkMinusY(self):
+        #print("Minus Y side")
+        self.ren.GetActiveCamera().SetPosition(0, -1, 0)
+        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
+        self.ren.ResetCamera()
+        self.vtkWidget.GetRenderWindow().Render()
+
+    def vtkMinusZ(self):
+        #print("Minus Z side")
+        self.ren.GetActiveCamera().SetPosition(0, 0, -1)
+        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
+        self.ren.ResetCamera()
+        self.vtkWidget.GetRenderWindow().Render()
+
+    def vtkShowWire(self):
+        #print("Show Wire")
+        actors = self.ren.GetActors()
+        for actor in actors:
+            actor.GetProperty().SetRepresentationToWireframe()
+        self.vtkWidget.GetRenderWindow().Render()
+    
+    def vtkShowSurface(self):
+        #print("Show Surface")
+        actors = self.ren.GetActors()
+        for actor in actors:
+            actor.GetProperty().SetRepresentationToSurface()
+            actor.GetProperty().EdgeVisibilityOff()
+        self.vtkWidget.GetRenderWindow().Render()
+
+    def vtkShowEdges(self):
+        #print("Show Edges")
+        actors = self.ren.GetActors()
+        for actor in actors:
+            actor.GetProperty().SetRepresentationToSurface()
+            actor.GetProperty().EdgeVisibilityOn()
+        self.vtkWidget.GetRenderWindow().Render()
+
+    def vtkHilightSTL(self,stlFile):
+        idx = 0
+        actors = self.ren.GetActors()
+        colors = vtk.vtkNamedColors()
+        actor_found = None
+        for actor in actors:
+            if actor.GetObjectName() in self.project.stl_names:
+                #print("Actor Name: ",actor.GetObjectName())
+                #print(f"Iteration: {idx}")
+                if actor.GetObjectName() == stlFile:
+                    #print("Actor Found: ",actor.GetObjectName())
+                    actor_found = actor
+                    actor_found.GetProperty().SetColor(1.0, 0.0, 1.0)
+                else:
+                    # reset colors for other colors
+                    actor.GetProperty().SetColor(colors.GetColor3d(self.listOfColors[idx]))
+                idx += 1
+        self.vtkWidget.GetRenderWindow().Render()
+
+
 #-------------- End of Event Handlers -------------#
 
 
