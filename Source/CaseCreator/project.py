@@ -92,6 +92,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         self.mod_options = ["Background Mesh","Add Geometry","Refinement Levels","Mesh Point","Boundary Conditions","Fluid Properties", "Numerical Settings", 
                    "Simulation Control Settings","Turbulence Model","Post Processing Settings"]
         self.minX, self.maxX, self.minY, self.maxY, self.minZ, self.maxZ = -1e-3, 1e-3, -1e-3, 1e-3, -1e-3, 1e-3
+        self.lenX, self.lenY, self.lenZ = 2e-3, 2e-3, 2e-3
     #--------------------------------------------------------------------
     # Methods to handle the project summary and changes
     #--------------------------------------------------------------------
@@ -764,6 +765,56 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             return -1
         self.current_stl_file = stl_path
         return 0
+    
+    def add_one_stl_file(self,stl_file): # to only copy the STL file to the project directory and add it to the STL list
+        #stl_file = ampersandPrimitives.ask_for_file([("STL Geometry", "*.stl"), ("OBJ Geometry", "*.obj")],self.GUIMode)
+        if stl_file is None:
+            #ampersandIO.printWarning("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode)
+            ampersandIO.printMessage("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode,window=self.window)
+            return -1
+        if os.path.exists(stl_file):
+            # add the stl file to the project
+            # This is a bit confusing. 
+            # stl_name is the name of the file, stl_file is the path to the file
+            file_path_to_token = stl_file.split("/")
+            stl_name = file_path_to_token[-1]
+            if stl_name in self.stl_names:
+                #ampersandIO.printWarning(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode)
+                ampersandIO.printMessage(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode,window=self.window)
+                return -1
+            else: # this is to prevent the bug of having the same file added multiple times
+                if self.GUIMode:
+                    purpose = "wall"
+                    property = None
+                else:
+                    purpose = self.ask_purpose()
+                    property = self.set_property(purpose)
+                bounds = stlAnalysis.compute_bounding_box(stl_file)
+                bounds = tuple(bounds)
+                ampersandIO.printMessage(f"Bounds of the geometry: {bounds}",GUIMode=self.GUIMode,window=self.window)
+                if purpose == 'refinementRegion' or purpose == 'refinementSurface':
+                    featureEdges = False
+                else:  
+                    featureEdges = True
+                self.add_stl_to_mesh_settings(stl_name,purpose=purpose,property=property,featureEdges=featureEdges,bounds=bounds)
+            # this is the path to the constant/triSurface inside project directory where STL will be copied
+            stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_name)
+            try:
+                ampersandIO.printMessage(f"Copying {stl_name} to the project directory",GUIMode=self.GUIMode,window=self.window)
+                shutil.copy(stl_file, stl_path)
+            except OSError as error:
+                ampersandIO.printError(error,GUIMode=self.GUIMode)
+                return -1
+            try:
+                stlAnalysis.set_stl_solid_name(stl_path)
+            except Exception as error:
+                ampersandIO.printError(error,GUIMode=self.GUIMode)
+                return -1
+        else:
+            ampersandIO.printError("File does not exist. Aborting project creation.",GUIMode=self.GUIMode)
+            return -1
+        self.current_stl_file = stl_path
+        return 0
             
     # this is a wrapper of the primitives 
     def list_stl_files(self):
@@ -844,6 +895,19 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         self.meshSettings['domain']['ny'] = ny
         self.meshSettings['domain']['nz'] = nz
 
+    def update_max_stl_length(self,bounds):
+        # update the characteristic length based on the bounding box of the stl files
+        # the characteristic length is the maximum dimension of the bounding box
+        xmin, xmax, ymin, ymax, zmin, zmax = bounds
+        dx = xmax - xmin
+        dy = ymax - ymin
+        dz = zmax - zmin
+        self.lenX = max(dx,self.lenX)
+        self.lenY = max(dy,self.lenY)
+        self.lenZ = max(dz,self.lenZ)
+        
+
+
     def analyze_stl_file(self,stl_file_number=0):
         rho = self.physicalProperties['rho']
         nu = self.physicalProperties['nu']
@@ -866,6 +930,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                                                                            onGround=self.onGround,internalFlow=self.internalFlow,
                                                                            refinement=self.refinement,halfModel=self.halfModel,
                                                                            GUI=self.GUIMode,window=self.window)
+        self.update_max_stl_length(stlBoundingBox)
         featureLevel = max(refLevel,1)
         self.meshSettings = stlAnalysis.set_mesh_settings(self.meshSettings, domain_size, nx, ny, nz, refLevel, featureLevel,nLayers=nLayers) 
         self.set_max_domain_size(domain_size,nx,ny,nz)

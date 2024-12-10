@@ -230,7 +230,19 @@ class stlAnalysis:
         
         # Calculate the bounding box
         bounds = poly_data.GetBounds()
-        # xmin, xmax, ymin, ymax, zmin, zmax = bounds
+        xmin, xmax, ymin, ymax, zmin, zmax = bounds
+        # if the bounding box is too small, increase the size
+        # this is to avoid division by zero problems
+        if xmax - xmin < 1e-4:
+            xmax += 1e-4
+            xmin -= 1e-4
+        if ymax - ymin < 1e-4:
+            ymax += 1e-4
+            ymin -= 1e-4
+        if zmax - zmin < 1e-4:
+            zmax += 1e-4
+            zmin -= 1e-4
+        bounds = (xmin, xmax, ymin, ymax, zmin, zmax)
         # Optionally, return the bounding box as a tuple
         return bounds
     
