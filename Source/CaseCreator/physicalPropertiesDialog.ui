@@ -174,7 +174,7 @@
    <property name="frameShadow">
     <enum>QFrame::Sunken</enum>
    </property>
-   <widget class="QLineEdit" name="lineEditNu">
+   <widget class="QLineEdit" name="lineEditMu">
     <property name="geometry">
      <rect>
       <x>120</x>

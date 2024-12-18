@@ -1,5 +1,5 @@
 water_liquid:
-  rho: 1000
+  density: 1000
   nu: 1.0e-06
   Pr: 0.7
   Cp: 1000
@@ -12,3 +12,18 @@ water_vapor:
   Cp: 2000
   TRef: 300
   pRef: 0
+air:
+  rho: 1.2
+  nu: 1.5e-05
+  Pr: 0.7
+  Cp: 1000
+  TRef: 300
+  pRef: 0
+methane:
+  rho: 0.668
+  nu: 1.5e-05
+  Pr: 0.7
+  Cp: 2000
+  TRef: 300
+  pRef: 0
+

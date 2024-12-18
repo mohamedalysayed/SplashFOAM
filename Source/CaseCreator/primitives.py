@@ -33,16 +33,18 @@ class ampersandPrimitives:
     
     @staticmethod
     def list_stl_files(stl_files, GUIMode=False, window=None):
+        """
         if GUIMode:
             stl_names = [stl_file['name'] for stl_file in stl_files]
             #window.listWidgetObjList.clear()
             for i in range(len(stl_names)):
                 ampersandIO.printMessage(f"{i+1}. {stl_names[i]}",GUIMode=GUIMode,window=window) 
             return 0
+        """
         i = 1
-        ampersandIO.show_title("STL Files")
+        ampersandIO.show_title("STL Files",GUIMode=GUIMode,window=window)
         
-        ampersandIO.printMessage(f"{'No.':<5}{'Name':<20}{'Purpose':<20}{'RefineMent':<15}{'Property':<15}")
+        ampersandIO.printMessage(f"{'No.':<5}{'Name':<20}{'Purpose':<20}{'RefineMent':<15}{'Property':<15}",GUIMode=GUIMode,window=window)
         for stl_file in stl_files:
             if(stl_file['property']==None):
                 stl_property = "None"
@@ -61,9 +63,9 @@ class ampersandPrimitives:
                 #stl_property = f"[{stl_file['property'][0]} {stl_file['property'][1]} {stl_file['property'][2]}]"
             else:
                 stl_property = stl_file['property']
-            ampersandIO.printMessage(f"{i:<5}{stl_file['name']:<20}{stl_file['purpose']:<20}({stl_file['refineMin']} {stl_file['refineMax']}{')':<11}{stl_property:<15}")
+            ampersandIO.printMessage(f"{i:<5}{stl_file['name']:<20}{stl_file['purpose']:<20}({stl_file['refineMin']} {stl_file['refineMax']}{')':<11}{stl_property:<15}",GUIMode=GUIMode,window=window)
             i += 1
-        ampersandIO.show_line()
+        ampersandIO.show_line(GUIMode=GUIMode,window=window)
         return 0
 
     @staticmethod
@@ -343,6 +345,9 @@ class ampersandIO:
         else:
             print(*args)
 
+        # set cursor to the end of the text
+        #window.terminal.moveCursor(QTextCursor.End)
+
     @staticmethod
     def printWarning(*args, GUIMode=False):
         if GUIMode:
@@ -457,15 +462,15 @@ class ampersandIO:
         return choice-1
     
     @staticmethod
-    def show_title(title):
+    def show_title(title, GUIMode=False, window=None):
         total_len = 60
         half_len = (total_len - len(title))//2
         title = "-"*half_len + title + "-"*half_len
-        ampersandIO.printMessage("\n" + title  )
+        ampersandIO.printMessage("\n" + title, GUIMode=GUIMode, window=window)
 
     @staticmethod
-    def show_line():
-        ampersandIO.printMessage("-"*60)
+    def show_line(GUIMode=False, window=None):
+        ampersandIO.printMessage("-"*60,GUIMode=GUIMode,window=window)
 
     @staticmethod
     def printFormat(item_name, item_value, GUIMode=False, window=None):

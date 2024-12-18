@@ -57,6 +57,7 @@ def create_project():
     ampersandIO.printMessage("Fluid properties and inlet values are necessary for mesh size calculations")
     project.set_fluid_properties()
     project.set_inlet_values()
+    project.ask_transient()
     project.set_transient_settings()
     project.set_parallel()
     project.ask_half_model()
