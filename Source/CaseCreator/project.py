@@ -113,7 +113,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
 
     def summarize_project(self):
         trueFalse = {True: 'Yes', False: 'No'}
-        ampersandIO.show_title("Project Summary")
+        ampersandIO.show_title("Project Summary",GUIMode=self.GUIMode,window=self.window)
         #ampersandIO.printMessage(f"Project directory: {self.project_directory_path}")
         ampersandIO.printFormat("Project name", self.project_name, GUIMode=self.GUIMode,window=self.window)
         ampersandIO.printFormat("Project path", self.project_path, GUIMode=self.GUIMode,window=self.window)
@@ -137,11 +137,11 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         nx = self.meshSettings['domain']['nx']
         ny = self.meshSettings['domain']['ny']
         nz = self.meshSettings['domain']['nz']
-        ampersandIO.printMessage(f"Domain size:{'X':>10}{'Y':>10}{'Z':>10}")
-        ampersandIO.printMessage(f"Min         {minX:>10.3f}{minY:>10.3f}{minZ:>10.3f}")
-        ampersandIO.printMessage(f"Max         {maxX:>10.3f}{maxY:>10.3f}{maxZ:>10.3f}")
-        ampersandIO.printMessage(f"Background mesh size: {nx}x{ny}x{nz} cells")
-        ampersandIO.printMessage(f"Background cell size: {self.meshSettings['maxCellSize']} m")
+        ampersandIO.printMessage(f"Domain size:{'X':>10}{'Y':>10}{'Z':>10}",GUIMode=self.GUIMode,window=self.window)
+        ampersandIO.printMessage(f"Min         {minX:>10.3f}{minY:>10.3f}{minZ:>10.3f}",GUIMode=self.GUIMode,window=self.window)
+        ampersandIO.printMessage(f"Max         {maxX:>10.3f}{maxY:>10.3f}{maxZ:>10.3f}",GUIMode=self.GUIMode,window=self.window)
+        ampersandIO.printMessage(f"Background mesh size: {nx}x{ny}x{nz} cells",GUIMode=self.GUIMode,window=self.window)
+        ampersandIO.printMessage(f"Background cell size: {self.meshSettings['maxCellSize']} m",GUIMode=self.GUIMode,window=self.window)
     
       
     def change_boundary_condition(self,bcName,newBC):
@@ -691,6 +691,18 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                 return purpose,refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds
         return None
     
+    def get_stl(self,stl_file_name):
+        for stl in self.stl_files:
+            if stl['name'] == stl_file_name:
+                return stl
+        return None
+    
+    def get_stl_index(self,stl_file_name):
+        for idx,stl in enumerate(self.stl_files):
+            if stl['name'] == stl_file_name:
+                return idx
+        return -1
+    
     def set_stl_properties(self,stl_file_name,stl_properties):
         refMin,refMax,refLevel,nLayers,usage,edgeRefine,ami,property = stl_properties
         #refMin,refMax,featureLevel,nLayers,property,bounds = stl_properties
@@ -883,6 +895,24 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             self.halfModel = False
             self.meshSettings['halfModel'] = False
 
+    def get_domain_size(self):
+        minx = self.meshSettings['domain']['minx']
+        maxx = self.meshSettings['domain']['maxx']
+        miny = self.meshSettings['domain']['miny']
+        maxy = self.meshSettings['domain']['maxy']
+        minz = self.meshSettings['domain']['minz']
+        maxz = self.meshSettings['domain']['maxz']
+        nx = self.meshSettings['domain']['nx']
+        ny = self.meshSettings['domain']['ny']
+        nz = self.meshSettings['domain']['nz']
+        return minx,maxx,miny,maxy,minz,maxz,nx,ny,nz
+    
+    def update_max_lengths(self):
+        minx,maxx,miny,maxy,minz,maxz,nx,ny,nz = self.get_domain_size()
+        self.lenX = maxx - minx
+        self.lenY = maxy - miny
+        self.lenZ = maxz - minz
+
     def set_max_domain_size(self,domain_size,nx,ny,nz):
         self.minX = min(domain_size[0],self.minX)
         self.maxX = max(domain_size[1],self.maxX)
@@ -906,7 +936,20 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         self.lenY = max(dy,self.lenY)
         self.lenZ = max(dz,self.lenZ)
         
+    def set_domain_size(self,stl_name):
+        if stl_name is None:
+            ampersandIO.printError("No stl file selected. Aborting operation",GUIMode=self.GUIMode)
+            return -1
+        
+        stl_idx = self.get_stl_index(stl_name)
+        if stl_idx == -1:
+            ampersandIO.printError("STL file not found. Aborting operation",GUIMode=self.GUIMode)
+            return -1
+        stl_file = self.stl_files[stl_idx]
+        stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_name)
+        stlBoundingBox = stlAnalysis.compute_bounding_box(stl_path)
 
+        
 
     def analyze_stl_file(self,stl_file_number=0):
         rho = self.physicalProperties['rho']
@@ -1022,17 +1065,25 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         turbulence_model = ampersandDataInput.choose_turbulence_model()
         self.solverSettings['turbulenceModel'] = turbulence_model
     
+    def ask_transient_settings(self):
+        self.simulationSettings['endTime'] = ampersandIO.get_input_float("End time: ")
+        self.simulationSettings['writeInterval'] = ampersandIO.get_input_float("Write interval: ")
+        self.simulationSettings['deltaT'] = ampersandIO.get_input_float("Time step: ")
     
     def set_transient_settings(self):
-        self.ask_transient()
+        #self.ask_transient()
         if self.transient:
             ampersandIO.printMessage("Transient simulation settings")
             self.simulationSettings['transient'] = True
             self.simulationSettings['application'] = 'pimpleFoam'
             self.simulationFlowSettings['solver'] = 'pimpleFoam'
-            self.simulationSettings['endTime'] = ampersandIO.get_input_float("End time: ")
-            self.simulationSettings['writeInterval'] = ampersandIO.get_input_float("Write interval: ")
-            self.simulationSettings['deltaT'] = ampersandIO.get_input_float("Time step: ")
+            if not self.GUIMode:
+                self.ask_transient_settings()
+            else:
+                pass
+                #self.simulationSettings['endTime'] = ampersandIO.get_input_float("End time: ")
+                #self.simulationSettings['writeInterval'] = ampersandIO.get_input_float("Write interval: ")
+                #self.simulationSettings['deltaT'] = ampersandIO.get_input_float("Time step: ")
             self.simulationSettings['adjustTimeStep'] = 'no'
             self.simulationSettings['maxCo'] = 0.9
             self.numericalSettings['ddtSchemes']['default'] = 'Euler'
@@ -1093,7 +1144,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         if os.path.exists("0.orig"):
             shutil.rmtree("0.orig")
         # create the initial conditions file
-        ampersandIO.printMessage("Creating boundary conditions")
+        ampersandIO.printMessage("Creating boundary conditions",GUIMode=self.GUIMode,window=self.window)
         # check if the 0 directory exists
         if not os.path.exists("0"):
             # create the 0 directory

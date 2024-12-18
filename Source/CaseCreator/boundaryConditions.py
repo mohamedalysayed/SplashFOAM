@@ -22,7 +22,7 @@
 # This is an early version of the script and will be updated in the future.
 # Brute force writing is used instead of a more elegant solution.
 #import yaml
-from primitives import ampersandPrimitives
+from primitives import ampersandPrimitives, ampersandIO
 from constants import meshSettings, boundaryConditions, inletValues
 from stlAnalysis import stlAnalysis
 
@@ -247,7 +247,7 @@ def create_boundary_conditions(meshSettings, boundaryConditions, nu=1.e-5):
     nut_file = create_nut_file(meshSettings, boundaryConditions)
     #print(p_file)
     #print(u_file)
-    print("Creating boundary conditions files")
+    #print("Creating boundary conditions files")
     ampersandPrimitives.write_to_file("U", u_file)
    
     ampersandPrimitives.write_to_file("p", p_file)

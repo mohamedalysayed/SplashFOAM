@@ -122,6 +122,7 @@ meshSettings = {
 
 physicalProperties = {
     'name': 'physicalProperties',
+    'fluid': 'Air',
     'rho': 1.0,
     'nu': 1.0e-6,
     'g': [0, 0, -9.81],
