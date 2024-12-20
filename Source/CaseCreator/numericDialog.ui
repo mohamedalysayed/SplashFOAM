@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Numerical Settings</string>
   </property>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="comboBoxGradient">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -49,7 +49,7 @@
     <string>Divergence Schemes</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_2">
+  <widget class="QComboBox" name="comboBoxDivergence">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -72,7 +72,7 @@
     <string>Laplacian Schemes</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_3">
+  <widget class="QComboBox" name="comboBoxLaplacian">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -95,7 +95,7 @@
     <string>Temporal Schemes</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_4">
+  <widget class="QComboBox" name="comboBoxTemporal">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -105,7 +105,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="pushButtonOK">
    <property name="geometry">
     <rect>
      <x>50</x>
@@ -118,7 +118,7 @@
     <string>OK</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="pushButtonCancel">
    <property name="geometry">
     <rect>
      <x>130</x>
@@ -131,7 +131,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3">
+  <widget class="QPushButton" name="pushButtonApply">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -144,7 +144,7 @@
     <string>Apply</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_4">
+  <widget class="QPushButton" name="pushButtonDefault">
    <property name="geometry">
     <rect>
      <x>290</x>
