@@ -83,8 +83,8 @@ meshSettings = {
                         'multiRegionFeatureSnap': 'false'},
 
     'addLayersControls': {'relativeSizes': 'true',
-                            'expansionRatio': 1.4,
-                            'finalLayerThickness': 0.3,
+                            'expansionRatio': 1.25,
+                            'finalLayerThickness': 0.4,
                             'firstLayerThickness': 0.001,
                             'minThickness': 1e-7,
                             'nGrow': 0,
@@ -102,7 +102,7 @@ meshSettings = {
                             },
 
     'meshQualityControls': {'maxNonOrtho': 70,
-                            'maxBoundarySkewness': 4,
+                            'maxBoundarySkewness': 20,
                             'maxInternalSkewness': 4,
                             'maxConcave': 80,
                             'minTetQuality': 1.0e-30,
@@ -144,6 +144,7 @@ numericalSettings = {
                    'div(phi,k)': 'Gauss upwind',
                    'div(phi,omega)': 'Gauss upwind',
                    'div(phi,epsilon)': 'Gauss upwind',
+                   'div(phi,nuTilda)': 'Gauss upwind',
                    'div(phi,nut)': 'Gauss upwind',
                    'div(nuEff*dev(T(grad(U))))': 'Gauss linear',
                    },
@@ -157,11 +158,12 @@ numericalSettings = {
                    'pRefCell': 0, 'pRefValue': 0,
                    'residualControl': {'p': 1e-3, 'U': 1e-3, 
                                        'k': 1e-3, 'omega': 1e-3, 'epsilon': 1e-3, 
+                                       'nuTilda': 1e-3,
                                        'nut': 1e-3},
                    },
 
-    'relaxationFactors': {'U': 0.9, 'k': 0.7, 'omega': 0.7, 'epsilon': 0.7, 'nut': 0.7, 'p': 1.0}, 
-    'simpleDict':{'nNonOrthogonalCorrectors': 2, 'consistent': 'true', 'residualControl': {'U': 1e-4, 'p': 1e-4, 'k': 1e-4, 'omega': 1e-4, 'epsilon': 1e-4, 'nut': 1e-4}},
+    'relaxationFactors': {'U': 0.7, 'k': 0.7, 'omega': 0.7, 'epsilon': 0.7, 'nut': 0.7, 'nuTilda':0.7, 'p': 0.3}, 
+    'simpleDict':{'nNonOrthogonalCorrectors': 2, 'consistent': 'false', 'residualControl': {'U': 1e-4, 'p': 1e-4, 'k': 1e-4, 'omega': 1e-4, 'epsilon': 1e-4, 'nut': 1e-4, 'nuTilda': 1e-4}},
     'potentialFlowDict':{'nonOrthogonalCorrectors': 10},
 }
 
@@ -171,7 +173,7 @@ inletValues = {
     'k': 0.1,
     'omega': 1,
     'epsilon': 0.1,
-    'nut': 0,
+    'nut': 1e-6,
 }
 
 solverSettings = {
@@ -203,6 +205,10 @@ solverSettings = {
            'smoother': 'GaussSeidel',
            'tolerance': 1e-08,
            'relTol': 0.1},
+    'nuTilda': {'type': 'smoothSolver',
+           'smoother': 'GaussSeidel',
+           'tolerance': 1e-08,
+           'relTol': 0.1},
     'nut': {'type': 'smoothSolver',
            'smoother': 'GaussSeidel',
            'tolerance': 1e-08,
@@ -229,7 +235,8 @@ boundaryConditions = {
      'k_type': 'fixedValue','k_value': inletValues['k'],
      'omega_type': 'fixedValue','omega_value': inletValues['omega'],
      'epsilon_type': 'fixedValue','epsilon_value': inletValues['epsilon'],
-     'nut_type': 'calculated','nut_value': inletValues['nut']},
+     'nut_type': 'calculated','nut_value': inletValues['nut'],
+     'nutilda_type': 'fixedValue','nutilda_value': inletValues['nut']*3.0},
     
     'pressureOutlet':
     {'u_type': 'inletOutlet','u_value': [0, 0, 0],
@@ -237,7 +244,8 @@ boundaryConditions = {
      'k_type': 'zeroGradient','k_value': 1.0e-6,
      'omega_type': 'zeroGradient','omega_value': 1.0e-6,
      'epsilon_type': 'zeroGradient','epsilon_value': 1.0e-6,
-     'nut_type': 'calculated','nut_value': 0},
+     'nut_type': 'calculated','nut_value': 0,
+     'nutilda_type': 'zeroGradient','nutilda_value': '$internalField'},
 
     'wall':
     {'u_type': 'fixedValue','u_value': [0, 0, 0],
@@ -245,7 +253,8 @@ boundaryConditions = {
      'k_type': 'kqRWallFunction','k_value': '$internalField',
      'omega_type': 'omegaWallFunction','omega_value': '$internalField',
      'epsilon_type': 'epsilonWallFunction','epsilon_value': '$internalField',
-     'nut_type': 'nutkWallFunction','nut_value': '$internalField'},
+     'nut_type': 'nutkWallFunction','nut_value': '$internalField',
+     'nutilda_type': 'fixedValue','nutilda_value': '$internalField'},
 
     'movingWall':
     {'u_type': 'movingWallVelocity','u_value': [0, 0, 0],
@@ -253,7 +262,8 @@ boundaryConditions = {
      'k_type': 'kqRWallFunction','k_value': '$internalField',
      'omega_type': 'omegaWallFunction','omega_value': '$internalField',
      'epsilon_type': 'epsilonWallFunction','epsilon_value': '$internalField',
-     'nut_type': 'nutkWallFunction','nut_value': '$internalField'},
+     'nut_type': 'nutkWallFunction','nut_value': '$internalField',
+     'nutilda_type': 'fixedValue','nutilda_value':'$internalField'},
 }
 
 simulationSettings = {

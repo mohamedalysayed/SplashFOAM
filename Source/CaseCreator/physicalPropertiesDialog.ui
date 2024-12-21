@@ -13,40 +13,11 @@
   <property name="windowTitle">
    <string>Physical Properties</string>
   </property>
-  <widget class="QCheckBox" name="checkBoxTurbulenceOn">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>30</y>
-     <width>101</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Turbulence On</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>10</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Turbulence Modeling</string>
-   </property>
-  </widget>
   <widget class="QComboBox" name="comboBoxTurbulenceModels">
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>80</y>
+     <y>30</y>
      <width>181</width>
      <height>22</height>
     </rect>
@@ -56,7 +27,7 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>60</y>
+     <y>10</y>
      <width>141</width>
      <height>16</height>
     </rect>
@@ -69,7 +40,7 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>110</y>
+     <y>60</y>
      <width>181</width>
      <height>131</height>
     </rect>

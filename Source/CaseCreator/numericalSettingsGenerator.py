@@ -33,7 +33,7 @@ PIMPLE
     pRefValue {numericalSettings['pimpleDict']['pRefValue']};
     residualControl
     {{
-        "(U|k|omega|epsilon|nut)" 
+        "(U|k|omega|epsilon|nuTilda|nut)" 
         {{
             tolerance {numericalSettings['pimpleDict']['residualControl']['U']};
             relTol 0;
@@ -57,6 +57,7 @@ SIMPLE
         omega {numericalSettings['simpleDict']['residualControl']['omega']};
         epsilon {numericalSettings['simpleDict']['residualControl']['epsilon']};
         nut {numericalSettings['simpleDict']['residualControl']['nut']};
+        nuTilda {numericalSettings['simpleDict']['residualControl']['nuTilda']};
     }}
 }}
 potentialFlow
@@ -72,6 +73,7 @@ relaxationFactors
         k {numericalSettings['relaxationFactors']['k']};
         omega {numericalSettings['relaxationFactors']['omega']};
         epsilon {numericalSettings['relaxationFactors']['epsilon']};
+        nuTilda {numericalSettings['relaxationFactors']['nuTilda']};
         nut {numericalSettings['relaxationFactors']['nut']};
     }}
     fields
@@ -120,13 +122,13 @@ def create_solverFinalDict(solverSettings,solverName="U"):
     
     solverDict = f""
     solverDict += f"""
-    {solverName}Final
-    {{
-        ${solverName}
-        tolerance {solverSettings[solverName]['tolerance']/100.};
-        relTol 0;  
-    }}
-    """
+{solverName}Final
+{{
+    ${solverName}
+    tolerance {solverSettings[solverName]['tolerance']/100.};
+    relTol 0;  
+}}
+"""
     return solverDict
 
 def create_fvSolutionDict(numericalSettings,solverSettings):
@@ -166,6 +168,7 @@ divSchemes
     div(phi,k) {numericalSettings['divSchemes']['div(phi,k)']};
     div(phi,omega) {numericalSettings['divSchemes']['div(phi,omega)']};
     div(phi,epsilon) {numericalSettings['divSchemes']['div(phi,epsilon)']};
+    div(phi,nuTilda) {numericalSettings['divSchemes']['div(phi,nuTilda)']};
     div(phi,nut) {numericalSettings['divSchemes']['div(phi,nut)']};
     div(nuEff*dev(T(grad(U)))) {numericalSettings['divSchemes']['div(nuEff*dev(T(grad(U))))']};
 }}

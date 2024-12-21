@@ -33,6 +33,14 @@ nu              nu [ 0 2 -1 0 0 0 0 ] {transportProperties['nu']};
 
 def create_turbulencePropertiesDict(turbulenceProperties):
     header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="turbulenceProperties")
+    turbulenceModel = turbulenceProperties['turbulenceModel']
+    if turbulenceModel == "laminar":
+        turbulencePropertiesDict = f""+header
+        turbulenceProperties_ = f"""
+simulationType  laminar;"""
+        turbulencePropertiesDict += turbulenceProperties_
+        return turbulencePropertiesDict
+     
     turbulencePropertiesDict = f""+header
     turbulenceProperties_ = f"""
 simulationType  RAS;

@@ -38,6 +38,7 @@ from surfaceExtractor import create_surfaceFeatureExtractDict
 from transportAndTurbulence import create_transportPropertiesDict, create_turbulencePropertiesDict
 #from transportAndTurbulence import write_transportPropertiesDict, write_turbulencePropertiesDict
 from boundaryConditionsGenerator import create_boundary_conditions
+#from boundaryConditions import create_boundary_conditions
 from controlDictGenerator import createControlDict
 from numericalSettingsGenerator import create_fvSchemesDict, create_fvSolutionDict
 from scriptGenerator import ScriptGenerator
@@ -458,6 +459,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
 
     # write current settings to the project_settings.yaml file inside the project directory
     def write_settings(self):
+        self.meshSettings['onGround'] = self.onGround
         settings = {
             'meshSettings': self.meshSettings,
             'physicalProperties': self.physicalProperties,
@@ -471,6 +473,10 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             'postProcessSettings': self.postProcessSettings
         }
         #print(self.meshSettings)
+        #print(self.physicalProperties)
+        #print(self.numericalSettings)
+        #print(self.inletValues)
+        #print(self.boundaryConditions)
         ampersandIO.printMessage("Writing settings to project_settings.yaml",GUIMode=self.GUIMode,window=self.window)
         ampersandPrimitives.dict_to_yaml(settings, 'project_settings.yaml')
 
@@ -532,6 +538,8 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         ampersandIO.print_dict(self.simulationFlowSettings)
         ampersandIO.printMessage("Post Process Settings")
         ampersandIO.print_dict(self.postProcessSettings)
+
+    
 
     # If the project is not existing, load the default settings
     def load_default_settings(self):
@@ -597,6 +605,16 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             self.stl_files[idx] = stl_
             return 1 # flag to indicate that the stl file is replaced
         return 0
+    
+    def remove_stl_from_mesh_settings(self,stl_name):
+        idx = 0
+        for stl in self.meshSettings['geometry']:
+            if stl['name'] == stl_name:
+                self.meshSettings['geometry'].pop(idx)
+                return 0
+            idx += 1
+        return -1
+             
 
     
 
@@ -631,6 +649,9 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         else:
             property = None
         return property
+    
+    def set_numerical_settings(self,numericalSettings):
+        self.numericalSettings = numericalSettings
     
     def set_property_gui(self,purpose='wall'):
         if purpose == 'inlet':
@@ -691,6 +712,18 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                 return purpose,refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds
         return None
     
+    def show_stl_properties(self,stl_file_name):
+        purpose,refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds = self.get_stl_properties(stl_file_name)
+        ampersandIO.printMessage(f"STL file: {stl_file_name}")
+        ampersandIO.printMessage(f"Purpose: {purpose}")
+        ampersandIO.printMessage(f"Refinement Min: {refMin}")
+        ampersandIO.printMessage(f"Refinement Max: {refMax}")
+        ampersandIO.printMessage(f"Feature Edges: {featureEdges}")
+        ampersandIO.printMessage(f"Feature Level: {featureLevel}")
+        ampersandIO.printMessage(f"Number of Layers: {nLayers}")
+        ampersandIO.printMessage(f"Property: {property}")
+        ampersandIO.printMessage(f"Bounds: {bounds}")
+    
     def get_stl(self,stl_file_name):
         for stl in self.stl_files:
             if stl['name'] == stl_file_name:
@@ -702,6 +735,13 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             if stl['name'] == stl_file_name:
                 return idx
         return -1
+    
+    def get_location_in_mesh(self):
+        return self.meshSettings["castellatedMeshControls"]["locationInMesh"]
+    
+    def set_location_in_mesh(self,locationInMesh):
+        print(locationInMesh)
+        self.meshSettings["castellatedMeshControls"]["locationInMesh"] = locationInMesh
     
     def set_stl_properties(self,stl_file_name,stl_properties):
         refMin,refMax,refLevel,nLayers,usage,edgeRefine,ami,property = stl_properties
@@ -717,9 +757,28 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                 stl['featureEdges'] = edgeRefine
                 stl['featureLevel'] = refMin
                 stl['nLayers'] = nLayers
-                stl['property'] = property
+                
                 #stl['bounds'] = bounds
+                if usage == 'Cell_Zone':
+                    stl['property'] = (refLevel,ami)
+                elif usage == 'Refinement_Region':
+                    stl['property'] = refLevel
+                elif usage == 'Refinement_Surface':
+                    stl['property'] = refLevel
+                else:
+                    stl['property'] = property
                 return 0
+        return -1
+    
+    def set_boundary_condition(self,stl_file_name,boundary_condition):
+        for stl in self.meshSettings['geometry']:
+            if stl['name'] == stl_file_name:
+                if stl['purpose'] == 'inlet':
+                    # set the inlet values
+                    stl['property'] = list(boundary_condition[0])
+                return 0
+            
+        print("Failed setting boundary condition. STL file not found")
         return -1
 
     def add_stl_to_project(self):
@@ -839,11 +898,33 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             #ampersandIO.printMessage(stl_path)
             stl_paths.append(stl_path)
         return stl_paths
+    
+    def remove_stl_file_by_name(self,stl_name):
+        print("Before removing")
+        self.list_stl_files()
+        for stl in self.stl_files:
+            if stl['name'] == stl_name:
+                self.stl_files.remove(stl)
+                self.remove_stl_from_mesh_settings(stl_name)
+                if stl_name in self.stl_names:
+                    self.stl_names.remove(stl_name)
+                #stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_name)
+                #try:
+                #    os.remove(stl_path)
+                #except OSError as error:
+                #    ampersandIO.printError(error)
+                #    return -1
+                print(f"STL file {stl_name} removed from the project")
+                self.list_stl_files()
+                print(self.stl_files)
+                return 0
+        self.list_stl_files()
+        return -1
 
 
     def remove_stl_file(self,stl_file_number=0):
         #self.list_stl_files()
-        stl_file_number = ampersandIO.get_input("Enter the number of the file to remove: ")
+        #stl_file_number = ampersandIO.get_input("Enter the number of the file to remove: ")
         try:
             stl_file_number = int(stl_file_number)
         except ValueError:
@@ -906,6 +987,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         ny = self.meshSettings['domain']['ny']
         nz = self.meshSettings['domain']['nz']
         return minx,maxx,miny,maxy,minz,maxz,nx,ny,nz
+    
     
     def update_max_lengths(self):
         minx,maxx,miny,maxy,minz,maxz,nx,ny,nz = self.get_domain_size()
