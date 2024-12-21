@@ -19,7 +19,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>251</width>
+      <width>261</width>
       <height>811</height>
      </rect>
     </property>
@@ -153,8 +153,8 @@
      <property name="geometry">
       <rect>
        <x>190</x>
-       <y>220</y>
-       <width>61</width>
+       <y>210</y>
+       <width>71</width>
        <height>31</height>
       </rect>
      </property>
@@ -465,8 +465,8 @@
      <property name="geometry">
       <rect>
        <x>190</x>
-       <y>260</y>
-       <width>61</width>
+       <y>240</y>
+       <width>71</width>
        <height>31</height>
       </rect>
      </property>
@@ -513,13 +513,26 @@
       <string>Summarize</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButtonMeshPoint">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>270</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Mesh Point</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>280</x>
       <y>10</y>
-      <width>271</width>
+      <width>261</width>
       <height>621</height>
      </rect>
     </property>
@@ -532,9 +545,9 @@
     <widget class="QListWidget" name="listWidgetObjList">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>30</y>
-       <width>241</width>
+       <width>251</width>
        <height>231</height>
       </rect>
      </property>
@@ -556,7 +569,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>270</y>
+       <y>290</y>
        <width>81</width>
        <height>16</height>
       </rect>
@@ -569,7 +582,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>300</y>
+       <y>320</y>
        <width>241</width>
        <height>311</height>
       </rect>
@@ -578,10 +591,10 @@
     <widget class="QPushButton" name="pushButtonUpList">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>60</y>
-       <width>21</width>
-       <height>71</height>
+       <x>100</x>
+       <y>260</y>
+       <width>41</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
@@ -591,14 +604,40 @@
     <widget class="QPushButton" name="pushButtonDownList">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>140</y>
-       <width>21</width>
-       <height>81</height>
+       <x>140</x>
+       <y>260</y>
+       <width>41</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
       <string>⌄</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonAddSTL">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>260</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>+</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonRemoveSTL">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>260</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>-</string>
      </property>
     </widget>
    </widget>
@@ -606,13 +645,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>700</y>
+      <y>620</y>
       <width>831</width>
-      <height>131</height>
+      <height>201</height>
      </rect>
     </property>
-    <property name="mouseTracking">
-     <bool>true</bool>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>14</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustToContents</enum>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -624,7 +670,7 @@
       <x>550</x>
       <y>40</y>
       <width>831</width>
-      <height>651</height>
+      <height>571</height>
      </rect>
     </property>
    </widget>

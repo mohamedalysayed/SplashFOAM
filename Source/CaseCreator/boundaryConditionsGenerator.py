@@ -537,6 +537,116 @@ def create_epsilon_file(meshSettings,boundaryConditions,nu=1.0e-5):
 }"""
     return epsilon_file
 
+def create_nutilda_file(meshSettings,boundaryConditions,nu=1.0e-5):
+    header = ampersandPrimitives.createFoamHeader(className="volScalarField", objectName="nuTilda")
+    dims = ampersandPrimitives.createDimensions(M=0,L=2,T=-1)
+    internalField = ampersandPrimitives.createInternalFieldScalar(type="uniform", value=1.0e-6)
+    nutilda_file = f""+header+dims+internalField+"\n"+"""\nboundaryField 
+{
+    #includeEtc "caseDicts/setConstraintTypes"
+"""
+    # Loop through patches for each boundary condition
+    if(meshSettings['internalFlow'] == False):
+        for patch in meshSettings['patches']:
+            #print(patch)
+            nutilda_file += f"""
+    {patch['name']}"""
+            if(patch['type'] == 'patch' and patch['name'] == 'inlet'):
+                Umag = ampersandPrimitives.calc_Umag(boundaryConditions['velocityInlet']['u_value'])
+                I = 0.05 # turbulence intensity in %
+                k = 1.5*(Umag*I)**2
+                nut = 100.*nu
+                epsilon = 0.09*k**2/nu*(nut/nu)**(-1)
+                nutilda = 3.0*nut
+                # add epsilon boundary condition
+                nutilda_file += f"""
+    {{
+        type {boundaryConditions['velocityInlet']['nutilda_type']};
+        value uniform {nutilda};
+    }}
+    """
+            if(patch['type'] == 'patch' and patch['name'] == 'outlet'):
+                nutilda_file += f"""
+    {{
+        type {boundaryConditions['pressureOutlet']['nutilda_type']};
+        value uniform {boundaryConditions['pressureOutlet']['nutilda_value']};
+    }}
+    """
+            if(patch['type'] == 'wall'):
+                nutilda_file += f"""
+    {{
+        type {boundaryConditions['wall']['nutilda_type']};
+        value uniform {boundaryConditions['wall']['nutilda_value']};
+    }}
+    """
+            if(patch['type'] == 'movingWall'):
+                nutilda_file += f"""
+    {{
+        type {boundaryConditions['movingWall']['nutilda_type']};
+        value uniform {boundaryConditions['movingWall']['nutilda_value']};
+    }}
+    """
+            if(patch['type'] == 'symmetry'):
+                nutilda_file += f"""
+    {{
+        type symmetry;
+    }}
+    """
+                
+    # If internal flow and half domain, set the symmetry boundary conditions
+    # for the back patche
+    if(meshSettings['internalFlow'] == True and meshSettings['halfModel'] == True):
+        nutilda_file += f"""
+    back
+    {{
+        type symmetry;
+    }}
+    """
+                
+    for patch in meshSettings['geometry']:
+        if(patch['type'] == 'triSurfaceMesh'):
+            if(patch['purpose'] == 'wall'):
+                nutilda_file += f"""
+    "{patch['name'][:-4]}.*"
+    {{
+        type {boundaryConditions['wall']['nutilda_type']};
+        value  {boundaryConditions['wall']['nutilda_value']};
+    }}
+    """
+            elif(patch['purpose'] == 'inlet'):
+                if(patch['bounds'] != None):
+                    charLen = stlAnalysis.getMaxSTLDim(patch['bounds'])
+                    l = 0.07*charLen # turbulent length scale
+                    Umag = ampersandPrimitives.calc_Umag(patch['property'])
+                    I = 0.01 # turbulence intensity in %
+                    k = 1.5*(Umag*I)**2
+                    epsilon = 0.09**(3./4.)*k**(3./2.)/l
+                    nut = 100.*nu
+                    nutilda = 3.0*nut
+                else:
+                    epsilon = 1.0e-6 # default value
+                nutilda_file += f"""
+    "{patch['name'][:-4]}.*"
+    {{
+        type {boundaryConditions['velocityInlet']['nutilda_type']};
+        value uniform {nutilda};
+    }}
+    """  
+            elif(patch['purpose'] == 'outlet'):
+                nutilda_file += f"""
+    "{patch['name'][:-4]}.*"
+    {{
+        type {boundaryConditions['pressureOutlet']['nutilda_type']};
+        value uniform {boundaryConditions['pressureOutlet']['nutilda_value']};
+    }}
+    """
+            else:
+                pass 
+        
+    nutilda_file += """
+}"""
+    return nutilda_file
+
 def create_nut_file(meshSettings,boundaryConditions):
     header = ampersandPrimitives.createFoamHeader(className="volScalarField", objectName="nut")
     dims = ampersandPrimitives.createDimensions(M=0,L=2,T=-1)
@@ -652,6 +762,7 @@ def create_boundary_conditions(meshSettings, boundaryConditions, nu=1.e-5):
     omega_file = create_omega_file(meshSettings, boundaryConditions)
     epsilon_file = create_epsilon_file(meshSettings, boundaryConditions)
     nut_file = create_nut_file(meshSettings, boundaryConditions)
+    nutilda_file = create_nutilda_file(meshSettings, boundaryConditions)
     #print(p_file)
     #print(u_file)
     print("Creating boundary conditions files")
@@ -666,6 +777,8 @@ def create_boundary_conditions(meshSettings, boundaryConditions, nu=1.e-5):
     ampersandPrimitives.write_to_file("epsilon", epsilon_file)
 
     ampersandPrimitives.write_to_file("nut", nut_file)
+
+    ampersandPrimitives.write_to_file("nuTilda", nutilda_file)
 
 
 

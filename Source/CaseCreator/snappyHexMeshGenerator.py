@@ -98,7 +98,7 @@ addLayers       {meshSettings['snappyHexSteps']['addLayers']};"""
             cellZone {an_entry['name'][:-4]};
             faceZone {an_entry['name'][:-4]};
             cellZoneInside inside;
-            boundary internal;
+            //boundary internal;
             faceType boundary;
         }}"""
                 else: # no patches. Just cellZone
@@ -221,7 +221,7 @@ addLayers       {meshSettings['snappyHexSteps']['addLayers']};"""
     {{
         {refinementRegions}
     }};
-    locationInMesh ({meshSettings['castellatedMeshControls']['locationInMesh'][0]} {meshSettings['castellatedMeshControls']['locationInMesh'][1]} {meshSettings['castellatedMeshControls']['locationInMesh'][2]});
+    locationInMesh ({meshSettings['castellatedMeshControls']['locationInMesh'][0]:.3f} {meshSettings['castellatedMeshControls']['locationInMesh'][1]:.3f} {meshSettings['castellatedMeshControls']['locationInMesh'][2]:.3f});
     allowFreeStandingZoneFaces {meshSettings['castellatedMeshControls']['allowFreeStandingZoneFaces']};
 }}"""
     
@@ -263,6 +263,12 @@ addLayers       {meshSettings['snappyHexSteps']['addLayers']};"""
             }}"""
             else:
                 pass
+    if meshSettings['onGround']:
+        layerControls += f"""
+            "bottom"
+            {{
+                nSurfaceLayers 3;
+            }}"""
     layerControls += f"""
     }};
     expansionRatio {meshSettings['addLayersControls']['expansionRatio']};

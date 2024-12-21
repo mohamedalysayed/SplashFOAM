@@ -30,8 +30,12 @@ def write_vector_boundary_condition(patch="inlet1", purpose="inlet", property=No
     """
     Write a vector boundary condition 
     """
-    property = [str(property[0]), str(property[1]), str(property[2])]
-    bc = f"""{patch} 
+    if property is None:
+        property = [0, 0, 0]
+    #else:
+    #    property = [str(property[0]), str(property[1]), str(property[2])]
+    bc = f"""
+    {patch} 
     {{"""
     # if the purpose is an inlet, then the velocity is specified
     if purpose == "inlet":
@@ -44,8 +48,8 @@ def write_vector_boundary_condition(patch="inlet1", purpose="inlet", property=No
         # write the pressure
         bc += f"""
         type            inletOutlet;
-        inletValue      uniform (0 0 0);
-        value           uniform (0 0 0);"""
+        inletValue      uniform ({property[0]} {property[1]} {property[2]});
+        value           uniform ({property[0]} {property[1]} {property[2]});"""
     # if the purpose is a wall, give a fixedValue boundary condition
     elif purpose == "wall":
         bc += f"""
@@ -58,74 +62,7 @@ def write_vector_boundary_condition(patch="inlet1", purpose="inlet", property=No
     else:
         raise ValueError("Invalid boundary condition type")
     bc += f"""
-    }}"""
-    return bc
-
-def write_turbulence_boundary_condition(patch="inlet1", purpose="inlet", 
-                                    property=None, wallFunction="kqRWallFunction"):
-    """
-    Write a scalar boundary condition
-    """
-    bc = f"""{patch} 
-    {{"""
-    # if the purpose is an inlet, then the fixedValue is specified
-    if purpose == "inlet":
-        # write the velocity
-        bc += f"""
-        type            fixedValue;
-        value           uniform {property};"""
-    # if the purpose is an outlet, give an inletOutlet boundary condition
-    elif purpose == "outlet":
-        # write the pressure
-        bc += f"""
-        type            inletOutlet;
-        inletValue      uniform 0;
-        value           uniform 0;"""
-    # if the purpose is a wall, give a fixedValue boundary condition
-    elif purpose == "wall":
-        bc += f"""
-        type            {wallFunction};
-        value           $internalField;"""
-    # if the purpose is a symmetry, give a symmetry boundary condition
-    elif purpose == "symmetry":
-        bc += f"""
-        type            symmetry;"""
-    else:
-        raise ValueError("Invalid boundary condition type")
-    bc += f"""
-    }}"""
-    return bc
-
-def write_pressure_boundary_condition(patch="inlet1", purpose="inlet", 
-                                    property=0.0):
-    """
-    Write a scalar boundary condition
-    """
-    bc = f"""{patch} 
-    {{"""
-    # if the purpose is an inlet, then the fixedValue is specified
-    if purpose == "inlet":
-        # write the velocity
-        bc += f"""
-        type            zeroGradient;"""
-    # if the purpose is an outlet, give an inletOutlet boundary condition
-    elif purpose == "outlet":
-        # write the pressure
-        bc += f"""
-        type            fixedValue;
-        value           uniform {property};""" # to define reference pressure
-    # if the purpose is a wall, give a fixedValue boundary condition
-    elif purpose == "wall":
-        bc += f"""
-        type            zeroGradient;"""
-    # if the purpose is a symmetry, give a symmetry boundary condition
-    elif purpose == "symmetry":
-        bc += f"""
-        type            symmetry;"""
-    else:
-        raise ValueError("Invalid boundary condition type")
-    bc += f"""
-    }}"""
+    }}\n"""
     return bc
 
 def create_scalar_file(meshSettings,boundaryConditions,objName="k",dimensions=(0,2,-2)):
@@ -146,14 +83,89 @@ def create_scalar_file(meshSettings,boundaryConditions,objName="k",dimensions=(0
             
     # If internal flow, set the boundary conditions for STL patches
     for patch in meshSettings['geometry']:
+        
         if(patch['type'] == 'triSurfaceMesh'):
             if(objName == "k" or objName == "epsilon" or objName == "omega"):
-                s_file += write_turbulence_boundary_condition(patch=aKey, purpose=anItem['purpose'], property=anItem['property'])
+                s_file += write_turbulence_boundary_condition(patch=patch["name"], purpose=patch['purpose'], property=patch['property'])
             elif(objName == "p"):
-                s_file += write_pressure_boundary_condition(patch=aKey, purpose=anItem['purpose'], property=anItem['property'])
+                s_file += write_pressure_boundary_condition(patch=patch["name"], purpose=patch['purpose'], property=patch['property'])
+            else:
+                raise ValueError("Invalid scalar field type")        
     s_file += """
 }"""
     return s_file
+
+def write_turbulence_boundary_condition(patch="inlet1", purpose="inlet", 
+                                    property=None, wallFunction="kqRWallFunction"):
+    """
+    Write a scalar boundary condition
+    """
+    bc = f"""
+    {patch} 
+    {{"""
+    # if the purpose is an inlet, then the fixedValue is specified
+    if purpose == "inlet":
+        # write the velocity
+        bc += f"""
+        type            fixedValue;
+        value           uniform {property};"""
+    # if the purpose is an outlet, give an inletOutlet boundary condition
+    elif purpose == "outlet":
+        # write the pressure
+        bc += f"""
+        type            inletOutlet;
+        inletValue      uniform 1e-6;
+        value           uniform 1e-6;"""
+    # if the purpose is a wall, give a fixedValue boundary condition
+    elif purpose == "wall":
+        bc += f"""
+        type            {wallFunction};
+        value           $internalField;"""
+    # if the purpose is a symmetry, give a symmetry boundary condition
+    elif purpose == "symmetry":
+        bc += f"""
+        type            symmetry;"""
+    else:
+        raise ValueError("Invalid boundary condition type")
+    bc += f"""
+    }}\n"""
+    return bc
+
+def write_pressure_boundary_condition(patch="inlet1", purpose="inlet", 
+                                    property=0.0):
+    """
+    Write a scalar boundary condition
+    """
+    bc = f"""
+    {patch} 
+    {{"""
+    # if the purpose is an inlet, then the fixedValue is specified
+    if purpose == "inlet":
+        # write the velocity
+        bc += f"""
+        type            zeroGradient;"""
+    # if the purpose is an outlet, give an inletOutlet boundary condition
+    elif purpose == "outlet":
+        # write the pressure
+        if property is None:
+            property = 0.0
+        bc += f"""
+        type            fixedValue;
+        value           uniform {property};""" # to define reference pressure
+    # if the purpose is a wall, give a fixedValue boundary condition
+    elif purpose == "wall":
+        bc += f"""
+        type            zeroGradient;"""
+    # if the purpose is a symmetry, give a symmetry boundary condition
+    elif purpose == "symmetry":
+        bc += f"""
+        type            symmetry;"""
+    else:
+        raise ValueError("Invalid boundary condition type")
+    bc += f"""
+    }}\n"""
+    return bc
+
 
 def create_u_file(meshSettings,boundaryConditions):
     header = ampersandPrimitives.createFoamHeader(className="volVectorField", objectName="U")
@@ -193,7 +205,7 @@ def create_omega_file(meshSettings,boundaryConditions):
     omega_file = create_scalar_file(meshSettings,boundaryConditions,objName="omega",dimensions=(0,2,-2))
     return omega_file
 
-def create_nut_file(meshSettings,boundaryConditions):
+def create_nut_file(meshSettings,boundaryConditions=None):
     header = ampersandPrimitives.createFoamHeader(className="volScalarField", objectName="nut")
     dims = ampersandPrimitives.createDimensions(M=0,L=2,T=-1)
     internalField = ampersandPrimitives.createInternalFieldScalar(type="calculated", value=0.0)
@@ -230,7 +242,7 @@ def update_boundary_conditions(boundaryConditions, inletValues):
     boundaryConditions['velocityInlet']['nut_value'] = inletValues['nut']
     return boundaryConditions
 
-def create_boundary_conditions(meshSettings, boundaryConditions, nu=1.e-5):
+def create_boundary_conditions(meshSettings, boundaryConditions):
     """
     Create boundary condition files for an OpenFOAM pimpleFoam simulation.
 
@@ -239,6 +251,7 @@ def create_boundary_conditions(meshSettings, boundaryConditions, nu=1.e-5):
     boundaryConditions (dict): Dictionary specifying boundary conditions for U, p, k, and omega.
     inletValues (dict): Dictionary specifying inlet values for U, p, k, and omega.
     """
+    
     u_file = create_u_file(meshSettings, boundaryConditions)
     p_file = create_p_file(meshSettings, boundaryConditions)
     k_file = create_k_file(meshSettings, boundaryConditions)

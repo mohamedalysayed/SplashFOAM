@@ -8,7 +8,7 @@ from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from dialogBoxes import sphereDialogDriver, yesNoDialogDriver, yesNoCancelDialogDriver
 from dialogBoxes import vectorInputDialogDriver, STLDialogDriver, physicalPropertiesDialogDriver
 from dialogBoxes import boundaryConditionDialogDriver, numericsDialogDriver, controlsDialogDriver
-from dialogBoxes import set_src
+from dialogBoxes import set_src, meshPointDialogDriver
 # ----------------- VTK Libraries ----------------- #
 import vtk
 import vtkmodules.vtkInteractionStyle
@@ -40,23 +40,6 @@ src = os.path.dirname(os.path.abspath(__file__))
 
 # set the source directory for the dialog boxes
 set_src(src)
-
-# This function reads STL file and extracts the surface patch names.
-def readSTL(stlFileName="cylinder.stl"):
-    surfaces = [] # to store the surfaces in the STL file
-    try:
-        f = open(stlFileName, "r")
-        for x in f:
-            
-            items = x.split(" ")
-            if(items[0]=='solid'):
-                surfaces.append(items[1][:-1])
-                #print(items[1][:-1])
-        f.close()
-    except:
-        print("Error while opening file: ",stlFileName)
-    return surfaces
-
 
 # This is the main window class
 class mainWindow(QMainWindow):
@@ -93,6 +76,19 @@ class mainWindow(QMainWindow):
         self.window.pushButtonDomainManual.setEnabled(False)
         self.window.pushButtonSteadyTransient.setEnabled(False)
         self.window.pushButtonSummarize.setEnabled(False)
+        self.window.pushButtonFitAll.setEnabled(False)
+        self.window.pushButtonPlusX.setEnabled(False)
+        self.window.pushButtonPlusY.setEnabled(False)
+        self.window.pushButtonPlusZ.setEnabled(False)
+        self.window.pushButtonMinusX.setEnabled(False)
+        self.window.pushButtonMinusY.setEnabled(False)
+        self.window.pushButtonMinusZ.setEnabled(False)
+        self.window.pushButtonShowWire.setEnabled(False)
+        self.window.pushButtonShowSurface.setEnabled(False)
+        self.window.pushButtonShowEdges.setEnabled(False)
+        self.window.pushButtonAddSTL.setEnabled(False)
+        self.window.pushButtonRemoveSTL.setEnabled(False)
+        self.window.pushButtonMeshPoint.setEnabled(False)
 
         #self.window.pushButtonCreate.setEnabled(False)
         #self.window.pushButtonOpen.setEnabled(False)
@@ -132,6 +128,20 @@ class mainWindow(QMainWindow):
         self.window.pushButtonDomainManual.setEnabled(True)
         self.window.pushButtonSteadyTransient.setEnabled(True)
         self.window.pushButtonSummarize.setEnabled(True)
+        self.window.pushButtonFitAll.setEnabled(True)
+        self.window.pushButtonPlusX.setEnabled(True)
+        self.window.pushButtonPlusY.setEnabled(True)
+        self.window.pushButtonPlusZ.setEnabled(True)
+        self.window.pushButtonMinusX.setEnabled(True)
+        self.window.pushButtonMinusY.setEnabled(True)
+        self.window.pushButtonMinusZ.setEnabled(True)
+        self.window.pushButtonShowWire.setEnabled(True)
+        self.window.pushButtonShowSurface.setEnabled(True)
+        self.window.pushButtonShowEdges.setEnabled(True)
+        self.window.pushButtonAddSTL.setEnabled(True)
+        self.window.pushButtonRemoveSTL.setEnabled(True)
+        self.window.pushButtonMeshPoint.setEnabled(True)
+
 
         self.window.lineEditMinX.setEnabled(True)
         self.window.lineEditMinY.setEnabled(True)
@@ -240,10 +250,7 @@ class mainWindow(QMainWindow):
         axes.SetTotalLength(0.1, 0.1, 0.1)
         self.ren.AddActor(axes)
         self.iren.Start()
-
-    
-
-        
+      
 
     def render3D(self,actorName=None):  # self.ren and self.iren must be used. other variables are local variables
         # Create a mapper
@@ -275,14 +282,18 @@ class mainWindow(QMainWindow):
         
         #self.iren.Start()
 
-    def add_object_to_VTK(self,object,objectName="sphere",opacity=0.5,removePrevious=False):
+    def add_object_to_VTK(self,object,objectName="sphere",opacity=0.5,removePrevious=False,color=(0.5,0.5,0.5)):
         # Create a mapper
         mapper = vtk.vtkPolyDataMapper()
         mapper.SetInputConnection(object.GetOutputPort())
+        
         # Create an actor
         actor = vtk.vtkActor()
         actor.GetProperty().SetOpacity(opacity)
-        actor.GetProperty().SetColor(0.5,0.5,0.5)
+        if color:
+            actor.GetProperty().SetColor(color)
+        else:
+            actor.GetProperty().SetColor(0.5,0.5,0.5)
         actor.GetProperty().SetObjectName(objectName)
         actor.GetProperty().EdgeVisibilityOn()
         actor.SetMapper(mapper)
@@ -291,16 +302,17 @@ class mainWindow(QMainWindow):
             currentActors = self.ren.GetActors()
             for act in currentActors:
                 if(act.GetProperty().GetObjectName()==objectName):
+                    print("Removing previous object: ",objectName)
                     self.ren.RemoveActor(act)
         self.ren.AddActor(actor)
         self.iren.Start()
 
-    def add_sphere_to_VTK(self):
+    def add_sphere_to_VTK(self,center=(0.0,0.0,0.0),radius=1.0,objectName="sphere",removePrevious=True):
         # Create a sphere
         sphere = vtk.vtkSphereSource()
-        sphere.SetCenter(0.0, 0.0, 0.0)
-        sphere.SetRadius(1.0)
-        self.add_object_to_VTK(sphere,objectName="sphere",removePrevious=True)
+        sphere.SetCenter(center)
+        sphere.SetRadius(radius)
+        self.add_object_to_VTK(sphere,objectName=objectName,removePrevious=removePrevious)
        
 
     def add_box_to_VTK(self,minX=0.0,minY=0.0,minZ=0.0,maxX=1.0,maxY=1.0,maxZ=1.0,boxName="box"):
@@ -348,8 +360,6 @@ class mainWindow(QMainWindow):
         for i in range(len(self.project.stl_files)):
             self.window.listWidgetObjList.insertItem(i,self.project.stl_files[i]['name'])
 
-    
-
     def listClicked(self):
         # find the selected item in the list
         item = self.window.listWidgetObjList.currentItem()
@@ -378,11 +388,15 @@ class mainWindow(QMainWindow):
         
     def updateStatusBar(self,message="Go!"):
         self.window.statusbar.showMessage(message)
-        self.window.plainTextTerminal.appendPlainText(message)
+        #self.window.plainTextTerminal.appendPlainText(message)
+        self.window.plainTextTerminal.insertPlainText(message+"\n")
 
     def updateTerminal(self,message="Go!"):
-        self.window.plainTextTerminal.appendPlainText(message)
-
+        self.window.plainTextTerminal.insertPlainText(message+"\n")
+        #self.window.plainTextTerminal.appendPlainText(message)
+       
+        self.window.plainTextTerminal.verticalScrollBar().setValue(self.window.plainTextTerminal.verticalScrollBar().maximum())
+        
     def readyStatusBar(self):
         # pause 1 millisecond
         sleep(0.001)
@@ -414,6 +428,9 @@ class mainWindow(QMainWindow):
         self.window.pushButtonControls.clicked.connect(self.controlsDialog)
         self.window.pushButtonSteadyTransient.clicked.connect(self.toggleSteadyTransient)
         self.window.pushButtonSummarize.clicked.connect(self.summarizeProject)
+        self.window.pushButtonAddSTL.clicked.connect(self.importSTL)
+        self.window.pushButtonRemoveSTL.clicked.connect(self.removeSTL)
+        self.window.pushButtonMeshPoint.clicked.connect(self.setMeshPoint)
         #self.window.checkBoxOnGround.clicked.connect(self.chooseExternalFlow)
         # change view on the VTK widget
         self.window.pushButtonFitAll.clicked.connect(self.vtkFitAll)
@@ -446,7 +463,10 @@ class mainWindow(QMainWindow):
             return
         #self.project.analyze_stl_file()
         self.project.add_stl_to_project()
-        self.showSTL(stlFile=self.project.current_stl_file)
+        #self.showSTL(stlFile=self.project.current_stl_file)
+        stl_file_paths = self.project.list_stl_paths()
+        for stl_file in stl_file_paths:
+            self.showSTL(stlFile=stl_file)
         self.update_list()
         #self.project.list_stl_files()
 
@@ -468,9 +488,21 @@ class mainWindow(QMainWindow):
             self.showSTL(stlFile=stl)
         self.update_list()
         self.readyStatusBar()
-    
+
+    def removeSTL(self):
+        # show warning message box
+        
+        item = self.window.listWidgetObjList.currentItem()
+        if item==None or item.text()=="":
+            return
+        idx = self.window.listWidgetObjList.row(item)
+        stl = item.text()
+        self.project.remove_stl_file_by_name(stl)
+        self.update_list()
+        self.readyStatusBar()
+
     def createSphere(self):
-        #print("Create Sphere")
+       
         ampersandIO.printMessage("Creating Sphere",GUIMode=True,window=self)
         # create a sphere dialog
         sphereData = sphereDialogDriver()
@@ -483,10 +515,8 @@ class mainWindow(QMainWindow):
         self.readyStatusBar()
 
     def resizeEvent(self, event):
-        #print("Resizing")
-        #print("Width: ",self.window.width())
-        #print("Height: ",self.window.height())
-        terminalHeight = 250
+        
+        terminalHeight = 302
         vtkWidgetWidth = self.window.width()-560
         vtkWidgetHeight = self.window.height()-terminalHeight-20
         terminalX = self.window.widget.pos().x()
@@ -506,7 +536,7 @@ class mainWindow(QMainWindow):
 
 
     def closeEventTriggered(self, event):
-        print("Closing")
+        
         self.close()
 
     def toggleSteadyTransient(self):
@@ -523,7 +553,7 @@ class mainWindow(QMainWindow):
         self.readyStatusBar()
 
     def chooseInternalFlow(self):
-        #print("Choose Internal Flow")
+        
         self.project.internalFlow = True
         self.project.meshSettings['internalFlow'] = True
         self.project.onGround = False
@@ -665,8 +695,10 @@ class mainWindow(QMainWindow):
         self.project_opened = True
         ampersandIO.printMessage(f"Project {self.project.project_name} created",GUIMode=True,window=self)
         self.setWindowTitle(f"Case Creator: {self.project.project_name}")
-        
+        self.vtkDrawMeshPoint()
         self.readyStatusBar()
+
+    
 
     def generateCase(self):
         self.updateStatusBar("Analyzing Case")
@@ -718,7 +750,7 @@ class mainWindow(QMainWindow):
             return
         if analyze:
             self.project.analyze_stl_file()
-        #print("On Ground: ",onGround)
+        
         minx = self.project.meshSettings['domain']['minx']
         miny = self.project.meshSettings['domain']['miny']
         minz = self.project.meshSettings['domain']['minz']
@@ -728,7 +760,7 @@ class mainWindow(QMainWindow):
         nx = self.project.meshSettings['domain']['nx']
         ny = self.project.meshSettings['domain']['ny']
         nz = self.project.meshSettings['domain']['nz']
-        #print("Domain: ",minx,miny,minz,maxx,maxy,maxz,nx,ny,nz)
+       
         self.window.lineEditMinX.setText(f"{minx:.2f}")
         self.window.lineEditMinY.setText(f"{miny:.2f}")
         self.window.lineEditMinZ.setText(f"{minz:.2f}")
@@ -739,6 +771,10 @@ class mainWindow(QMainWindow):
         self.window.lineEdit_nY.setText(str(ny))
         self.window.lineEdit_nZ.setText(str(nz))
         self.add_box_to_VTK(minX=minx,minY=miny,minZ=minz,maxX=maxx,maxY=maxy,maxZ=maxz,boxName="Domain")
+        
+        
+        self.vtkDrawMeshPoint()
+        self.readyStatusBar()
         
     def manualDomain(self):
         minx = float(self.window.lineEditMinX.text())
@@ -770,19 +806,18 @@ class mainWindow(QMainWindow):
         self.updateStatusBar("Manual Domain Set")
         self.add_box_to_VTK(minX=minx,minY=miny,minZ=minz,maxX=maxx,maxY=maxy,maxZ=maxz,boxName="Domain")
         self.readyStatusBar()
-        #print("Domain: ",minx,miny,minz,maxx,maxy,maxz,nx,ny,nz)
+        
 
     def stlPropertiesDialog(self):
         stl = self.current_stl_file
         if stl==None:
             return
         currentStlProperties = self.project.get_stl_properties(stl)
-        #print("Current STL Properties: ",currentStlProperties)
+        
         # open STL properties dialog
         stlProperties = STLDialogDriver(stl,stlProperties=currentStlProperties)
         # The properties are:
-        #refMin,refMax,refLevel,nLayers,usage,edgeRefine,ami,None
-        #print(stlProperties)
+       
         if stlProperties==None:
             return
         # update the properties
@@ -801,12 +836,15 @@ class mainWindow(QMainWindow):
         nu = self.project.physicalProperties['nu']
         cp = self.project.physicalProperties['Cp']
         turbulence_model = self.project.physicalProperties['turbulenceModel']
-        initialProperties = (rho,nu,cp,turbulence_model)
-        print("Initial Properties: ",initialProperties)
+        fluid = self.project.physicalProperties['fluid']
+        initialProperties = (fluid,rho,nu,cp,turbulence_model)
+        
         physicalProperties = physicalPropertiesDialogDriver(initialProperties)
-        rho,nu,cp,turbulence_model = physicalProperties
+        fluid,rho,nu,cp,turbulence_model = physicalProperties
         # update the project physical properties
         ampersandIO.printMessage("Updating Physical Properties",GUIMode=True)
+        ampersandIO.printMessage(f"Updated Properties: {physicalProperties}",GUIMode=True,window=self)
+        self.project.physicalProperties['fluid'] = fluid
         self.project.physicalProperties['rho'] = rho
         self.project.physicalProperties['nu'] = nu
         self.project.physicalProperties['Cp'] = cp
@@ -817,7 +855,12 @@ class mainWindow(QMainWindow):
         if stl==None:
             ampersandIO.printError("STL not found",GUIMode=True)
             return
+        
         boundaryConditions = boundaryConditionDialogDriver(stl)
+        if boundaryConditions==None:
+            return
+        # update the boundary conditions
+        self.project.set_boundary_condition(self.current_stl_file,boundaryConditions)
 
     def numericsDialog(self):
         numerics = numericsDialogDriver()  
@@ -829,17 +872,27 @@ class mainWindow(QMainWindow):
         self.project.summarize_project()
         self.readyStatusBar()
 
+    def setMeshPoint(self):
+        # open the mesh point dialog
+        meshPoint = meshPointDialogDriver(self.project.get_location_in_mesh())
+        ampersandIO.printMessage("Mesh Point: ",meshPoint,GUIMode=True,window=self)
+        if meshPoint==None:
+            return
+        
+        self.project.set_location_in_mesh(meshPoint)
+        self.vtkDrawMeshPoint()
+
 # VTK Event Handlers
 #----------------- VTK Event Handlers -----------------#
     def vtkFitAll(self):
-        #print("Fitting all")
+       
         self.ren.ResetCamera()
         self.vtkWidget.GetRenderWindow().Render()
         #self.ren.ResetCamera()
         #self.iren.Start()
 
     def vtkPlusX(self):
-        #print("Plus X side")
+       
         self.ren.GetActiveCamera().SetPosition(1, 0, 0)
         self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
         self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
@@ -847,7 +900,7 @@ class mainWindow(QMainWindow):
         self.vtkWidget.GetRenderWindow().Render()
     
     def vtkPlusY(self):
-        #print("Plus Y side")
+        
         self.ren.GetActiveCamera().SetPosition(0, 1, 0)
         self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
         self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
@@ -855,7 +908,7 @@ class mainWindow(QMainWindow):
         self.vtkWidget.GetRenderWindow().Render()
 
     def vtkPlusZ(self):
-        #print("Plus Z side")
+        
         self.ren.GetActiveCamera().SetPosition(0, 0, 1)
         self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
         self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
@@ -912,11 +965,17 @@ class mainWindow(QMainWindow):
     def vtkHilightSTL(self,stlFile):
         idx = 0
         actors = self.ren.GetActors()
+        
         colors = vtk.vtkNamedColors()
         actor_found = None
+        stl_names = [] #self.project.stl_files
+        for stl in self.project.stl_files:
+            stl_names.append(stl['name'])
         for actor in actors:
-            if actor.GetObjectName() in self.project.stl_names:
-                
+            #print("Actor Name: ",actor.GetObjectName())
+            #print("STL File: ",stlFile)
+            
+            if actor.GetObjectName() in stl_names:  
                 if actor.GetObjectName() == stlFile:
                     #print("Actor Found: ",actor.GetObjectName())
                     actor_found = actor
@@ -937,6 +996,16 @@ class mainWindow(QMainWindow):
         axes.SetTotalLength(charLen, charLen, charLen)
         self.ren.AddActor(axes)
         self.vtkWidget.GetRenderWindow().Render()
+
+    def vtkDrawMeshPoint(self):
+        # estimate size of the mesh point
+        lx,ly,lz = self.project.lenX,self.project.lenY,self.project.lenZ
+        maxLen = max(lx,ly,lz,0.02)
+        locationInMesh = tuple(self.project.get_location_in_mesh())
+
+        print("Location in Mesh: ",locationInMesh)
+        print("Drawing Mesh Point")
+        self.add_sphere_to_VTK(center=locationInMesh,radius=0.02*maxLen,objectName="MeshPoint",removePrevious=True)
 
 #----------------- End of VTK Event Handlers -----------------#
 
