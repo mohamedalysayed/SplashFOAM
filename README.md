@@ -17,7 +17,7 @@ Clone the SplashFOAM repository to your local machine by running:
 - Step 2: Switch to the Correct Branch
 Ensure you are on the Standard-release branch to access the latest stable version:
 
-``` cd SplashFOAM ```
+``` cd Splash-OpenFOAM ```
 
 ``` git checkout Standard-release ```
 
