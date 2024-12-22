@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>424</width>
-    <height>226</height>
+    <width>476</width>
+    <height>243</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -68,7 +68,7 @@
   <widget class="QComboBox" name="comboBoxBasicMode">
    <property name="geometry">
     <rect>
-     <x>118</x>
+     <x>150</x>
      <y>10</y>
      <width>281</width>
      <height>22</height>
@@ -80,7 +80,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>111</width>
+     <width>131</width>
      <height>16</height>
     </rect>
    </property>
@@ -93,7 +93,7 @@
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>411</width>
+     <width>451</width>
      <height>151</height>
     </rect>
    </property>
@@ -108,7 +108,7 @@
      <rect>
       <x>0</x>
       <y>60</y>
-      <width>111</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -119,7 +119,7 @@
    <widget class="QComboBox" name="comboBoxDivScheme">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>60</y>
       <width>291</width>
       <height>22</height>
@@ -131,7 +131,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>101</width>
+      <width>131</width>
       <height>16</height>
      </rect>
     </property>
@@ -142,7 +142,7 @@
    <widget class="QComboBox" name="comboBoxLaplacian">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>90</y>
       <width>291</width>
       <height>22</height>
@@ -152,7 +152,7 @@
    <widget class="QComboBox" name="comboBoxGradScheme">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>30</y>
       <width>291</width>
       <height>22</height>
@@ -164,7 +164,7 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>101</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -175,7 +175,7 @@
    <widget class="QComboBox" name="comboBoxTemporal">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>120</y>
       <width>291</width>
       <height>22</height>
@@ -187,7 +187,7 @@
      <rect>
       <x>10</x>
       <y>120</y>
-      <width>101</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
