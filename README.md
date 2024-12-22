@@ -13,8 +13,11 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
   - [Configuration Management](#configuration-management)
   - [Run Simulation](#run-simulation)
   - [Post-Processing](#post-processing)
+  - [Splash Cloud](#splash-cloud)
 - [Documentation](#documentation)
-- [Contributing](#contributing)
+- [Code Developers](#code-developers)
+- [Feedback](#feedback)
+- [CFD Dose Album](#cfd-dose-album)
 
 ## Overview
 SplashFOAM is a modular GUI for the Computational Fluid Dynamics (CFD) code OpenFOAM. The main impetus behind building SplashFOAM has been to increase the efficiency of CFD production, remove unnecessary friction, and allow engineers to focus on the physics of the problem rather than coding syntax. 
@@ -58,8 +61,8 @@ Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.
 
   ```bash
   cd SplashFOAM/Resources/Build_Splash/
-  chmod +x Ubuntu_MEL_Interactive.sh
-  ./Ubuntu_MEL_Interactive.sh
+  chmod +x PreInstaller.sh
+  ./PreInstaller.sh
 ![Splash-PreInstallerII](https://github.com/user-attachments/assets/ca9f7879-b72f-4b4e-9ea5-1ee81fa7fd9a)
 
 This will ensure that all required packages are installed. The user can install other secondary packages from the suggested list if needed. 
@@ -160,22 +163,44 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
   
   ![Grace-Example](https://github.com/user-attachments/assets/a89c6591-12f6-4d8c-9c42-4c4adf68f338)
 
-## CFD Album 
- - **Motorbike OpenFOAM Case - Steady State**
-![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
+## Splash Cloud
+[**Splash-Cloud**](https://splash-foam-cloud-9h9d.vercel.app/) is an innovative web-based application [_currently under development_](https://github.com/mohamedalysayed/SplashFOAM-Cloud) to bring CFD workflows to your browser. Designed to complement SplashFOAM, this tool enables users to interact with their geometries directly online, offering an intuitive way to inspect, modify, and prepare geometries for simulation and exports seamless OpenFOAM cases.
 
- - **Grid wall distance of a 90-degree-bend geometry**
-![Screenshot from 2024-08-08 23-59-18](https://github.com/user-attachments/assets/1783a07f-5466-4b4e-9e44-b4936660b3c7)
+![SplashCloud-ii](https://github.com/user-attachments/assets/65097e71-2bce-44e2-8ee3-b9dcef17e00b)
+![SplashCloud-i](https://github.com/user-attachments/assets/4d2c65b1-5e99-4a75-9b7c-07e00fab187f)
 
- - **Velocity distribution in a 90-degree-bend at Re=4080**
-![Screenshot from 2024-10-03 22-10-34](https://github.com/user-attachments/assets/2fdf595c-0f7c-4890-aff8-df732484f090)
-
- - **Instantaneous velocity and particle distribution at a cross-section of a rectangular channel at shear Re=150**
-![641234f5f0f60e00ad86359e_Streamwise_fvel_yz_vel_vectorfield_10e5part_St15_Re150_ts_490k_Vinkovic_comparison](https://github.com/user-attachments/assets/e7660b93-3054-4114-9d9e-49047bc127c0)
-
+### Key Features
+- **Browser-Based Geometry Manipulation**: Load, rotate, scale, and inspect geometries (STL, OBJ, STEP) right from your web browser.
+- **Advanced 3D Rendering**: Experience glossy, interactive 3D rendering for geometries in formats like STL, OBJ, and STEP, with seamless camera control and enhanced lighting for precision inspections.
+- **Seamless Integration with SplashFOAM**: Prepare OpenFOAM-ready cases effortlessly, as Splash-Cloud outputs configurations that are fully compatible with SplashFOAM.
+- **No Installation Required**: Accessible on any device with an internet connection—eliminating setup hassle.
+- **Collaboration Made Easy**: Share geometries and configurations in real time with teammates.
 
 ## Documentation
 The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
 
-## Contributing
-Feel free to contribute to SplashFOAM by submitting issues, pull requests, or feature suggestions. Feedback is super valuable here ;) 
+## Code Developers 
+- **[Mohamed Aly Sayed](https://www.linkedin.com/in/mohamedsayedh/)** | muhammmedaly@gmail.com
+- **[Thaw Tar](https://www.linkedin.com/in/thaw-tar-8bb34a73/)** | mr.thaw.tar1990@gmail.com 
+
+## Feedback 
+Feel free to contribute to SplashFOAM by submitting issues or feature suggestions. Your feedback is super valuable here ;) 
+
+## CFD Dose Album* 
+ [*_Please refer to this GitHub repository when using any of the images below (proper referencing is required)_]
+ 
+ - **Motorbike OpenFOAM Case - Steady State**
+   
+![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
+
+ - **Grid wall distance of a 90-degree-bend geometry**
+   
+![Screenshot from 2024-08-08 23-59-18](https://github.com/user-attachments/assets/1783a07f-5466-4b4e-9e44-b4936660b3c7)
+
+ - **Velocity distribution in a 90-degree-bend at Re=4080**
+   
+![Screenshot from 2024-10-03 22-10-34](https://github.com/user-attachments/assets/2fdf595c-0f7c-4890-aff8-df732484f090)
+
+ - **Instantaneous velocity and particle distribution at a cross-section of a rectangular channel at shear Re=150**
+
+![641234f5f0f60e00ad86359e_Streamwise_fvel_yz_vel_vectorfield_10e5part_St15_Re150_ts_490k_Vinkovic_comparison](https://github.com/user-attachments/assets/e7660b93-3054-4114-9d9e-49047bc127c0)
