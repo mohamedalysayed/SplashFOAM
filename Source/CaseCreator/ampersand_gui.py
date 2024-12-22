@@ -3,6 +3,9 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtCore import QFile
 from PySide6.QtWidgets import QMainWindow
+from PySide6.QtCore import QTimer, QTime # for Timer
+from PySide6.QtCore import Qt
+import time
 from PySide6 import QtWidgets
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from dialogBoxes import sphereDialogDriver, yesNoDialogDriver, yesNoCancelDialogDriver
@@ -30,6 +33,9 @@ import sys
 import os
 from time import sleep
 
+#Importing separate classes and functions
+from vtk_manager import VTKManager
+
 # Connection to the Ampersand Backend
 from project import ampersandProject
 from primitives import ampersandPrimitives, ampersandIO
@@ -49,6 +55,9 @@ class mainWindow(QMainWindow):
         self.surfaces = []
         self.project_opened = False
         self.project = None #ampersandProject(GUIMode=True,window=self)
+        self.vtk_manager = VTKManager(self.ren, self.vtkWidget)  # Initialize VTK Manager
+        self.app_start_time = time.time()  # Record the time at app launch
+        self.setup_timer()
         self.minx,self.miny,self.minz = 0.0,0.0,0.0
         self.maxx,self.maxy,self.maxz = 0.0,0.0,0.0
         self.nx,self.ny,self.nz = 0,0,0
@@ -58,6 +67,26 @@ class mainWindow(QMainWindow):
         self.listOfColors = ["Pink","Red","Green","Blue","Yellow","Orange","Purple","Cyan","Magenta","Brown",]
         # disable all the buttons and input fields
         self.disableButtons()
+        
+    def setup_timer(self):
+        """
+        Sets up a timer to update the timer label every second.
+        """
+        self.timer = QTimer(self)  # Create a QTimer instance
+        self.timer.timeout.connect(self.update_timer_label)  # Connect the timeout signal
+        self.timer.start(1000)  # Update every 1 second (1000 ms)
+
+    def update_timer_label(self):
+        """
+        Updates the timer label with the elapsed time since app launch.
+        """
+        if not self.timerLabel:
+            return  # Prevent errors if timerLabel is not found
+        elapsed_time = int(time.time() - self.app_start_time)  # Calculate elapsed time in seconds
+        hours, remainder = divmod(elapsed_time, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        formatted_time = f"{hours:02}:{minutes:02}:{seconds:02}"  # Format as HH:MM:SS
+        self.timerLabel.setText(formatted_time)  # Update the label text
 
     def disableButtons(self):
         self.window.pushButtonSTLImport.setEnabled(False)
@@ -103,6 +132,7 @@ class mainWindow(QMainWindow):
         self.window.lineEdit_nX.setEnabled(False)
         self.window.lineEdit_nY.setEnabled(False)
         self.window.lineEdit_nZ.setEnabled(False)
+        
         # change color of widget 
         self.window.widget.setStyleSheet('''background-color: lightgrey;''')
         self.window.plainTextTerminal.appendPlainText("Welcome to SplashFOAM Case Creator")
@@ -142,7 +172,6 @@ class mainWindow(QMainWindow):
         self.window.pushButtonRemoveSTL.setEnabled(True)
         self.window.pushButtonMeshPoint.setEnabled(True)
 
-
         self.window.lineEditMinX.setEnabled(True)
         self.window.lineEditMinY.setEnabled(True)
         self.window.lineEditMinZ.setEnabled(True)
@@ -153,6 +182,20 @@ class mainWindow(QMainWindow):
         self.window.lineEdit_nY.setEnabled(True)
         self.window.lineEdit_nZ.setEnabled(True)
 
+##    def load_ui(self):
+##        loader = QUiLoader()
+##        ui_path = os.path.join(src, "ampersandInputForm.ui")
+##        ui_file = QFile(ui_path)
+##        ui_file.open(QFile.ReadOnly)
+##        self.window = loader.load(ui_file, None)
+##        ui_file.close()
+##        self.setCentralWidget(self.window)
+##        self.setGeometry(100, 100, 1400, 880)
+##        self.setWindowTitle("SplashFOAM Case Creator")
+##        self.prepare_vtk()
+##        self.prepare_subWindows()
+##        self.prepare_events()
+
     def load_ui(self):
         loader = QUiLoader()
         ui_path = os.path.join(src, "ampersandInputForm.ui")
@@ -162,7 +205,14 @@ class mainWindow(QMainWindow):
         ui_file.close()
         self.setCentralWidget(self.window)
         self.setGeometry(100, 100, 1400, 880)
-        self.setWindowTitle("Case Creator GUI")
+        self.setWindowTitle("SplashFOAM Case Creator")
+        
+        # Add timer label programmatically
+        self.timerLabel = self.window.findChild(QtWidgets.QLabel, "timerLabel")
+        if not self.timerLabel:
+            print("Error: 'timerLabel' not found in the UI.")
+            return
+        
         self.prepare_vtk()
         self.prepare_subWindows()
         self.prepare_events()
@@ -207,7 +257,7 @@ class mainWindow(QMainWindow):
         #self.iren.Initialize()
         #self.iren.Start()
 
-    # this function will read STL file and show it in the VTK renderer
+    # this function will read STL file and show it in the VTK renderer | FLAG! local path!
     def showSTL(self,stlFile=r"C:\Users\mrtha\Desktop\GitHub\foamAutoGUI\src\pipe.stl"):
         # Read stl
         try:
@@ -229,7 +279,7 @@ class mainWindow(QMainWindow):
         actor.GetProperty().EdgeVisibilityOn()
         colors = vtk.vtkNamedColors()
         whiteColor = colors.GetColor3d("Grey")
-        blackColor = colors.GetColor3d("Black")
+        blackColor = colors.GetColor3d("Cyan")
         #deepBlue = colors.GetColor3d("DeepBlue")
         #self.ren.SetBackground(colors.GetColor3d("SlateGray"))
         # set background color as gradient
@@ -275,7 +325,7 @@ class mainWindow(QMainWindow):
         #charLen = min(self.project.lenX,self.project.lenY,self.project.lenZ)*0.5
         #maxLen = max(self.project.lenX,self.project.lenY,self.project.lenZ)
         #charLen = max(charLen,maxLen*0.2,0.01)
-        axes.SetTotalLength(0.2, 0.2, 0.2)
+        axes.SetTotalLength(0.1, 0.1, 0.1)
         self.ren.AddActor(axes)
         
         self.colorCounter += 1
@@ -386,22 +436,63 @@ class mainWindow(QMainWindow):
         self.window.tableViewProperties.setItem(2,1,QtWidgets.QTableWidgetItem(str(property)))
         self.window.tableViewProperties.setItem(3,0,QtWidgets.QTableWidgetItem(str(bounds[0])))
         
-    def updateStatusBar(self,message="Go!"):
-        self.window.statusbar.showMessage(message)
-        #self.window.plainTextTerminal.appendPlainText(message)
-        self.window.plainTextTerminal.insertPlainText(message+"\n")
+#    def updateStatusBar(self,message="Go!"):
+#        self.window.statusbar.showMessage(message)
+#        #self.window.plainTextTerminal.appendPlainText(message)
+#        self.window.plainTextTerminal.insertPlainText(message+"\n")
 
-    def updateTerminal(self,message="Go!"):
-        self.window.plainTextTerminal.insertPlainText(message+"\n")
-        #self.window.plainTextTerminal.appendPlainText(message)
-       
-        self.window.plainTextTerminal.verticalScrollBar().setValue(self.window.plainTextTerminal.verticalScrollBar().maximum())
-        
+##    def updateTerminal(self,message="Go!"):
+##        self.window.plainTextTerminal.insertPlainText(message+"\n")
+##        #self.window.plainTextTerminal.appendPlainText(message)
+
+#    def updateTerminal(self, *messages):
+#        """
+#        Updates the terminal output in the GUI with one or more messages.
+#        :param messages: Any number of strings to display in the terminal.
+#        """
+#        for message in messages:
+#            self.window.plainTextTerminal.insertPlainText(f"{message}\n")
+#        # Ensure the terminal scrolls to the most recent message
+#        self.window.plainTextTerminal.verticalScrollBar().setValue(
+#            self.window.plainTextTerminal.verticalScrollBar().maximum()
+#        )
+      
+#  def readyStatusBar(self):
+#        # pause 1 millisecond
+#        sleep(0.001)
+#        self.window.statusbar.showMessage("Ready")
+
+
+    def updateTerminal(self, *messages):
+        """
+        Updates the terminal output in the GUI with one or more messages.
+        :param messages: Any number of strings to display in the terminal.
+        """
+        for message in messages:
+            self.window.plainTextTerminal.insertPlainText(f"{message}\n")
+        # Ensure the terminal scrolls to the most recent message
+        self.window.plainTextTerminal.verticalScrollBar().setValue(
+            self.window.plainTextTerminal.verticalScrollBar().maximum()
+        )
+
+    def updateStatusBar(self, message="Go!"):
+        """
+        Updates the status bar in the GUI.
+        :param message: The message to display in the status bar.
+        """
+        self.window.statusbar.showMessage(message)
+        self.window.plainTextTerminal.insertPlainText(f"{message}\n")
+
     def readyStatusBar(self):
-        # pause 1 millisecond
+        """
+        Updates the status bar to 'Ready' after a short pause.
+        """
         sleep(0.001)
         self.window.statusbar.showMessage("Ready")
-
+    
+# FLAG! Why is this line is written this way?         
+#self.window.plainTextTerminal.verticalScrollBar().setValue(self.window.plainTextTerminal.verticalScrollBar().maximum())
+        
     def prepare_events(self):
         #self.window.resizeEvent = self.resizeEventTriggered
         #self.window.closeEvent = self.closeEventTriggered
@@ -444,7 +535,6 @@ class mainWindow(QMainWindow):
         self.window.pushButtonShowSurface.clicked.connect(self.vtkShowSurface)
         self.window.pushButtonShowEdges.clicked.connect(self.vtkShowEdges)
         
-
         #self.window.resizeEvent = self.resizeEvent
         self.window.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
         self.window.resizeEvent = self.resizeEvent
@@ -490,8 +580,6 @@ class mainWindow(QMainWindow):
         self.readyStatusBar()
 
     def removeSTL(self):
-        # show warning message box
-        
         item = self.window.listWidgetObjList.currentItem()
         if item==None or item.text()=="":
             return
@@ -502,7 +590,6 @@ class mainWindow(QMainWindow):
         self.readyStatusBar()
 
     def createSphere(self):
-       
         ampersandIO.printMessage("Creating Sphere",GUIMode=True,window=self)
         # create a sphere dialog
         sphereData = sphereDialogDriver()
@@ -515,7 +602,6 @@ class mainWindow(QMainWindow):
         self.readyStatusBar()
 
     def resizeEvent(self, event):
-        
         terminalHeight = 302
         vtkWidgetWidth = self.window.width()-560
         vtkWidgetHeight = self.window.height()-terminalHeight-20
@@ -534,9 +620,7 @@ class mainWindow(QMainWindow):
         self.window.plainTextTerminal.repaint()
         self.readyStatusBar()
 
-
     def closeEventTriggered(self, event):
-        
         self.close()
 
     def toggleSteadyTransient(self):
@@ -553,7 +637,6 @@ class mainWindow(QMainWindow):
         self.readyStatusBar()
 
     def chooseInternalFlow(self):
-        
         self.project.internalFlow = True
         self.project.meshSettings['internalFlow'] = True
         self.project.onGround = False
@@ -710,7 +793,6 @@ class mainWindow(QMainWindow):
         #project.list_stl_files()
         self.project.summarize_project()
         #project.analyze_stl_file()
-    
         self.project.write_settings()
         self.project.create_project_files()
         self.updateTerminal("--------------------")
@@ -728,7 +810,7 @@ class mainWindow(QMainWindow):
         self.project.set_post_process_settings()
         self.project.write_settings()
         self.updateTerminal("--------------------")
-        self.updateTerminal("Case saved")
+        self.updateTerminal("     Case saved!    ")
         self.updateTerminal("--------------------")
         self.readyStatusBar()
 
@@ -884,128 +966,188 @@ class mainWindow(QMainWindow):
 
 # VTK Event Handlers
 #----------------- VTK Event Handlers -----------------#
+#    def vtkFitAll(self):
+#       
+#        self.ren.ResetCamera()
+#        self.vtkWidget.GetRenderWindow().Render()
+#        #self.ren.ResetCamera()
+#        #self.iren.Start()
+
+#    def vtkPlusX(self):
+#       
+#        self.ren.GetActiveCamera().SetPosition(1, 0, 0)
+#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+#        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
+#        self.ren.ResetCamera()
+#        self.vtkWidget.GetRenderWindow().Render()
+#    
+#    def vtkPlusY(self):
+#        
+#        self.ren.GetActiveCamera().SetPosition(0, 1, 0)
+#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+#        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
+#        self.ren.ResetCamera()
+#        self.vtkWidget.GetRenderWindow().Render()
+
+#    def vtkPlusZ(self):
+#        
+#        self.ren.GetActiveCamera().SetPosition(0, 0, 1)
+#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+#        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
+#        self.ren.ResetCamera()
+#        self.vtkWidget.GetRenderWindow().Render()
+#    
+#    def vtkMinusX(self):
+#        #print("Minus X side")
+#        self.ren.GetActiveCamera().SetPosition(-1, 0, 0)
+#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+#        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
+#        self.ren.ResetCamera()
+#        self.vtkWidget.GetRenderWindow().Render()
+#    
+#    def vtkMinusY(self):
+#        #print("Minus Y side")
+#        self.ren.GetActiveCamera().SetPosition(0, -1, 0)
+#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+#        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
+#        self.ren.ResetCamera()
+#        self.vtkWidget.GetRenderWindow().Render()
+
+#    def vtkMinusZ(self):
+#        #print("Minus Z side")
+#        self.ren.GetActiveCamera().SetPosition(0, 0, -1)
+#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+#        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
+#        self.ren.ResetCamera()
+#        self.vtkWidget.GetRenderWindow().Render()
+
+#    def vtkShowWire(self):
+#        #print("Show Wire")
+#        actors = self.ren.GetActors()
+#        for actor in actors:
+#            actor.GetProperty().SetRepresentationToWireframe()
+#        self.vtkWidget.GetRenderWindow().Render()
+#    
+#    def vtkShowSurface(self):
+#        #print("Show Surface")
+#        actors = self.ren.GetActors()
+#        for actor in actors:
+#            actor.GetProperty().SetRepresentationToSurface()
+#            actor.GetProperty().EdgeVisibilityOff()
+#        self.vtkWidget.GetRenderWindow().Render()
+
+#    def vtkShowEdges(self):
+#        #print("Show Edges")
+#        actors = self.ren.GetActors()
+#        for actor in actors:
+#            actor.GetProperty().SetRepresentationToSurface()
+#            actor.GetProperty().EdgeVisibilityOn()
+#        self.vtkWidget.GetRenderWindow().Render()
+
+#    def vtkHilightSTL(self,stlFile):
+#        idx = 0
+#        actors = self.ren.GetActors()
+#        
+#        colors = vtk.vtkNamedColors()
+#        actor_found = None
+#        stl_names = [] #self.project.stl_files
+#        for stl in self.project.stl_files:
+#            stl_names.append(stl['name'])
+#        for actor in actors:
+#            #print("Actor Name: ",actor.GetObjectName())
+#            #print("STL File: ",stlFile)
+#            
+#            if actor.GetObjectName() in stl_names:  
+#                if actor.GetObjectName() == stlFile:
+#                    #print("Actor Found: ",actor.GetObjectName())
+#                    actor_found = actor
+#                    actor_found.GetProperty().SetColor(1.0, 0.0, 1.0)
+#                else:
+#                    # reset colors for other colors
+#                    actor.GetProperty().SetColor(colors.GetColor3d(self.listOfColors[idx]))
+#                idx += 1
+#        self.vtkWidget.GetRenderWindow().Render()
+
+#    def vtkUpdateAxes(self):
+#        axes = vtk.vtkAxesActor()
+#        self.project.update_max_lengths()
+#        charLen = min(self.project.lenX,self.project.lenY,self.project.lenZ)*0.5
+#        maxLen = max(self.project.lenX,self.project.lenY,self.project.lenZ)
+#        charLen = max(charLen,maxLen*0.2,0.01)
+#        axes.SetTotalLength(charLen, charLen, charLen)
+#        self.ren.AddActor(axes)
+#        self.vtkWidget.GetRenderWindow().Render()
+
+#    def vtkDrawMeshPoint(self):
+#        # estimate size of the mesh point
+#        lx,ly,lz = self.project.lenX,self.project.lenY,self.project.lenZ
+#        maxLen = max(lx,ly,lz,0.02)
+#        locationInMesh = tuple(self.project.get_location_in_mesh())
+
+#        print("Location in Mesh: ",locationInMesh)
+#        print("Drawing Mesh Point")
+
     def vtkFitAll(self):
-       
-        self.ren.ResetCamera()
-        self.vtkWidget.GetRenderWindow().Render()
-        #self.ren.ResetCamera()
-        #self.iren.Start()
+        """Reset the camera to fit all actors in view."""
+        self.vtk_manager.reset_camera()
 
     def vtkPlusX(self):
-       
-        self.ren.GetActiveCamera().SetPosition(1, 0, 0)
-        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
-        self.ren.ResetCamera()
-        self.vtkWidget.GetRenderWindow().Render()
-    
+        """Set camera view to +X direction."""
+        self.vtk_manager.set_camera_orientation(position=(1, 0, 0))
+
     def vtkPlusY(self):
-        
-        self.ren.GetActiveCamera().SetPosition(0, 1, 0)
-        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
-        self.ren.ResetCamera()
-        self.vtkWidget.GetRenderWindow().Render()
+        """Set camera view to +Y direction."""
+        self.vtk_manager.set_camera_orientation(position=(0, 1, 0))
 
     def vtkPlusZ(self):
-        
-        self.ren.GetActiveCamera().SetPosition(0, 0, 1)
-        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
-        self.ren.ResetCamera()
-        self.vtkWidget.GetRenderWindow().Render()
-    
+        """Set camera view to +Z direction."""
+        self.vtk_manager.set_camera_orientation(position=(0, 0, 1), view_up=(0, 1, 0))
+
     def vtkMinusX(self):
-        #print("Minus X side")
-        self.ren.GetActiveCamera().SetPosition(-1, 0, 0)
-        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
-        self.ren.ResetCamera()
-        self.vtkWidget.GetRenderWindow().Render()
-    
+        """Set camera view to -X direction."""
+        self.vtk_manager.set_camera_orientation(position=(-1, 0, 0))
+
     def vtkMinusY(self):
-        #print("Minus Y side")
-        self.ren.GetActiveCamera().SetPosition(0, -1, 0)
-        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
-        self.ren.ResetCamera()
-        self.vtkWidget.GetRenderWindow().Render()
+        """Set camera view to -Y direction."""
+        self.vtk_manager.set_camera_orientation(position=(0, -1, 0))
 
     def vtkMinusZ(self):
-        #print("Minus Z side")
-        self.ren.GetActiveCamera().SetPosition(0, 0, -1)
-        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
-        self.ren.ResetCamera()
-        self.vtkWidget.GetRenderWindow().Render()
+        """Set camera view to -Z direction."""
+        self.vtk_manager.set_camera_orientation(position=(0, 0, -1), view_up=(0, 1, 0))
 
     def vtkShowWire(self):
-        #print("Show Wire")
-        actors = self.ren.GetActors()
-        for actor in actors:
-            actor.GetProperty().SetRepresentationToWireframe()
-        self.vtkWidget.GetRenderWindow().Render()
-    
+        """Display all actors as wireframes."""
+        self.vtk_manager.toggle_actor_representation(representation_mode="Wireframe")
+
     def vtkShowSurface(self):
-        #print("Show Surface")
-        actors = self.ren.GetActors()
-        for actor in actors:
-            actor.GetProperty().SetRepresentationToSurface()
-            actor.GetProperty().EdgeVisibilityOff()
-        self.vtkWidget.GetRenderWindow().Render()
+        """Display all actors as solid surfaces without edges."""
+        self.vtk_manager.toggle_actor_representation(representation_mode="Surface")
 
     def vtkShowEdges(self):
-        #print("Show Edges")
-        actors = self.ren.GetActors()
-        for actor in actors:
-            actor.GetProperty().SetRepresentationToSurface()
-            actor.GetProperty().EdgeVisibilityOn()
-        self.vtkWidget.GetRenderWindow().Render()
+        """Display all actors as solid surfaces with visible edges."""
+        self.vtk_manager.toggle_actor_representation(representation_mode="Surface", edge_visibility=True)
 
-    def vtkHilightSTL(self,stlFile):
-        idx = 0
-        actors = self.ren.GetActors()
-        
-        colors = vtk.vtkNamedColors()
-        actor_found = None
-        stl_names = [] #self.project.stl_files
-        for stl in self.project.stl_files:
-            stl_names.append(stl['name'])
-        for actor in actors:
-            #print("Actor Name: ",actor.GetObjectName())
-            #print("STL File: ",stlFile)
-            
-            if actor.GetObjectName() in stl_names:  
-                if actor.GetObjectName() == stlFile:
-                    #print("Actor Found: ",actor.GetObjectName())
-                    actor_found = actor
-                    actor_found.GetProperty().SetColor(1.0, 0.0, 1.0)
-                else:
-                    # reset colors for other colors
-                    actor.GetProperty().SetColor(colors.GetColor3d(self.listOfColors[idx]))
-                idx += 1
-        self.vtkWidget.GetRenderWindow().Render()
-
+    def vtkHilightSTL(self, stlFile):
+        """Highlight the specified STL actor."""
+        self.vtk_manager.highlight_actor(
+            stl_file=stlFile,
+            stl_names=[stl['name'] for stl in self.project.stl_files],
+            colors=vtk.vtkNamedColors()
+        )
 
     def vtkUpdateAxes(self):
-        axes = vtk.vtkAxesActor()
-        self.project.update_max_lengths()
-        charLen = min(self.project.lenX,self.project.lenY,self.project.lenZ)*0.5
-        maxLen = max(self.project.lenX,self.project.lenY,self.project.lenZ)
-        charLen = max(charLen,maxLen*0.2,0.01)
-        axes.SetTotalLength(charLen, charLen, charLen)
-        self.ren.AddActor(axes)
-        self.vtkWidget.GetRenderWindow().Render()
+        """Draw axes with a dynamic size based on project dimensions."""
+        char_len = max(self.project.lenX, self.project.lenY, self.project.lenZ) * 0.2
+        self.vtk_manager.draw_axes(char_len)
 
     def vtkDrawMeshPoint(self):
-        # estimate size of the mesh point
-        lx,ly,lz = self.project.lenX,self.project.lenY,self.project.lenZ
-        maxLen = max(lx,ly,lz,0.02)
-        locationInMesh = tuple(self.project.get_location_in_mesh())
+        """Draw the mesh point as a sphere in the renderer."""
+        location = self.project.get_location_in_mesh()
+        size_factor = max(self.project.lenX, self.project.lenY, self.project.lenZ) * 0.02
+        self.vtk_manager.draw_mesh_point(location, size_factor)
 
-        print("Location in Mesh: ",locationInMesh)
-        print("Drawing Mesh Point")
-        self.add_sphere_to_VTK(center=locationInMesh,radius=0.02*maxLen,objectName="MeshPoint",removePrevious=True)
+# FLAG! why is this added here?!         
+#self.add_sphere_to_VTK(center=locationInMesh,radius=0.02*maxLen,objectName="MeshPoint",removePrevious=True)
 
 #----------------- End of VTK Event Handlers -----------------#
 

@@ -16,7 +16,7 @@
   <widget class="QLineEdit" name="lineEditSphereX">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>10</y>
      <width>31</width>
      <height>22</height>
@@ -29,20 +29,20 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>10</y>
      <width>49</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Center</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Center&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEditSphereY">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>120</x>
      <y>10</y>
      <width>31</width>
      <height>22</height>
@@ -55,7 +55,7 @@
   <widget class="QLineEdit" name="lineEditSphereZ">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>160</x>
      <y>10</y>
      <width>31</width>
      <height>22</height>
@@ -68,20 +68,20 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>40</y>
      <width>49</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Radius</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Radius&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEditSphereRadius">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>40</y>
      <width>71</width>
      <height>22</height>
