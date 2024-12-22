@@ -727,7 +727,7 @@ background-color: rgb(222, 221, 218);</string>
       <x>550</x>
       <y>40</y>
       <width>831</width>
-      <height>591</height>
+      <height>601</height>
      </rect>
     </property>
     <widget class="QComboBox" name="comboBox">
@@ -897,14 +897,57 @@ selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
      <number>24</number>
     </property>
    </widget>
-   <widget class="QDateTimeEdit" name="dateTimeEdit">
+   <widget class="QComboBox" name="vtkBackground">
+    <property name="geometry">
+     <rect>
+      <x>750</x>
+      <y>10</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>9</y>
+      <width>191</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string>
+            font-size:14pt; 
+            font-weight:600; 
+            color:#1a5fb4;
+        </string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="timerLabel">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>10</y>
+      <width>75</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#1a5fb4;&quot;&gt;00:00:00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>10</y>
-      <width>194</width>
-      <height>26</height>
+      <width>131</width>
+      <height>21</height>
      </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#000000;&quot;&gt;Elapsed Time:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>  
     </property>
    </widget>
   </widget>

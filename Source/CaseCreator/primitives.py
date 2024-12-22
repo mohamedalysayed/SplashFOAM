@@ -29,8 +29,6 @@ class ampersandPrimitives:
     def __init__(self):
         pass
     
-    
-    
     @staticmethod
     def list_stl_files(stl_files, GUIMode=False, window=None):
         """
@@ -162,7 +160,6 @@ class ampersandPrimitives:
             elif isinstance(value, list):
                 data[key] = tuple(value)
         return data
-
 
     @staticmethod
     def crlf_to_LF(file_path):
@@ -535,8 +532,6 @@ class ampersandDataInput:
             ampersandIO.printMessage("Invalid mesh refinement level. Defaulting to medium.")
             refLevel = 1
         return refLevel
-    
-
 
 if __name__ == "__main__":
     print(ampersandPrimitives.createFoamHeader(className="dictionary",objectName="snappyHexMeshDict"))
