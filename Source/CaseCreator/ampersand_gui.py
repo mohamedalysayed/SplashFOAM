@@ -1,3 +1,15 @@
+# Importing system-related libs  
+import sys
+import os
+from time import sleep # maybe this line can be deleted
+import time
+
+# Connection to the Ampersand Backend
+from project import ampersandProject
+from primitives import ampersandPrimitives, ampersandIO
+
+# Importing PySide components 
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QVBoxLayout
@@ -5,13 +17,13 @@ from PySide6.QtCore import QFile
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtCore import QTimer, QTime # for Timer
 from PySide6.QtCore import Qt
-import time
 from PySide6 import QtWidgets
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from dialogBoxes import sphereDialogDriver, yesNoDialogDriver, yesNoCancelDialogDriver
 from dialogBoxes import vectorInputDialogDriver, STLDialogDriver, physicalPropertiesDialogDriver
 from dialogBoxes import boundaryConditionDialogDriver, numericsDialogDriver, controlsDialogDriver
 from dialogBoxes import set_src, meshPointDialogDriver
+
 # ----------------- VTK Libraries ----------------- #
 import vtk
 import vtkmodules.vtkInteractionStyle
@@ -29,16 +41,9 @@ from vtkmodules.vtkRenderingCore import (
     vtkRenderer
 )
 # ------------------------------------------------- #
-import sys
-import os
-from time import sleep
 
 #Importing separate classes and functions
 from vtk_manager import VTKManager
-
-# Connection to the Ampersand Backend
-from project import ampersandProject
-from primitives import ampersandPrimitives, ampersandIO
 
 #os.chdir(r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src")
 # get the absolute path of the current directory
@@ -51,21 +56,20 @@ set_src(src)
 class mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.vtk_manager = None  # Defer initialization
         self.load_ui()
         self.surfaces = []
         self.project_opened = False
-        self.project = None #ampersandProject(GUIMode=True,window=self)
-        self.vtk_manager = VTKManager(self.ren, self.vtkWidget)  # Initialize VTK Manager
-        self.app_start_time = time.time()  # Record the time at app launch
+        self.project = None
+        self.app_start_time = time.time()
         self.setup_timer()
-        self.minx,self.miny,self.minz = 0.0,0.0,0.0
-        self.maxx,self.maxy,self.maxz = 0.0,0.0,0.0
-        self.nx,self.ny,self.nz = 0,0,0
-        self.lenX,self.lenY,self.lenZ = 1e-3,1e-3,1e-3
+        self.minx, self.miny, self.minz = 0.0, 0.0, 0.0
+        self.maxx, self.maxy, self.maxz = 0.0, 0.0, 0.0
+        self.nx, self.ny, self.nz = 0, 0, 0
+        self.lenX, self.lenY, self.lenZ = 1e-3, 1e-3, 1e-3
         self.current_stl_file = None
         self.colorCounter = 0
-        self.listOfColors = ["Pink","Red","Green","Blue","Yellow","Orange","Purple","Cyan","Magenta","Brown",]
-        # disable all the buttons and input fields
+        #self.listOfColors = ["Pink", "Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Cyan", "Magenta", "Brown"]
         self.disableButtons()
         
     def setup_timer(self):
@@ -182,20 +186,6 @@ class mainWindow(QMainWindow):
         self.window.lineEdit_nY.setEnabled(True)
         self.window.lineEdit_nZ.setEnabled(True)
 
-##    def load_ui(self):
-##        loader = QUiLoader()
-##        ui_path = os.path.join(src, "ampersandInputForm.ui")
-##        ui_file = QFile(ui_path)
-##        ui_file.open(QFile.ReadOnly)
-##        self.window = loader.load(ui_file, None)
-##        ui_file.close()
-##        self.setCentralWidget(self.window)
-##        self.setGeometry(100, 100, 1400, 880)
-##        self.setWindowTitle("SplashFOAM Case Creator")
-##        self.prepare_vtk()
-##        self.prepare_subWindows()
-##        self.prepare_events()
-
     def load_ui(self):
         loader = QUiLoader()
         ui_path = os.path.join(src, "ampersandInputForm.ui")
@@ -213,9 +203,38 @@ class mainWindow(QMainWindow):
             print("Error: 'timerLabel' not found in the UI.")
             return
         
-        self.prepare_vtk()
+        # Set up VTK widget
+        self.vl = QVBoxLayout()
+        self.vtkWidget = QVTKRenderWindowInteractor(self.window.widget)
+        self.vl.addWidget(self.vtkWidget)
+        self.ren = vtkRenderer()
+        self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
+        
+        # Initialize VTKManager
+        self.vtk_manager = VTKManager(self.ren, self.vtkWidget)
+        
+        # Prepare sub-windows and event connections
         self.prepare_subWindows()
         self.prepare_events()
+        
+        # Configure VTK Background ComboBox
+        self.vtkBackground = self.window.findChild(QtWidgets.QComboBox, "vtkBackground")
+        if not self.vtkBackground:
+            print("Error: 'vtkBackground' ComboBox not found in the UI.")
+            return
+
+        # Populate and bind the ComboBox
+        self.vtkBackground.addItems([
+            "Cyan-Gray Gradient",
+            "White-Black Gradient",
+            "Blue Gradient",
+            "Solid White",
+            "Solid Black",
+        ])
+        self.vtkBackground.currentIndexChanged.connect(
+            lambda index: self.vtk_manager.update_vtk_background(index)
+        )
+       
 
     def __del__(self):
         pass
@@ -232,165 +251,6 @@ class mainWindow(QMainWindow):
     # manage sub windows
     def prepare_subWindows(self):
         self.createCaseWindow = None
-
-    def prepare_vtk(self):
-        # Prepare the VTK widget to show the STL
-        self.vl = QVBoxLayout()
-        self.vtkWidget = QVTKRenderWindowInteractor(self.window.widget)
-        self.vl.addWidget(self.vtkWidget)
-        self.ren = vtk.vtkRenderer()
-        self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
-        self.vtkWidget.resize(891,471)
-        # change the background color to black
-        colors = vtk.vtkNamedColors()
-        whiteColor = colors.GetColor3d("White")
-        blackColor = colors.GetColor3d("Black")
-        self.ren.GradientBackgroundOn()
-        self.ren.SetBackground(whiteColor)
-        self.ren.SetBackground2(blackColor)
-        #self.ren.SetBackground(0, 0, 0)
-        #self.ren.SetBackground(0.1, 0.2, 0.4)
-        self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
-        #self.reader = vtk.vtkSTLReader()
-        #self.render3D()
-        self.initializeVTK()
-        #self.iren.Initialize()
-        #self.iren.Start()
-
-    # this function will read STL file and show it in the VTK renderer | FLAG! local path!
-    def showSTL(self,stlFile=r"C:\Users\mrtha\Desktop\GitHub\foamAutoGUI\src\pipe.stl"):
-        # Read stl
-        try:
-            self.reader = vtk.vtkSTLReader()
-            self.reader.SetFileName(stlFile)
-            stl_name = os.path.basename(stlFile)
-            print("STL Name: ",stl_name)
-            self.render3D(actorName=stl_name)
-        except:
-            print("Reading STL not successful. Try again")
-
-    def initializeVTK(self):
-        # Create a mapper
-        #mapper = vtk.vtkPolyDataMapper()
-        #mapper.SetInputConnection(self.reader.GetOutputPort())
-        # Create an actor
-        actor = vtk.vtkActor()
-        #actor.SetMapper(mapper)
-        actor.GetProperty().EdgeVisibilityOn()
-        colors = vtk.vtkNamedColors()
-        whiteColor = colors.GetColor3d("Grey")
-        blackColor = colors.GetColor3d("Cyan")
-        #deepBlue = colors.GetColor3d("DeepBlue")
-        #self.ren.SetBackground(colors.GetColor3d("SlateGray"))
-        # set background color as gradient
-        self.ren.GradientBackgroundOn()
-        self.ren.SetBackground(whiteColor)
-        self.ren.SetBackground2(blackColor)
-        self.ren.AddActor(actor)
-        style = vtk.vtkInteractorStyleTrackballCamera()
-        self.iren.SetInteractorStyle(style)
-        camera = vtk.vtkCamera()
-        camera.SetPosition(-1, 1, 1)
-        camera.SetFocalPoint(0, 0, 0)
-        camera.SetViewUp(0, 0, 1)
-        self.ren.SetActiveCamera(camera)
-        self.iren.Initialize()
-        # add coordinate axes
-        axes = vtk.vtkAxesActor()
-        axes.SetTotalLength(0.1, 0.1, 0.1)
-        self.ren.AddActor(axes)
-        self.iren.Start()
-      
-
-    def render3D(self,actorName=None):  # self.ren and self.iren must be used. other variables are local variables
-        # Create a mapper
-        mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(self.reader.GetOutputPort())
-        # Create an actor
-        actor = vtk.vtkActor()
-        actor.SetMapper(mapper)
-        if actorName:
-            actor.SetObjectName(actorName)
-            #print("Actor Name: ",actor.GetObjectName())
-        #actor.GetProperty().EdgeVisibilityOn()
-        # set random colors to the actor
-        colors = vtk.vtkNamedColors()
-        
-        if(self.colorCounter>9):
-            self.colorCounter = 0
-        actor.GetProperty().SetColor(colors.GetColor3d(self.listOfColors[self.colorCounter]))
-        self.ren.AddActor(actor)
-        axes = vtk.vtkAxesActor()
-        #self.project.update_max_lengths()
-        #charLen = min(self.project.lenX,self.project.lenY,self.project.lenZ)*0.5
-        #maxLen = max(self.project.lenX,self.project.lenY,self.project.lenZ)
-        #charLen = max(charLen,maxLen*0.2,0.01)
-        axes.SetTotalLength(0.1, 0.1, 0.1)
-        self.ren.AddActor(axes)
-        
-        self.colorCounter += 1
-        
-        #self.iren.Start()
-
-    def add_object_to_VTK(self,object,objectName="sphere",opacity=0.5,removePrevious=False,color=(0.5,0.5,0.5)):
-        # Create a mapper
-        mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(object.GetOutputPort())
-        
-        # Create an actor
-        actor = vtk.vtkActor()
-        actor.GetProperty().SetOpacity(opacity)
-        if color:
-            actor.GetProperty().SetColor(color)
-        else:
-            actor.GetProperty().SetColor(0.5,0.5,0.5)
-        actor.GetProperty().SetObjectName(objectName)
-        actor.GetProperty().EdgeVisibilityOn()
-        actor.SetMapper(mapper)
-        # remove the previous object
-        if(removePrevious):
-            currentActors = self.ren.GetActors()
-            for act in currentActors:
-                if(act.GetProperty().GetObjectName()==objectName):
-                    print("Removing previous object: ",objectName)
-                    self.ren.RemoveActor(act)
-        self.ren.AddActor(actor)
-        self.iren.Start()
-
-    def add_sphere_to_VTK(self,center=(0.0,0.0,0.0),radius=1.0,objectName="sphere",removePrevious=True):
-        # Create a sphere
-        sphere = vtk.vtkSphereSource()
-        sphere.SetCenter(center)
-        sphere.SetRadius(radius)
-        self.add_object_to_VTK(sphere,objectName=objectName,removePrevious=removePrevious)
-       
-
-    def add_box_to_VTK(self,minX=0.0,minY=0.0,minZ=0.0,maxX=1.0,maxY=1.0,maxZ=1.0,boxName="box"):
-        # Create a cube
-        cube = vtk.vtkCubeSource()
-        cube.SetXLength(maxX-minX)
-        cube.SetYLength(maxY-minY)
-        cube.SetZLength(maxZ-minZ)
-        cube.SetCenter((maxX+minX)/2,(maxY+minY)/2,(maxZ+minZ)/2)
-        # make box transparent
-
-        cubeMapper = vtk.vtkPolyDataMapper()
-        cubeMapper.SetInputConnection(cube.GetOutputPort())
-        cubeActor = vtk.vtkActor()
-        cubeActor.GetProperty().SetOpacity(0.5)
-        cubeActor.GetProperty().SetColor(0.5,0.5,0.5)
-        cubeActor.GetProperty().SetObjectName(boxName)
-        cubeActor.SetMapper(cubeMapper)
-        # remove the previous box
-        currentActors = self.ren.GetActors()
-        for actor in currentActors:
-            if(actor.GetProperty().GetObjectName()==boxName):
-                self.ren.RemoveActor(actor)
-        self.ren.AddActor(cubeActor)
-        currentActors = self.ren.GetActors()
-        
-        #self.ren.ResetCamera()
-        self.iren.Start()
     
     def loadSTL(self,stlFile = r"C:\Users\mrtha\Desktop\GitHub\foamAutoGUI\src\pipe.stl"):
         ampersandIO.printMessage("Loading STL file")
@@ -407,61 +267,80 @@ class mainWindow(QMainWindow):
 
     def update_list(self):
         self.window.listWidgetObjList.clear()
-        for i in range(len(self.project.stl_files)):
-            self.window.listWidgetObjList.insertItem(i,self.project.stl_files[i]['name'])
+        for idx, stl in enumerate(self.project.stl_files):
+            print(f"Adding to list: {stl['name']}")
+            self.window.listWidgetObjList.addItem(stl['name'])
 
+    # ----------------------------------------------
+    #  Highlighing the clicked STL file in the list
+    # ---------------------------------------------
     def listClicked(self):
-        # find the selected item in the list
-        item = self.window.listWidgetObjList.currentItem()
-        idx = self.window.listWidgetObjList.row(item)
-        
-        self.current_stl_file = item.text()
-        #print("Selected Item: ",self.current_stl_file)
-        #actors = self.ren.GetActors()
-        self.vtkHilightSTL(self.current_stl_file)
-        
-        stl_properties = self.project.get_stl_properties(self.current_stl_file)
-        if stl_properties==None:
-            return
-        purpose,refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds = stl_properties
-        #print("STL Properties: ",refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds)
-        return
-        # update the property box
-        self.window.tableViewProperties.setItem(0,0,QtWidgets.QTableWidgetItem("Refinement Min"))
-        #self.window.tableViewProperties.setItem(0,0,QtWidgets.QTableWidgetItem(str(refMin)))
-        self.window.tableViewProperties.setItem(0,1,QtWidgets.QTableWidgetItem(str(refMax)))
-        self.window.tableViewProperties.setItem(1,0,QtWidgets.QTableWidgetItem(str(featureEdges)))
-        self.window.tableViewProperties.setItem(1,1,QtWidgets.QTableWidgetItem(str(featureLevel)))
-        self.window.tableViewProperties.setItem(2,0,QtWidgets.QTableWidgetItem(str(nLayers)))
-        self.window.tableViewProperties.setItem(2,1,QtWidgets.QTableWidgetItem(str(property)))
-        self.window.tableViewProperties.setItem(3,0,QtWidgets.QTableWidgetItem(str(bounds[0])))
-        
-#    def updateStatusBar(self,message="Go!"):
-#        self.window.statusbar.showMessage(message)
-#        #self.window.plainTextTerminal.appendPlainText(message)
-#        self.window.plainTextTerminal.insertPlainText(message+"\n")
+        """
+        Handles the event when an item is clicked in the listWidgetObjList.
+        Highlights the selected STL in the VTK viewer and updates the property box.
+        """
+        try:
+            # Find the selected item in the list
+            item = self.window.listWidgetObjList.currentItem()
+            if not item:
+                print("No item selected.")
+                return
+            
+            idx = self.window.listWidgetObjList.row(item)
+            self.current_stl_file = item.text()
+            
+            print(f"Selected Item: {self.current_stl_file}, at Index: {idx}")
+            
+            # Highlight the STL file in the VTK viewer
+            self.vtk_manager.highlight_actor(
+                self.current_stl_file,
+                [s['name'] for s in self.project.stl_files],
+                vtkNamedColors()
+            )
+            
+            # Retrieve STL properties
+            stl_properties = self.project.get_stl_properties(self.current_stl_file)
+            if not stl_properties:
+                print(f"No properties found for STL: {self.current_stl_file}")
+                return
 
-##    def updateTerminal(self,message="Go!"):
-##        self.window.plainTextTerminal.insertPlainText(message+"\n")
-##        #self.window.plainTextTerminal.appendPlainText(message)
+            # Unpack STL properties
+            purpose, refMin, refMax, featureEdges, featureLevel, nLayers, property, bounds = stl_properties
+            print(f"STL Properties for {self.current_stl_file}:")
+            print(f"Purpose: {purpose}, RefMin: {refMin}, RefMax: {refMax}")
+            print(f"FeatureEdges: {featureEdges}, FeatureLevel: {featureLevel}")
+            print(f"nLayers: {nLayers}, Property: {property}, Bounds: {bounds}")
+            
+            # Update the property box with the retrieved properties
+            self.window.tableViewProperties.clearContents()
+            self.window.tableViewProperties.setRowCount(4)
+            self.window.tableViewProperties.setColumnCount(2)
 
-#    def updateTerminal(self, *messages):
-#        """
-#        Updates the terminal output in the GUI with one or more messages.
-#        :param messages: Any number of strings to display in the terminal.
-#        """
-#        for message in messages:
-#            self.window.plainTextTerminal.insertPlainText(f"{message}\n")
-#        # Ensure the terminal scrolls to the most recent message
-#        self.window.plainTextTerminal.verticalScrollBar().setValue(
-#            self.window.plainTextTerminal.verticalScrollBar().maximum()
-#        )
-      
-#  def readyStatusBar(self):
-#        # pause 1 millisecond
-#        sleep(0.001)
-#        self.window.statusbar.showMessage("Ready")
+            # Setting headers (if not already set elsewhere)
+            self.window.tableViewProperties.setHorizontalHeaderLabels(["Property", "Value"])
+            
+            self.window.tableViewProperties.setItem(0, 0, QtWidgets.QTableWidgetItem("Refinement Min"))
+            self.window.tableViewProperties.setItem(0, 1, QtWidgets.QTableWidgetItem(str(refMin)))
+            self.window.tableViewProperties.setItem(1, 0, QtWidgets.QTableWidgetItem("Refinement Max"))
+            self.window.tableViewProperties.setItem(1, 1, QtWidgets.QTableWidgetItem(str(refMax)))
+            self.window.tableViewProperties.setItem(2, 0, QtWidgets.QTableWidgetItem("Feature Edges"))
+            self.window.tableViewProperties.setItem(2, 1, QtWidgets.QTableWidgetItem(str(featureEdges)))
+            self.window.tableViewProperties.setItem(3, 0, QtWidgets.QTableWidgetItem("Feature Level"))
+            self.window.tableViewProperties.setItem(3, 1, QtWidgets.QTableWidgetItem(str(featureLevel)))
+            
+            # Additional rows for other properties
+            additional_row = 4
+            self.window.tableViewProperties.setRowCount(additional_row + 2)
+            self.window.tableViewProperties.setItem(additional_row, 0, QtWidgets.QTableWidgetItem("Number of Layers"))
+            self.window.tableViewProperties.setItem(additional_row, 1, QtWidgets.QTableWidgetItem(str(nLayers)))
+            self.window.tableViewProperties.setItem(additional_row + 1, 0, QtWidgets.QTableWidgetItem("Bounds"))
+            self.window.tableViewProperties.setItem(additional_row + 1, 1, QtWidgets.QTableWidgetItem(str(bounds)))
 
+        except Exception as e:
+            print(f"Error in listClicked: {e}")
+    # ------------------------------------------------------
+    #  End of: Highlighing the clicked STL file in the list
+    # ------------------------------------------------------        
 
     def updateTerminal(self, *messages):
         """
@@ -493,18 +372,26 @@ class mainWindow(QMainWindow):
 # FLAG! Why is this line is written this way?         
 #self.window.plainTextTerminal.verticalScrollBar().setValue(self.window.plainTextTerminal.verticalScrollBar().maximum())
         
+        #----------------- Event Handlers -----------------#    
     def prepare_events(self):
-        #self.window.resizeEvent = self.resizeEventTriggered
-        #self.window.closeEvent = self.closeEventTriggered
-        # Initiate the button click maps
-        self.window.pushButtonSTLImport.clicked.connect(self.importSTL)
-        self.window.pushButtonSphere.clicked.connect(self.createSphere)
+        # Saving screenshots and connecting relevant events
+        save_screenshot_action = QAction("Save Screenshot", self)
+        save_screenshot_action.triggered.connect(self.saveScreenshotOptions)
+
+        # Add the "Save Screenshot" action before the "Exit" action
+        self.window.menuFile.insertAction(self.window.actionExit, save_screenshot_action)  # Insert above "Exit"
+
+        # Connect other menu actions
         self.window.actionNew_Case.triggered.connect(self.createCase)
         self.window.actionOpen_Case.triggered.connect(self.openCase)
         self.window.actionSave_Case.triggered.connect(self.saveCase)
+        self.window.actionExit.triggered.connect(self.close)
+
+        # Additional button connections
+        self.window.pushButtonSTLImport.clicked.connect(self.importSTL)
+        self.window.pushButtonSphere.clicked.connect(self.createSphere)
         self.window.pushButtonCreate.clicked.connect(self.createCase)
         self.window.pushButtonOpen.clicked.connect(self.openCase)
-        self.window.actionExit.triggered.connect(self.close)
         self.window.pushButtonGenerate.clicked.connect(self.generateCase)
         self.window.pushButtonSave.clicked.connect(self.saveCase)
         self.window.radioButtonInternal.clicked.connect(self.chooseInternalFlow)
@@ -522,8 +409,13 @@ class mainWindow(QMainWindow):
         self.window.pushButtonAddSTL.clicked.connect(self.importSTL)
         self.window.pushButtonRemoveSTL.clicked.connect(self.removeSTL)
         self.window.pushButtonMeshPoint.clicked.connect(self.setMeshPoint)
-        #self.window.checkBoxOnGround.clicked.connect(self.chooseExternalFlow)
-        # change view on the VTK widget
+        
+        # Manual generation event
+        download_manual_action = QAction("Download Manual", self)
+        download_manual_action.triggered.connect(self.download_manual)
+        self.window.menuHelp.addAction(download_manual_action)
+
+        # VTK view changes
         self.window.pushButtonFitAll.clicked.connect(self.vtkFitAll)
         self.window.pushButtonPlusX.clicked.connect(self.vtkPlusX)
         self.window.pushButtonPlusY.clicked.connect(self.vtkPlusY)
@@ -534,31 +426,135 @@ class mainWindow(QMainWindow):
         self.window.pushButtonShowWire.clicked.connect(self.vtkShowWire)
         self.window.pushButtonShowSurface.clicked.connect(self.vtkShowSurface)
         self.window.pushButtonShowEdges.clicked.connect(self.vtkShowEdges)
-        
-        #self.window.resizeEvent = self.resizeEvent
-        self.window.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
-        self.window.resizeEvent = self.resizeEvent
-        self.window.widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
-        #self.window.closeEvent = self.closeEvent
-        self.window.statusbar.showMessage("Ready")
+    #----------------- Event Handlers -----------------#
+    
+    def download_manual(self):
+        """
+        Generates the documentation for the application in both HTML and PDF formats.
+        """
+        try:
+            from documentation_generator import DocumentationGenerator
 
-#----------------- Event Handlers -----------------#
-    def importSTL(self):
-        #self.updateStatusBar("Opening STL")
-        #self.openSTL()
-        #self.readyStatusBar()
-        stl_status = self.project.add_stl_file()
-        if stl_status==-1:
-            #ampersandIO.printError("STL file not loaded",GUIMode=True,window=self)
+            source_file = os.path.abspath(__file__)  # Path to the current script
+            output_dir = os.path.join(os.getcwd(), "docs")
+            DocumentationGenerator.generate_manual(source_file, output_dir)
+
+            self.updateStatusBar("Manual downloaded successfully.")
+        except Exception as e:
+            self.updateStatusBar(f"Error generating manual: {e}")
+            print(f"Error: {e}")
+        
+    #-------------------    
+    # Screenshot saving
+    #-------------------     
+    def saveScreenshotOptions(self):
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle("Screenshot Options")
+
+        layout = QtWidgets.QVBoxLayout(dialog)
+
+        # Resolution input
+        resolution_label = QtWidgets.QLabel("Resolution (width x height):")
+        layout.addWidget(resolution_label)
+        resolution_input = QtWidgets.QLineEdit()
+        resolution_input.setPlaceholderText("1920x1080")
+        layout.addWidget(resolution_input)
+
+        # Transparency checkbox
+        transparency_checkbox = QtWidgets.QCheckBox("Transparent Background")
+        layout.addWidget(transparency_checkbox)
+
+        # Buttons
+        button_layout = QtWidgets.QHBoxLayout()
+        save_button = QtWidgets.QPushButton("Save")
+        cancel_button = QtWidgets.QPushButton("Cancel")
+        button_layout.addWidget(save_button)
+        button_layout.addWidget(cancel_button)
+        layout.addLayout(button_layout)
+
+        # Button actions
+        def save_action():
+            resolution = resolution_input.text().strip()
+            transparent = transparency_checkbox.isChecked()
+            dialog.accept()
+            self.saveScreenshot(resolution, transparent)
+
+        save_button.clicked.connect(save_action)
+        cancel_button.clicked.connect(dialog.reject)
+
+        dialog.exec()
+    
+    def saveScreenshot(self, resolution="1920x1080", transparent=False):
+        # Open a file dialog to get the save location and file name
+        options = QtWidgets.QFileDialog.Options()
+        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Save Screenshot",
+            "",
+            "Image Files (*.png *.jpg *.bmp *.tiff)",
+            options=options
+        )
+
+        if not file_path:
+            print("Save operation canceled.")
             return
-        #self.project.analyze_stl_file()
-        self.project.add_stl_to_project()
-        #self.showSTL(stlFile=self.project.current_stl_file)
-        stl_file_paths = self.project.list_stl_paths()
-        for stl_file in stl_file_paths:
-            self.showSTL(stlFile=stl_file)
-        self.update_list()
-        #self.project.list_stl_files()
+
+        # Parse resolution
+        try:
+            width, height = map(int, resolution.split("x"))
+        except ValueError:
+            print("Invalid resolution format. Using default resolution.")
+            width, height = 1920, 1080
+
+        # Set up the VTK filter to capture the rendering window
+        render_window = self.vtkWidget.GetRenderWindow()
+        window_to_image_filter = vtk.vtkWindowToImageFilter()
+        window_to_image_filter.SetInput(render_window)
+
+        # Configure transparency
+        if transparent:
+            window_to_image_filter.SetInputBufferTypeToRGBA()
+            render_window.SetAlphaBitPlanes(1)  # Enable alpha channel for the render window
+            self.ren.SetBackground(1.0, 1.0, 1.0)  # Set background color (white)
+            self.ren.GetRenderWindow().SetMultiSamples(0)  # Disable multisampling for transparency
+        else:
+            window_to_image_filter.SetInputBufferTypeToRGB()
+            self.ren.SetBackground(0.0, 0.0, 0.0)  # Set background color (black)
+
+        # Set resolution
+        render_window.SetSize(width, height)
+        render_window.Render()  # Update the render window
+
+        window_to_image_filter.Update()
+
+        # Save the image
+        writer = vtk.vtkPNGWriter()
+        writer.SetFileName(file_path)
+        writer.SetInputConnection(window_to_image_filter.GetOutputPort())
+        writer.Write()
+
+        print(f"Screenshot saved to: {file_path}")
+        self.updateStatusBar(f"Screenshot saved to: {file_path}")
+        #--------------------------    
+        # End of screenshot saving
+        #-------------------------- 
+    
+    def importSTL(self):
+        try:
+            print("Importing STL...")
+            stl_status = self.project.add_stl_file()
+            print(f"STL Status: {stl_status}")
+            if stl_status == -1:
+                self.updateStatusBar("Failed to load STL file.")
+                return
+            self.project.add_stl_to_project()
+            print(f"Project STL Files: {self.project.stl_files}")
+            self.vtk_manager.render_stl(self.project.current_stl_file)
+            self.update_list()
+            self.updateStatusBar("STL imported successfully.")
+        except Exception as e:
+            self.updateStatusBar(f"Error importing STL: {e}")
+            print(f"Error: {e}")
 
     def importMultipleSTL(self):
         # show the file dialog
@@ -575,7 +571,7 @@ class mainWindow(QMainWindow):
                 ampersandIO.printError(f"STL file {stl} not loaded",GUIMode=True,window=self)
                 #return
             self.project.add_stl_to_project()
-            self.showSTL(stlFile=stl)
+            self.vtk_manager.showSTL(stlFile=stl)
         self.update_list()
         self.readyStatusBar()
 
@@ -714,75 +710,180 @@ class mainWindow(QMainWindow):
         # change window title
         self.setWindowTitle(f"Case Creator: {project_name}")
         self.readyStatusBar()
+        
+#------------------------------ Back up 25.12.2024 -------------------------------
+#    # Open an existing OpenFOAM case
+#    def openCase(self):
+#        if self.project_opened:
+#            # ask yes or no or cancel
+#            yNC = yesNoCancelDialogDriver("Save changes to current case files before creating a New Case","Save Changes")
+#            if yNC==1: # if yes
+#                # save the project
+#                self.project.add_stl_to_project()
+#                self.project.write_settings()
+#                self.disableButtons()
+#                self.ren.RemoveAllViewProps()
+#            elif yNC==-1: # if no
+#                # close the project
+#                self.project = None
+#                self.project_opened = False
+#                self.disableButtons()
+#                self.ren.RemoveAllViewProps()
+#            else: # if cancel
+#                self.readyStatusBar()
+#                return
+#        self.updateStatusBar("Opening Case")
+#        # clear terminal
+#        self.window.plainTextTerminal.clear()
+#        # clear the case
+#        self.project = None
+#        self.project = ampersandProject(GUIMode=True,window=self)
+
+#        # clear vtk renderer
+#        self.ren.RemoveAllViewProps()
+#        # clear the list widget
+#        self.window.listWidgetObjList.clear()
+#        projectFound = self.project.set_project_path(ampersandPrimitives.ask_for_directory(qt=True))
+#        
+#        if projectFound==-1:
+#            ampersandIO.printWarning("No project found. Failed to open case directory.",GUIMode=True)
+#            self.updateTerminal("No project found. Failed to open case directory.")
+#            
+#            self.readyStatusBar()
+#            return -1
+#        ampersandIO.printMessage(f"Project path: {self.project.project_path}",GUIMode=True,window=self)
+#        ampersandIO.printMessage("Loading the project",GUIMode=True,window=self)
+#        self.project.go_inside_directory()
+#        
+#        self.project.load_settings()
+#        self.project.check_0_directory()
+#        ampersandIO.printMessage("Project loaded successfully",GUIMode=True,window=self)
+#        self.project.summarize_project()
+#        self.enableButtons()
+#        self.autoDomain(analyze=False)
+#        #self.vtkUpdateAxes()
+#        stl_file_paths = self.project.list_stl_paths()
+#        
+#        for stl_file in stl_file_paths:
+#            self.vtk_manager.render_stl(stl_file)
+#        self.update_list()  # Populate the Object List panel    
+#        
+#        self.readyStatusBar()
+#        if self.project.internalFlow:
+#            self.window.radioButtonInternal.setChecked(True)
+#            self.window.checkBoxOnGround.setEnabled(False)
+#        else:
+#            self.window.radioButtonExternal.setChecked(True)
+#            self.window.checkBoxOnGround.setChecked(self.project.onGround)
+#        self.project_opened = True
+#        ampersandIO.printMessage(f"Project {self.project.project_name} created",GUIMode=True,window=self)
+#        
+#        # Update the window status 
+#        self.setWindowTitle(f"Case Creator: {self.project.project_name}")
+#        self.vtkDrawMeshPoint()
+#        self.readyStatusBar()
+#------------------------------ Back up 25.12.2024 -------------------------------
 
     def openCase(self):
+        """
+        Opens an existing OpenFOAM case and loads its associated settings and STL files.
+        
+        This method handles the following:
+        1. Prompts the user to save changes to the currently open project if applicable.
+        2. Clears the terminal, renderer, and GUI elements to prepare for the new case.
+        3. Loads the project directory selected by the user.
+        4. Reads project settings, checks the case structure, and validates the directory.
+        5. Renders all STL files in the case and updates the object list.
+        6. Restores the camera to its previous state (if saved) or sets a default view.
+        7. Updates the GUI elements based on the loaded project settings.
+        8. Displays success or error messages in the terminal and status bar.
+
+        GUI Elements Updated:
+        - The object list is populated with STL file names.
+        - Buttons are enabled or disabled based on the project state.
+        - Camera view is adjusted to fit the loaded geometry.
+
+        Error Handling:
+        - If no project directory is selected or the directory is invalid, appropriate warnings are displayed.
+
+        Raises:
+            None
+        """
         if self.project_opened:
-            # ask yes or no or cancel
-            yNC = yesNoCancelDialogDriver("Save changes to current case files before creating a New Case","Save Changes")
-            if yNC==1: # if yes
-                # save the project
+            # Ask user to save changes, discard, or cancel
+            yNC = yesNoCancelDialogDriver(
+                "Save changes to current case files before creating a New Case", "Save Changes"
+            )
+            if yNC == 1:  # Yes
                 self.project.add_stl_to_project()
                 self.project.write_settings()
                 self.disableButtons()
                 self.ren.RemoveAllViewProps()
-            elif yNC==-1: # if no
-                # close the project
+            elif yNC == -1:  # No
                 self.project = None
                 self.project_opened = False
                 self.disableButtons()
                 self.ren.RemoveAllViewProps()
-            else: # if cancel
+            else:  # Cancel
                 self.readyStatusBar()
                 return
-        self.updateStatusBar("Opening Case")
-        # clear terminal
-        self.window.plainTextTerminal.clear()
-        # clear the case
-        self.project = None
-        self.project = ampersandProject(GUIMode=True,window=self)
 
-        # clear vtk renderer
+        self.updateStatusBar("Opening Case")
+        # Clear terminal and VTK renderer
+        self.window.plainTextTerminal.clear()
         self.ren.RemoveAllViewProps()
-        # clear the list widget
-        self.window.listWidgetObjList.clear()
-        projectFound = self.project.set_project_path(ampersandPrimitives.ask_for_directory(qt=True))
-        
-        if projectFound==-1:
-            ampersandIO.printWarning("No project found. Failed to open case directory.",GUIMode=True)
+
+        # Reset the project
+        self.project = ampersandProject(GUIMode=True, window=self)
+        self.window.listWidgetObjList.clear()  # Clear the object list
+
+        project_found = self.project.set_project_path(ampersandPrimitives.ask_for_directory(qt=True))
+        if project_found == -1:
+            ampersandIO.printWarning("No project found. Failed to open case directory.", GUIMode=True)
             self.updateTerminal("No project found. Failed to open case directory.")
-            
             self.readyStatusBar()
             return -1
-        ampersandIO.printMessage(f"Project path: {self.project.project_path}",GUIMode=True,window=self)
-        ampersandIO.printMessage("Loading the project",GUIMode=True,window=self)
+
+        ampersandIO.printMessage(f"Project path: {self.project.project_path}", GUIMode=True, window=self)
+        ampersandIO.printMessage("Loading the project", GUIMode=True, window=self)
+
+        # Load settings and validate the case structure
         self.project.go_inside_directory()
-        
         self.project.load_settings()
         self.project.check_0_directory()
-        ampersandIO.printMessage("Project loaded successfully",GUIMode=True,window=self)
-        self.project.summarize_project()
-        self.enableButtons()
-        self.autoDomain(analyze=False)
-        #self.vtkUpdateAxes()
-        self.update_list()
+        ampersandIO.printMessage("Project loaded successfully", GUIMode=True, window=self)
+
+        # Render all STL files in the case
         stl_file_paths = self.project.list_stl_paths()
         for stl_file in stl_file_paths:
-            self.showSTL(stlFile=stl_file)
-        self.readyStatusBar()
+            self.vtk_manager.render_stl(stl_file)
+
+        # Update the object list panel
+        self.update_list()
+
+        # Restore camera state or set a default view
+        self.vtk_manager.restore_camera_state()
+        self.vtk_manager.set_default_camera()
+
+        # Update GUI elements based on project settings
+        self.enableButtons()
+        self.autoDomain(analyze=False)
+
         if self.project.internalFlow:
             self.window.radioButtonInternal.setChecked(True)
             self.window.checkBoxOnGround.setEnabled(False)
         else:
             self.window.radioButtonExternal.setChecked(True)
             self.window.checkBoxOnGround.setChecked(self.project.onGround)
-        self.project_opened = True
-        ampersandIO.printMessage(f"Project {self.project.project_name} created",GUIMode=True,window=self)
-        self.setWindowTitle(f"Case Creator: {self.project.project_name}")
-        self.vtkDrawMeshPoint()
-        self.readyStatusBar()
 
+        # Update window title and status
+        self.project_opened = True
+        self.setWindowTitle(f"Case Creator: {self.project.project_name}")
+        ampersandIO.printMessage(f"Project {self.project.project_name} opened", GUIMode=True, window=self)
+        self.readyStatusBar()
     
 
+    # Generate a case of the current config. 
     def generateCase(self):
         self.updateStatusBar("Analyzing Case")
         #if(len(self.project.stl_files)>0):
@@ -796,7 +897,7 @@ class mainWindow(QMainWindow):
         self.project.write_settings()
         self.project.create_project_files()
         self.updateTerminal("--------------------")
-        self.updateTerminal("Case generated")
+        self.updateTerminal("   Case generated!  ")
         self.updateTerminal("--------------------")
         self.readyStatusBar()
 
@@ -852,9 +953,9 @@ class mainWindow(QMainWindow):
         self.window.lineEdit_nX.setText(str(nx))
         self.window.lineEdit_nY.setText(str(ny))
         self.window.lineEdit_nZ.setText(str(nz))
-        self.add_box_to_VTK(minX=minx,minY=miny,minZ=minz,maxX=maxx,maxY=maxy,maxZ=maxz,boxName="Domain")
-        
-        
+        #self.add_box_to_VTK(minX=minx,minY=miny,minZ=minz,maxX=maxx,maxY=maxy,maxZ=maxz,boxName="Domain")
+        self.vtk_manager.add_box_to_VTK(minX=minx, minY=miny, minZ=minz, maxX=maxx, maxY=maxy, maxZ=maxz, boxName="Domain")
+
         self.vtkDrawMeshPoint()
         self.readyStatusBar()
         
@@ -886,10 +987,11 @@ class mainWindow(QMainWindow):
         self.project.meshSettings['domain']['ny'] = ny
         self.project.meshSettings['domain']['nz'] = nz
         self.updateStatusBar("Manual Domain Set")
-        self.add_box_to_VTK(minX=minx,minY=miny,minZ=minz,maxX=maxx,maxY=maxy,maxZ=maxz,boxName="Domain")
+        #self.add_box_to_VTK(minX=minx,minY=miny,minZ=minz,maxX=maxx,maxY=maxy,maxZ=maxz,boxName="Domain")
+        self.vtk_manager.add_box_to_VTK(minX=minx, minY=miny, minZ=minz, maxX=maxx, maxY=maxy, maxZ=maxz, boxName="Domain")
+
         self.readyStatusBar()
         
-
     def stlPropertiesDialog(self):
         stl = self.current_stl_file
         if stl==None:
@@ -898,10 +1000,11 @@ class mainWindow(QMainWindow):
         
         # open STL properties dialog
         stlProperties = STLDialogDriver(stl,stlProperties=currentStlProperties)
+        
         # The properties are:
-       
         if stlProperties==None:
             return
+        
         # update the properties
         status = self.project.set_stl_properties(stl,stlProperties)
         if status==-1:
@@ -964,131 +1067,11 @@ class mainWindow(QMainWindow):
         self.project.set_location_in_mesh(meshPoint)
         self.vtkDrawMeshPoint()
 
-# VTK Event Handlers
 #----------------- VTK Event Handlers -----------------#
-#    def vtkFitAll(self):
-#       
-#        self.ren.ResetCamera()
-#        self.vtkWidget.GetRenderWindow().Render()
-#        #self.ren.ResetCamera()
-#        #self.iren.Start()
-
-#    def vtkPlusX(self):
-#       
-#        self.ren.GetActiveCamera().SetPosition(1, 0, 0)
-#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-#        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
-#        self.ren.ResetCamera()
-#        self.vtkWidget.GetRenderWindow().Render()
-#    
-#    def vtkPlusY(self):
-#        
-#        self.ren.GetActiveCamera().SetPosition(0, 1, 0)
-#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-#        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
-#        self.ren.ResetCamera()
-#        self.vtkWidget.GetRenderWindow().Render()
-
-#    def vtkPlusZ(self):
-#        
-#        self.ren.GetActiveCamera().SetPosition(0, 0, 1)
-#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-#        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
-#        self.ren.ResetCamera()
-#        self.vtkWidget.GetRenderWindow().Render()
-#    
-#    def vtkMinusX(self):
-#        #print("Minus X side")
-#        self.ren.GetActiveCamera().SetPosition(-1, 0, 0)
-#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-#        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
-#        self.ren.ResetCamera()
-#        self.vtkWidget.GetRenderWindow().Render()
-#    
-#    def vtkMinusY(self):
-#        #print("Minus Y side")
-#        self.ren.GetActiveCamera().SetPosition(0, -1, 0)
-#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-#        self.ren.GetActiveCamera().SetViewUp(0, 0, 1)
-#        self.ren.ResetCamera()
-#        self.vtkWidget.GetRenderWindow().Render()
-
-#    def vtkMinusZ(self):
-#        #print("Minus Z side")
-#        self.ren.GetActiveCamera().SetPosition(0, 0, -1)
-#        self.ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-#        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
-#        self.ren.ResetCamera()
-#        self.vtkWidget.GetRenderWindow().Render()
-
-#    def vtkShowWire(self):
-#        #print("Show Wire")
-#        actors = self.ren.GetActors()
-#        for actor in actors:
-#            actor.GetProperty().SetRepresentationToWireframe()
-#        self.vtkWidget.GetRenderWindow().Render()
-#    
-#    def vtkShowSurface(self):
-#        #print("Show Surface")
-#        actors = self.ren.GetActors()
-#        for actor in actors:
-#            actor.GetProperty().SetRepresentationToSurface()
-#            actor.GetProperty().EdgeVisibilityOff()
-#        self.vtkWidget.GetRenderWindow().Render()
-
-#    def vtkShowEdges(self):
-#        #print("Show Edges")
-#        actors = self.ren.GetActors()
-#        for actor in actors:
-#            actor.GetProperty().SetRepresentationToSurface()
-#            actor.GetProperty().EdgeVisibilityOn()
-#        self.vtkWidget.GetRenderWindow().Render()
-
-#    def vtkHilightSTL(self,stlFile):
-#        idx = 0
-#        actors = self.ren.GetActors()
-#        
-#        colors = vtk.vtkNamedColors()
-#        actor_found = None
-#        stl_names = [] #self.project.stl_files
-#        for stl in self.project.stl_files:
-#            stl_names.append(stl['name'])
-#        for actor in actors:
-#            #print("Actor Name: ",actor.GetObjectName())
-#            #print("STL File: ",stlFile)
-#            
-#            if actor.GetObjectName() in stl_names:  
-#                if actor.GetObjectName() == stlFile:
-#                    #print("Actor Found: ",actor.GetObjectName())
-#                    actor_found = actor
-#                    actor_found.GetProperty().SetColor(1.0, 0.0, 1.0)
-#                else:
-#                    # reset colors for other colors
-#                    actor.GetProperty().SetColor(colors.GetColor3d(self.listOfColors[idx]))
-#                idx += 1
-#        self.vtkWidget.GetRenderWindow().Render()
-
-#    def vtkUpdateAxes(self):
-#        axes = vtk.vtkAxesActor()
-#        self.project.update_max_lengths()
-#        charLen = min(self.project.lenX,self.project.lenY,self.project.lenZ)*0.5
-#        maxLen = max(self.project.lenX,self.project.lenY,self.project.lenZ)
-#        charLen = max(charLen,maxLen*0.2,0.01)
-#        axes.SetTotalLength(charLen, charLen, charLen)
-#        self.ren.AddActor(axes)
-#        self.vtkWidget.GetRenderWindow().Render()
-
-#    def vtkDrawMeshPoint(self):
-#        # estimate size of the mesh point
-#        lx,ly,lz = self.project.lenX,self.project.lenY,self.project.lenZ
-#        maxLen = max(lx,ly,lz,0.02)
-#        locationInMesh = tuple(self.project.get_location_in_mesh())
-
-#        print("Location in Mesh: ",locationInMesh)
-#        print("Drawing Mesh Point")
-
     def vtkFitAll(self):
         """Reset the camera to fit all actors in view."""
+        bounds = self.ren.ComputeVisiblePropBounds()
+        print(f"Visible bounds: {bounds}")  # Debugging output
         self.vtk_manager.reset_camera()
 
     def vtkPlusX(self):
@@ -1141,21 +1124,28 @@ class mainWindow(QMainWindow):
         self.vtk_manager.draw_axes(char_len)
 
     def vtkDrawMeshPoint(self):
-        """Draw the mesh point as a sphere in the renderer."""
+        """
+        Draw the mesh point using the VTKManager.
+        """
         location = self.project.get_location_in_mesh()
-        size_factor = max(self.project.lenX, self.project.lenY, self.project.lenZ) * 0.02
-        self.vtk_manager.draw_mesh_point(location, size_factor)
+        if not location:
+            print("No location found for the mesh point.")
+            return
 
-# FLAG! why is this added here?!         
-#self.add_sphere_to_VTK(center=locationInMesh,radius=0.02*maxLen,objectName="MeshPoint",removePrevious=True)
+        domain_bounds = (
+            self.project.meshSettings['domain']['minx'],
+            self.project.meshSettings['domain']['miny'],
+            self.project.meshSettings['domain']['minz'],
+            self.project.meshSettings['domain']['maxx'],
+            self.project.meshSettings['domain']['maxy'],
+            self.project.meshSettings['domain']['maxz']
+        )
 
+        self.vtk_manager.draw_mesh_point(location, domain_bounds=domain_bounds, remove_previous=True)
+        
 #----------------- End of VTK Event Handlers -----------------#
 
-#-------------- End of Event Handlers -------------#
-
-
 def main():
-
     app = QApplication(sys.argv)
     w = mainWindow()
     w.show()
