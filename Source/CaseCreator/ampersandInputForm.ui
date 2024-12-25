@@ -635,7 +635,7 @@
        <x>20</x>
        <y>340</y>
        <width>201</width>
-       <height>461</height>
+       <height>411</height>
       </rect>
      </property>
     </widget>
@@ -730,13 +730,13 @@ background-color: rgb(222, 221, 218);</string>
       <height>601</height>
      </rect>
     </property>
-    <widget class="QComboBox" name="comboBox">
+    <widget class="QLCDNumber" name="lcdNumber">
      <property name="geometry">
       <rect>
-       <x>740</x>
-       <y>560</y>
-       <width>86</width>
-       <height>25</height>
+       <x>750</x>
+       <y>480</y>
+       <width>64</width>
+       <height>23</height>
       </rect>
      </property>
     </widget>
@@ -888,7 +888,7 @@ selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>800</y>
+      <y>820</y>
       <width>831</width>
       <height>21</height>
      </rect>
@@ -930,7 +930,7 @@ selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
       <x>670</x>
       <y>10</y>
       <width>75</width>
-      <height>21</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
@@ -943,11 +943,11 @@ selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
       <x>550</x>
       <y>10</y>
       <width>131</width>
-      <height>21</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#000000;&quot;&gt;Elapsed Time:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>  
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#000000;&quot;&gt;Elapsed Time:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>
