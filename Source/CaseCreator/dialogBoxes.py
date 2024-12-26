@@ -249,7 +249,7 @@ class STLDialog(QDialog):
 
     def set_initial_values(self):
         # change window title
-        self.window.setWindowTitle(f"STL Properties: {self.stl_name}")
+        self.window.setWindowTitle(f"Mesh Refimenent: {self.stl_name}")
         self.window.comboBoxUsage.addItem("Wall")
         self.window.comboBoxUsage.addItem("Inlet")
         self.window.comboBoxUsage.addItem("Outlet")

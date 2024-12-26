@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>STL Properties</string>
+   <string>Mesh Refimenent</string>
   </property>
   <widget class="QComboBox" name="comboBoxUsage">
    <property name="geometry">

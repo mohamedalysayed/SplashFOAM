@@ -20,7 +20,7 @@
       <x>10</x>
       <y>10</y>
       <width>301</width>
-      <height>811</height>
+      <height>821</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -42,7 +42,8 @@
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
+      <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(170, 255, 255);</string>
      </property>
      <property name="text">
       <string>STL</string>
@@ -315,7 +316,7 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>480</y>
+       <y>530</y>
        <width>211</width>
        <height>31</height>
       </rect>
@@ -328,7 +329,7 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>560</y>
+       <y>610</y>
        <width>211</width>
        <height>31</height>
       </rect>
@@ -341,7 +342,7 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>520</y>
+       <y>570</y>
        <width>211</width>
        <height>31</height>
       </rect>
@@ -354,9 +355,9 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>600</y>
+       <y>400</y>
        <width>101</width>
-       <height>51</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -367,20 +368,20 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>400</y>
+       <y>450</y>
        <width>211</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
-      <string>STL Properties</string>
+      <string>Mesh Refinements</string>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButtonPhysicalProperties">
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>440</y>
+       <y>490</y>
        <width>211</width>
        <height>31</height>
       </rect>
@@ -393,9 +394,9 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>600</y>
+       <y>400</y>
        <width>101</width>
-       <height>51</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -458,13 +459,14 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>760</y>
+       <y>730</y>
        <width>211</width>
        <height>41</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
+      <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(170, 255, 255);</string>
      </property>
      <property name="text">
       <string>Generate</string>
@@ -487,9 +489,9 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>660</y>
+       <y>650</y>
        <width>211</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -513,9 +515,9 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>710</y>
+       <y>690</y>
        <width>211</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -577,6 +579,61 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
+    <widget class="QCheckBox" name="themeToggle">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>780</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">
+                QCheckBox::indicator {
+                    width: 50px;
+                    height: 25px;
+                    border-radius: 12px;
+                    background-color: lightgray;
+                    border: 2px solid gray;
+                    transition: all 0.3s ease;
+                }
+                QCheckBox::indicator:checked {
+                    background-color: #4caf50;
+                    border: 2px solid #4caf50;
+                }
+                QCheckBox::indicator:unchecked {
+                    background-color: #e0e0e0;
+                    border: 2px solid gray;
+                }
+                QCheckBox::indicator:checked::before {
+                    content: '';
+                    background-color: white;
+                    width: 23px;
+                    height: 23px;
+                    border-radius: 11px;
+                    margin-left: 24px;
+                    margin-top: 1px;
+                    position: relative;
+                    transition: all 0.3s ease;
+                }
+                QCheckBox::indicator:unchecked::before {
+                    content: '';
+                    background-color: white;
+                    width: 23px;
+                    height: 23px;
+                    border-radius: 11px;
+                    margin-left: 2px;
+                    margin-top: 1px;
+                    position: relative;
+                    transition: all 0.3s ease;
+                }
+            </string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
@@ -584,7 +641,7 @@
       <x>310</x>
       <y>10</y>
       <width>231</width>
-      <height>811</height>
+      <height>821</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -698,7 +755,7 @@
       <x>550</x>
       <y>640</y>
       <width>831</width>
-      <height>151</height>
+      <height>121</height>
      </rect>
     </property>
     <property name="font">
@@ -711,8 +768,7 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: italic 12pt &quot;Ubuntu&quot;;
-background-color: rgb(222, 221, 218);</string>
+     <string notr="true">font: italic 12pt &quot;Ubuntu&quot;;</string>
     </property>
     <property name="sizeAdjustPolicy">
      <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -730,16 +786,6 @@ background-color: rgb(222, 221, 218);</string>
       <height>601</height>
      </rect>
     </property>
-    <widget class="QLCDNumber" name="lcdNumber">
-     <property name="geometry">
-      <rect>
-       <x>750</x>
-       <y>480</y>
-       <width>64</width>
-       <height>23</height>
-      </rect>
-     </property>
-    </widget>
    </widget>
    <widget class="QPushButton" name="pushButtonFitAll">
     <property name="geometry">
@@ -751,7 +797,8 @@ background-color: rgb(222, 221, 218);</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(170, 255, 255);</string>
+     <string notr="true">background-color: rgb(198, 255, 255);
+color: rgb(0, 0, 0);</string>
     </property>
     <property name="text">
      <string>Fit</string>
@@ -845,7 +892,8 @@ background-color: rgb(222, 221, 218);</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 255, 255, 255), stop:0.1 rgba(255, 255, 255, 255), stop:0.2 rgba(255, 176, 176, 167), stop:0.3 rgba(255, 151, 151, 92), stop:0.4 rgba(255, 125, 125, 51), stop:0.5 rgba(255, 76, 76, 205), stop:0.52 rgba(255, 76, 76, 205), stop:0.6 rgba(255, 180, 180, 84), stop:1 rgba(255, 255, 255, 0));</string>
+     <string notr="true">background-color: rgb(198, 255, 255);
+color: rgb(0, 0, 0);</string>
     </property>
     <property name="text">
      <string>Wire</string>
@@ -861,7 +909,8 @@ background-color: rgb(222, 221, 218);</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(170, 255, 255);</string>
+     <string notr="true">background-color: rgb(138, 255, 250);
+color: rgb(0, 0, 0);</string>
     </property>
     <property name="text">
      <string>Surface</string>
@@ -877,8 +926,8 @@ background-color: rgb(222, 221, 218);</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(0, 0, 0, 0), stop:0.52 rgba(0, 0, 0, 0), stop:0.565 rgba(82, 121, 76, 33), stop:0.65 rgba(159, 235, 148, 64), stop:0.721925 rgba(255, 238, 150, 129), stop:0.77 rgba(255, 128, 128, 204), stop:0.89 rgba(191, 128, 255, 64), stop:1 rgba(0, 0, 0, 0));
-selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.05 rgba(14, 8, 73, 255), stop:0.36 rgba(28, 17, 145, 255), stop:0.6 rgba(126, 14, 81, 255), stop:0.75 rgba(234, 11, 11, 255), stop:0.79 rgba(244, 70, 5, 255), stop:0.86 rgba(255, 136, 0, 255), stop:0.935 rgba(239, 236, 55, 255));</string>
+     <string notr="true">background-color: rgb(63, 255, 255);
+color: rgb(0, 0, 0);</string>
     </property>
     <property name="text">
      <string>Edges</string>
@@ -888,7 +937,7 @@ selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>820</y>
+      <y>810</y>
       <width>831</width>
       <height>21</height>
      </rect>
@@ -900,7 +949,7 @@ selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
    <widget class="QComboBox" name="vtkBackground">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>760</x>
       <y>10</y>
       <width>131</width>
       <height>31</height>
@@ -929,7 +978,7 @@ selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
      <rect>
       <x>670</x>
       <y>10</y>
-      <width>75</width>
+      <width>91</width>
       <height>31</height>
      </rect>
     </property>
@@ -942,12 +991,12 @@ selection-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
      <rect>
       <x>550</x>
       <y>10</y>
-      <width>131</width>
+      <width>121</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#000000;&quot;&gt;Elapsed Time:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#1a5fb4;&quot;&gt;Elapsed Time&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>
