@@ -8,6 +8,10 @@ import time
 from project import ampersandProject
 from primitives import ampersandPrimitives, ampersandIO
 
+#Importing separate classes and functions
+from vtk_manager import VTKManager
+from theme_switcher import apply_theme
+
 # Importing PySide components 
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication
@@ -24,7 +28,7 @@ from dialogBoxes import vectorInputDialogDriver, STLDialogDriver, physicalProper
 from dialogBoxes import boundaryConditionDialogDriver, numericsDialogDriver, controlsDialogDriver
 from dialogBoxes import set_src, meshPointDialogDriver
 
-# ----------------- VTK Libraries ----------------- #
+# VTK Libraries
 import vtk
 import vtkmodules.vtkInteractionStyle
 # noinspection PyUnresolvedReferences
@@ -40,10 +44,8 @@ from vtkmodules.vtkRenderingCore import (
     vtkRenderWindowInteractor,
     vtkRenderer
 )
-# ------------------------------------------------- #
+# End of VTK Libraries
 
-#Importing separate classes and functions
-from vtk_manager import VTKManager
 
 #os.chdir(r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src")
 # get the absolute path of the current directory
@@ -56,7 +58,6 @@ set_src(src)
 class mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.vtk_manager = None  # Defer initialization
         self.load_ui()
         self.surfaces = []
         self.project_opened = False
@@ -69,9 +70,8 @@ class mainWindow(QMainWindow):
         self.lenX, self.lenY, self.lenZ = 1e-3, 1e-3, 1e-3
         self.current_stl_file = None
         self.colorCounter = 0
-        #self.listOfColors = ["Pink", "Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Cyan", "Magenta", "Brown"]
         self.disableButtons()
-        
+                
     def setup_timer(self):
         """
         Sets up a timer to update the timer label every second.
@@ -234,8 +234,20 @@ class mainWindow(QMainWindow):
         self.vtkBackground.currentIndexChanged.connect(
             lambda index: self.vtk_manager.update_vtk_background(index)
         )
-       
+        
+        # Connect theme toggle
+        self.window.themeToggle.stateChanged.connect(self.toggle_theme)
+    
+    def toggle_theme(self):
+        """
+        Toggles between light and dark themes, applying the appropriate stylesheet
+        and updating the VTK background via VTKManager.
+        """
+        dark_mode = self.window.themeToggle.isChecked()
+        apply_theme(self.window, self.vtk_manager, dark_mode)
 
+
+    # FLAG! For that purpose is this?    
     def __del__(self):
         pass
 

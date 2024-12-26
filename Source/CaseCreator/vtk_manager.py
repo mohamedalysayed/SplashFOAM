@@ -376,6 +376,7 @@ class VTKManager:
         :param renderer: vtk.vtkRenderer instance for rendering operations.
         :param vtk_widget: VTK widget instance (e.g., QVTKRenderWindowInteractor).
         """
+        # Initialize the renderer and widget
         self.renderer = renderer
         self.vtk_widget = vtk_widget
         self.colorCounter = 0
@@ -384,7 +385,7 @@ class VTKManager:
             "Orange", "Purple", "Cyan", "Magenta", "Brown"
         ]
 
-        # Default background
+        # Set background
         colors = vtkNamedColors()
         self.set_background(
             background=colors.GetColor3d("Grey"),
@@ -392,7 +393,7 @@ class VTKManager:
             background2=colors.GetColor3d("Cyan")
         )
 
-        # Configure axes for smoother appearance
+        # Configure axes
         self.axes_actor = vtkAxesActor()
         self._configure_axes(self.axes_actor)
         self.renderer.AddActor(self.axes_actor)
@@ -402,6 +403,12 @@ class VTKManager:
         style = vtk.vtkInteractorStyleTrackballCamera()
         interactor.SetInteractorStyle(style)
 
+        # Add an initial grid
+        self.add_initial_grid(grid_spacing=1.0, grid_size=10.0)
+
+        # Set the default camera view
+        self.set_default_camera()
+
     def _configure_axes(self, axes_actor):
         """
         Configures the appearance of the axes for better aesthetics.
@@ -410,7 +417,7 @@ class VTKManager:
         axes_actor.SetShaftTypeToCylinder()  # Cylindrical shafts
         axes_actor.SetTipTypeToCone()  # Smooth arrow tips
         axes_actor.SetAxisLabels(1)  # Enable labels
-        axes_actor.SetTotalLength(1.0, 1.0, 1.0)  # Default length
+        axes_actor.SetTotalLength(5.0, 5.0, 5.0)  # Default length
 
         # Thickness and smoothness
         axes_actor.SetCylinderRadius(0.02)  # Shaft thickness
@@ -452,33 +459,28 @@ class VTKManager:
         camera.SetFocalPoint(*focal_point)
         camera.SetViewUp(*view_up)
         self.reset_camera()
-        
+
     def set_default_camera(self):
         """
-        Sets the default camera position to an isometric view with axes centered
-        and zoom level appropriate to include all actors.
+        Sets the default camera position to mimic the desired isometric view,
+        with axes centered and a grid-like background.
         """
         camera = self.renderer.GetActiveCamera()
 
-        # Calculate bounds of all visible props
-        bounds = self.renderer.ComputeVisiblePropBounds()
-        print(f"Camera Setup: Visible bounds = {bounds}")  # Debugging bounds
+        # Set the camera position directly above the XY plane
+        # Adjust these values to fine-tune the perspective
+        camera.SetPosition(0, 0, 10)  # Camera is 10 units above the XY plane
+        camera.SetFocalPoint(0, 0, 0)  # Camera looks at the origin
+        camera.SetViewUp(0, 1, 0)  # The Y-axis is up in the view
 
-        if bounds != (0, -1, 0, -1, 0, -1):  # Ensure bounds are valid
-            center = (
-                (bounds[0] + bounds[1]) / 2,
-                (bounds[2] + bounds[3]) / 2,
-                (bounds[4] + bounds[5]) / 2
-            )
-            max_extent = max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4])
-            camera.SetPosition(center[0] + max_extent, center[1] + max_extent, center[2] + max_extent)
-            camera.SetFocalPoint(center)
-            camera.SetViewUp(0, 0, 1)
-
-        # Reset and slightly zoom out
+        # Optional: Zoom out slightly for a better overview
         self.renderer.ResetCamera()
-        camera.Zoom(0.8)
-        self.render_all()  
+        camera.Zoom(1.2)
+
+        # Update the renderer to apply the new camera settings
+        self.render_all()
+        print("Default camera set to mimic the provided view.")
+           
         
     def save_camera_state(self):
         """
@@ -702,10 +704,13 @@ class VTKManager:
 
     def render_stl(self, stl_file, color=(0.5, 0.5, 0.5)):
         """
-        Renders an STL file in the VTK renderer.
+        Renders an STL file in the VTK renderer and rescales the axes.
         :param stl_file: Path to the STL file.
         :param color: RGB tuple for the actor's color.
         """
+        # Remove initial grid if present
+        self.remove_initial_grid()
+     
         actor_name = os.path.basename(stl_file)  # Use file name as actor name
         self.remove_actor_by_name(actor_name)  # Remove any existing actor with the same name
 
@@ -736,6 +741,9 @@ class VTKManager:
 
         # Adjust the camera after adding the actor
         self.set_default_camera()
+
+        # Rescale the axes based on the geometry
+        self.rescale_axes_to_geometry()
 
         # Print debug info
         print(f"STL file rendered: {stl_file}")
@@ -798,3 +806,95 @@ class VTKManager:
 
         self.add_actor(actor)
         
+
+    def add_initial_grid(self, grid_spacing=1.0, grid_size=10.0, grid_name="InitialGrid", line_color=(0, 0, 0)):
+        """
+        Adds a grid to the VTK renderer to serve as an initial placeholder.
+        :param grid_spacing: Distance between grid lines.
+        :param grid_size: Half the length of the grid (total grid size will be 2 * grid_size).
+        :param grid_name: Name of the grid object for reference.
+        :param line_color: RGB tuple for the grid line color.
+        """
+        if grid_spacing <= 0:
+            print("Invalid grid spacing. Must be greater than 0.")
+            return
+
+        # Remove any existing grid with the same name
+        self.remove_actor_by_name(grid_name)
+
+        # Create grid lines in X and Y directions
+        grid_lines = vtk.vtkPolyData()
+        points = vtk.vtkPoints()
+        lines = vtk.vtkCellArray()
+
+        # Generate grid points and lines
+        start = -grid_size
+        end = grid_size
+        num_lines = int((2 * grid_size) / grid_spacing) + 1
+
+        # Add horizontal and vertical lines
+        for i in range(num_lines):
+            # X-direction lines
+            y = start + i * grid_spacing
+            points.InsertNextPoint(start, y, 0)
+            points.InsertNextPoint(end, y, 0)
+            lines.InsertNextCell(2)
+            lines.InsertCellPoint(2 * i)
+            lines.InsertCellPoint(2 * i + 1)
+
+            # Y-direction lines
+            x = start + i * grid_spacing
+            points.InsertNextPoint(x, start, 0)
+            points.InsertNextPoint(x, end, 0)
+            lines.InsertNextCell(2)
+            lines.InsertCellPoint(2 * i + num_lines * 2)
+            lines.InsertCellPoint(2 * i + num_lines * 2 + 1)
+
+        # Set points and lines to the grid
+        grid_lines.SetPoints(points)
+        grid_lines.SetLines(lines)
+
+        # Create a mapper and actor for the grid
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputData(grid_lines)
+
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+        actor.GetProperty().SetColor(line_color)
+        actor.GetProperty().SetOpacity(1.0)
+        actor.GetProperty().SetLineWidth(1.0)
+        actor.SetObjectName(grid_name)
+
+        # Add the grid actor to the renderer
+        self.add_actor(actor)
+        print(f"Initial grid added with spacing {grid_spacing} and size {grid_size}.")
+        
+    def remove_initial_grid(self, grid_name="InitialGrid"):
+        """
+        Removes the initial grid from the renderer.
+        :param grid_name: Name of the grid object to remove.
+        """
+        self.remove_actor_by_name(grid_name)
+        print(f"Initial grid '{grid_name}' removed.")
+        
+        
+    def rescale_axes_to_geometry(self):
+        """
+        Rescales the axes actor based on the bounds of the geometry loaded in the renderer.
+        """
+        # Compute the bounds of all visible props
+        bounds = self.renderer.ComputeVisiblePropBounds()
+
+        if bounds == (0, -1, 0, -1, 0, -1):
+            print("No geometry found to compute bounds. Axes will not be rescaled.")
+            return
+
+        # Compute the largest extent of the geometry
+        max_extent = max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4])
+        
+        # Scale the axes length proportionally (e.g., 10% of the max extent)
+        axes_length = max_extent * 0.1
+        self.draw_axes(axes_length)
+        print(f"Axes rescaled to length {axes_length:.2f} based on geometry bounds.")
+    
+            
