@@ -11,7 +11,6 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
   - [Meshing Tools](#meshing-tools)
   - [Case Creator](#case-creator)
   - [Simulation Setup](#simulation-setup)
-  - [Configuration Management](#configuration-management)
   - [Run Simulation](#run-simulation)
   - [Post-Processing](#post-processing)
   - [Splash Cloud](#splash-cloud)
@@ -76,6 +75,13 @@ This will ensure that all required packages are installed. The user can install 
   cd ../../Sources/
   python3 SplashFOAM.py
 
+### Configuration Management
+Easily manage configuration files for different versions of OpenFOAM:
+
+- **Automatic Detection of Installed OpenFOAM Versions**: SplashFOAM identifies available versions on your system and sets up the necessary environment variables.
+- **Alias Setup**: Aliases for various OpenFOAM versions are added to the _bashrc_ during installation (according to the user's choice), ensuring easy access to different versions.
+
+
 ## Features
 ### Geometry Import
 SplashFOAM allows users to import geometry files from various formats, including:
@@ -131,24 +137,38 @@ Splash Mesher offers the option to add refinement objects to the domain. As show
 
 
 ## Case Creator 
-To create a new OpenFOAM case, SplashFOAM supports a case generator for both canonical internal and external flows.  
+
+SplashFOAM’s Case Creator streamlines the generation of OpenFOAM cases for both internal and external flow scenarios. Accessible from the main window under File > Create Case, this tool now comes with enhanced functionality and visualization capabilities:
+
+- Built-In VTK Viewer: The Case Creator integrates a VTK-based geometry viewer, allowing users to:
+- Visualize imported geometries with real-time rendering.
+- Build and display a bounding box around the geometry to verify domain boundaries.
+- Define probes (mesh points) at critical locations for debugging problematic cases.
+- Enhanced Workflow: Quickly create cases with intuitive tools to set up boundary conditions, fluid properties, and simulation parameters, with a focus on efficiency and accuracy.
+- Guided Input Assistance: Case Creator provides a guided interface to ensure that input files are correctly set up for various OpenFOAM solvers, minimizing the risk of configuration errors.
+
 ![image](https://github.com/user-attachments/assets/da91bf47-1348-4ac1-8fd4-2d24fc20c30e)
 
 
 ## Simulation Setup
+
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
-![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
 
 - **Case Directory Management**: Seamlessly load, configure, and organize case directories.
-- **Simulation Configuration**: Adjust boundary conditions, solvers, and other simulation parameters through a graphical interface.
+- **Mesh Refinement Levels**: Users can specify refinement levels for different regions to improve mesh quality and resolution.
+- **Physical Properties**: Easily define physical properties for the simulation, with the option to select from pre-saved fluid property profiles for common fluids.
+- **Turbulence Models**: Choose from a wide range of turbulence models tailored to specific flow regimes.
+- **Numerical Schemes**: Define numerical schemes for discretization and solution accuracy directly in the GUI.
+- **Boundary Conditions**: Seamlessly configure boundary conditions through a guided interface.
+- **Simulation Controls**:
+  - Start and end time of the simulation.
+  - Time-stepping configurations.
+  - Solution reports to monitor progress and convergence.
+  - Function objects for calculating derived quantities and other post-processing tasks.
 - **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case.
-Note: SplashFOAM does not allow direct changes in boundary condition (BC) files. If BC changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
+Note: SplashFOAM does not allow direct changes in boundary condition (BC) files. If BC changes are needed, users may set up the case in **_Case Creator_** and then load the case again in SplashFOAM for further processing.
 
-## Configuration Management
-Easily manage configuration files for different versions of OpenFOAM:
-
-- **Automatic Detection of Installed OpenFOAM Versions**: SplashFOAM identifies available versions on your system and sets up the necessary environment variables.
-- **Alias Setup**: Aliases for various OpenFOAM versions are added to the _bashrc_ during installation (according to the user's choice), ensuring easy access to different versions.
+![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
 
 ## Run Simulation
 SplashFOAM can launch a simulation locally or on a remote HPC cluster (Cloud HPC):
