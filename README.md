@@ -34,7 +34,7 @@ SplashFOAM includes a pre-installation script to ensure your system is ready:
 - **Automated Dependency Installation**: The script checks for required packages and installs them if missing, including OpenFOAM, FreeCAD, Gmsh, and more.
 - **WSL Compatibility**: Special considerations for users running SplashFOAM on Windows Subsystem for Linux (WSL), including setting up display configurations.
 
-Whether you are running Ubuntu natively, through VirtualBox, or WSL, you must execute the `Ubuntu_MEL.sh` script prior to launching SplashFOAM.
+Whether you are running Ubuntu natively, through VirtualBox, or WSL, you must execute the `Ubuntu_MEL.sh` script before launching SplashFOAM.
 
 Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.5 LTS**).
 
@@ -49,20 +49,19 @@ Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.
 
 - **Step 2: Switch to the Correct Branch**
 
-  Ensure you are on the Standard-release branch to access the latest stable version:
-
-  ```bash
-  cd SplashFOAM
-  git checkout Standard-release
-
-- **Step 3: Install Necessary Packages**
-
-  Navigate to the SplashFOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
+ From the cloned code, navigate to the SplashFOAM/Resources/Build_Splash/ directory. 
 
   ```bash
   cd SplashFOAM/Resources/Build_Splash/
-  chmod +x PreInstaller.sh
-  ./PreInstaller.sh
+
+- **Step 3: Install Necessary Packages**
+
+   Run the PreInstaller_v0.1.sh script to install all the necessary dependencies:
+
+  ```bash
+  chmod +x PreInstaller_v0.1.sh
+  ./PreInstaller_v0.1.sh
+
 ![Splash-PreInstallerII](https://github.com/user-attachments/assets/ca9f7879-b72f-4b4e-9ea5-1ee81fa7fd9a)
 
 This will ensure that all required packages are installed. The user can install other secondary packages from the suggested list if needed. 
@@ -168,8 +167,6 @@ SplashFOAM simplifies the setup of OpenFOAM cases by providing:
 - **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case.
 Note: SplashFOAM does not allow direct changes in boundary condition (BC) files. If BC changes are needed, users may set up the case in **_Case Creator_** and then load the case again in SplashFOAM for further processing.
 
-![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
-
 ## Run Simulation
 SplashFOAM can launch a simulation locally or on a remote HPC cluster (Cloud HPC):
 
@@ -200,7 +197,7 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
 - **Advanced 3D Rendering**: Experience glossy, interactive 3D rendering for geometries in formats like STL, OBJ, and STEP, with seamless camera control and enhanced lighting for precision inspections.
 - **Seamless Integration with SplashFOAM**: Prepare OpenFOAM-ready cases effortlessly, as Splash-Cloud outputs configurations that are fully compatible with SplashFOAM.
 - **No Installation Required**: Accessible on any device with an internet connection—eliminating setup hassle.
-- **Collaboration Made Easy**: Share geometries and configurations in real time with teammates.
+- **Collaboration Made Easy**: Share geometries and configurations in real-time with teammates.
 
 ## Documentation
 The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
@@ -216,6 +213,8 @@ Feel free to contribute to SplashFOAM by submitting issues or feature suggestion
  [*_Please refer to this GitHub repository when using any of the images below (proper referencing is required)_]
  
  - **Motorbike OpenFOAM Case - Steady State**
+
+![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
    
 ![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
 
