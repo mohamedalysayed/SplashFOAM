@@ -9,6 +9,7 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
 - [Features](#features)
   - [Geometry Import](#geometry-import)
   - [Meshing Tools](#meshing-tools)
+  - [Case Creator](#case-creator)
   - [Simulation Setup](#simulation-setup)
   - [Configuration Management](#configuration-management)
   - [Run Simulation](#run-simulation)
@@ -128,12 +129,15 @@ Splash Mesher offers the option to add refinement objects to the domain. As show
 
 ![Screenshot from 2024-11-13 03-27-19](https://github.com/user-attachments/assets/4ff61616-0f20-47f7-ac4a-2fcf01214ead)
 
+## Case Creator 
+To create a new OpenFOAM case, SplashFOAM supports a case generator for both canonical internal and external flows.  
+![image](https://github.com/user-attachments/assets/e0d05c4f-7f98-4046-bf31-d65e1524837a)
 
 ## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
 ![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
 
-- **Case Directory Management**: Seamlessly load, configure and organize case directories.
+- **Case Directory Management**: Seamlessly load, configure, and organize case directories.
 - **Simulation Configuration**: Adjust boundary conditions, solvers, and other simulation parameters through a graphical interface.
 - **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case.
 Note: SplashFOAM does not allow direct changes in boundary condition (BC) files. If BC changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
@@ -142,7 +146,7 @@ Note: SplashFOAM does not allow direct changes in boundary condition (BC) files.
 Easily manage configuration files for different versions of OpenFOAM:
 
 - **Automatic Detection of Installed OpenFOAM Versions**: SplashFOAM identifies available versions on your system and sets up the necessary environment variables.
-- **Alias Setup**: Aliases for various OpenFOAM versions are added to .bashrc during installation, ensuring easy access to different versions.
+- **Alias Setup**: Aliases for various OpenFOAM versions are added to the _bashrc_ during installation (according to the user's choice), ensuring easy access to different versions.
 
 ## Run Simulation
 SplashFOAM can launch a simulation locally or on a remote HPC cluster (Cloud HPC):
