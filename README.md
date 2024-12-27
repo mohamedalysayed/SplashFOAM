@@ -45,18 +45,19 @@ Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.
   Clone the SplashFOAM repository to your local machine by running:
 
   ```bash
-  git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git
+  git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git 
 
 - **Step 2: Switch to the Correct Branch**
 
- From the cloned code, navigate to the SplashFOAM/Resources/Build_Splash/ directory. 
+   From the cloned code, navigate to the SplashFOAM/Resources/Build_Splash/ directory. 
 
   ```bash
   cd SplashFOAM/Resources/Build_Splash/
 
+
 - **Step 3: Install Necessary Packages**
 
-   Run the PreInstaller_v0.1.sh script to install all the necessary dependencies:
+  Run the PreInstaller_v0.1.sh script to install all the necessary dependencies:
 
   ```bash
   chmod +x PreInstaller_v0.1.sh
