@@ -71,6 +71,10 @@ class mainWindow(QMainWindow):
         self.current_stl_file = None
         self.colorCounter = 0
         self.disableButtons()
+        
+        # Default to Dark Theme
+        self.window.themeToggle.setChecked(True)  # Set theme toggle to dark mode by default
+        self.apply_default_theme()
                 
     def setup_timer(self):
         """
@@ -217,11 +221,10 @@ class mainWindow(QMainWindow):
         self.prepare_subWindows()
         self.prepare_events()
         
-        # Configure VTK Background ComboBox
+        # Configure VTK Background ComboBox -  with error handling
         self.vtkBackground = self.window.findChild(QtWidgets.QComboBox, "vtkBackground")
         if not self.vtkBackground:
-            print("Error: 'vtkBackground' ComboBox not found in the UI.")
-            return
+            raise ValueError("UI element 'vtkBackground' not found in the loaded UI.")
 
         # Populate and bind the ComboBox
         self.vtkBackground.addItems([
@@ -238,6 +241,21 @@ class mainWindow(QMainWindow):
         # Connect theme toggle
         self.window.themeToggle.stateChanged.connect(self.toggle_theme)
     
+#    def toggle_theme(self):
+#        """
+#        Toggles between light and dark themes, applying the appropriate stylesheet
+#        and updating the VTK background via VTKManager.
+#        """
+#        dark_mode = self.window.themeToggle.isChecked()
+#        apply_theme(self.window, self.vtk_manager, dark_mode)
+
+    def apply_default_theme(self):
+        """
+        Apply the default theme (dark) at application startup.
+        """
+        dark_mode = self.window.themeToggle.isChecked()
+        apply_theme(self.window, self.vtk_manager, dark_mode)
+
     def toggle_theme(self):
         """
         Toggles between light and dark themes, applying the appropriate stylesheet
@@ -245,7 +263,7 @@ class mainWindow(QMainWindow):
         """
         dark_mode = self.window.themeToggle.isChecked()
         apply_theme(self.window, self.vtk_manager, dark_mode)
-
+        
 
     # FLAG! For that purpose is this?    
     def __del__(self):
@@ -609,23 +627,44 @@ class mainWindow(QMainWindow):
             print("Radius: ",r)
         self.readyStatusBar()
 
+##    def resizeEvent(self, event):
+##        terminalHeight = 302
+##        vtkWidgetWidth = self.window.width()-560
+##        vtkWidgetHeight = self.window.height()-terminalHeight-20
+##        terminalX = self.window.widget.pos().x()
+##        terminalY = self.window.widget.pos().y()+vtkWidgetHeight+10
+##        terminalWidth = vtkWidgetWidth
+##        
+##        self.window.widget.resize(vtkWidgetWidth,vtkWidgetHeight)
+##        self.vtkWidget.resize(vtkWidgetWidth,vtkWidgetHeight)
+##        self.vtkWidget.GetRenderWindow().Render()
+##        self.window.plainTextTerminal.resize(self.window.width()-560,self.window.plainTextTerminal.height())
+##       
+##        self.window.plainTextTerminal.move(terminalX,terminalY)
+##        self.window.plainTextTerminal.resize(terminalWidth,terminalHeight-20)
+##        self.window.plainTextTerminal.update()
+##        self.window.plainTextTerminal.repaint()
+##        self.readyStatusBar()
+
+    
+
     def resizeEvent(self, event):
-        terminalHeight = 302
-        vtkWidgetWidth = self.window.width()-560
-        vtkWidgetHeight = self.window.height()-terminalHeight-20
+        """
+        Dynamically resize widgets when the main window is resized.
+        """
+        TERMINAL_HEIGHT = 302  # Adjust as needed
+        vtkWidgetHeight = self.window.height() - TERMINAL_HEIGHT - 20
+        vtkWidgetWidth = self.window.width() - 560
         terminalX = self.window.widget.pos().x()
-        terminalY = self.window.widget.pos().y()+vtkWidgetHeight+10
-        terminalWidth = vtkWidgetWidth
-        
-        self.window.widget.resize(vtkWidgetWidth,vtkWidgetHeight)
-        self.vtkWidget.resize(vtkWidgetWidth,vtkWidgetHeight)
+        terminalY = self.window.widget.pos().y() + vtkWidgetHeight + 10
+
+        self.window.widget.resize(vtkWidgetWidth, vtkWidgetHeight)
+        self.vtkWidget.resize(vtkWidgetWidth, vtkWidgetHeight)
         self.vtkWidget.GetRenderWindow().Render()
-        self.window.plainTextTerminal.resize(self.window.width()-560,self.window.plainTextTerminal.height())
-       
-        self.window.plainTextTerminal.move(terminalX,terminalY)
-        self.window.plainTextTerminal.resize(terminalWidth,terminalHeight-20)
+
+        self.window.plainTextTerminal.move(terminalX, terminalY)
+        self.window.plainTextTerminal.resize(vtkWidgetWidth, TERMINAL_HEIGHT - 20)
         self.window.plainTextTerminal.update()
-        self.window.plainTextTerminal.repaint()
         self.readyStatusBar()
 
     def closeEventTriggered(self, event):
@@ -723,78 +762,6 @@ class mainWindow(QMainWindow):
         self.setWindowTitle(f"Case Creator: {project_name}")
         self.readyStatusBar()
         
-#------------------------------ Back up 25.12.2024 -------------------------------
-#    # Open an existing OpenFOAM case
-#    def openCase(self):
-#        if self.project_opened:
-#            # ask yes or no or cancel
-#            yNC = yesNoCancelDialogDriver("Save changes to current case files before creating a New Case","Save Changes")
-#            if yNC==1: # if yes
-#                # save the project
-#                self.project.add_stl_to_project()
-#                self.project.write_settings()
-#                self.disableButtons()
-#                self.ren.RemoveAllViewProps()
-#            elif yNC==-1: # if no
-#                # close the project
-#                self.project = None
-#                self.project_opened = False
-#                self.disableButtons()
-#                self.ren.RemoveAllViewProps()
-#            else: # if cancel
-#                self.readyStatusBar()
-#                return
-#        self.updateStatusBar("Opening Case")
-#        # clear terminal
-#        self.window.plainTextTerminal.clear()
-#        # clear the case
-#        self.project = None
-#        self.project = ampersandProject(GUIMode=True,window=self)
-
-#        # clear vtk renderer
-#        self.ren.RemoveAllViewProps()
-#        # clear the list widget
-#        self.window.listWidgetObjList.clear()
-#        projectFound = self.project.set_project_path(ampersandPrimitives.ask_for_directory(qt=True))
-#        
-#        if projectFound==-1:
-#            ampersandIO.printWarning("No project found. Failed to open case directory.",GUIMode=True)
-#            self.updateTerminal("No project found. Failed to open case directory.")
-#            
-#            self.readyStatusBar()
-#            return -1
-#        ampersandIO.printMessage(f"Project path: {self.project.project_path}",GUIMode=True,window=self)
-#        ampersandIO.printMessage("Loading the project",GUIMode=True,window=self)
-#        self.project.go_inside_directory()
-#        
-#        self.project.load_settings()
-#        self.project.check_0_directory()
-#        ampersandIO.printMessage("Project loaded successfully",GUIMode=True,window=self)
-#        self.project.summarize_project()
-#        self.enableButtons()
-#        self.autoDomain(analyze=False)
-#        #self.vtkUpdateAxes()
-#        stl_file_paths = self.project.list_stl_paths()
-#        
-#        for stl_file in stl_file_paths:
-#            self.vtk_manager.render_stl(stl_file)
-#        self.update_list()  # Populate the Object List panel    
-#        
-#        self.readyStatusBar()
-#        if self.project.internalFlow:
-#            self.window.radioButtonInternal.setChecked(True)
-#            self.window.checkBoxOnGround.setEnabled(False)
-#        else:
-#            self.window.radioButtonExternal.setChecked(True)
-#            self.window.checkBoxOnGround.setChecked(self.project.onGround)
-#        self.project_opened = True
-#        ampersandIO.printMessage(f"Project {self.project.project_name} created",GUIMode=True,window=self)
-#        
-#        # Update the window status 
-#        self.setWindowTitle(f"Case Creator: {self.project.project_name}")
-#        self.vtkDrawMeshPoint()
-#        self.readyStatusBar()
-#------------------------------ Back up 25.12.2024 -------------------------------
 
     def openCase(self):
         """
@@ -1069,6 +1036,7 @@ class mainWindow(QMainWindow):
         self.project.summarize_project()
         self.readyStatusBar()
 
+    # FLAG! why is this not merged with draw_mesh_point? is it redundant?
     def setMeshPoint(self):
         # open the mesh point dialog
         meshPoint = meshPointDialogDriver(self.project.get_location_in_mesh())
