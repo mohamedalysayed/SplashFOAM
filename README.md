@@ -129,9 +129,11 @@ Splash Mesher offers the option to add refinement objects to the domain. As show
 
 ![Screenshot from 2024-11-13 03-27-19](https://github.com/user-attachments/assets/4ff61616-0f20-47f7-ac4a-2fcf01214ead)
 
+
 ## Case Creator 
 To create a new OpenFOAM case, SplashFOAM supports a case generator for both canonical internal and external flows.  
-![image](https://github.com/user-attachments/assets/e0d05c4f-7f98-4046-bf31-d65e1524837a)
+![image](https://github.com/user-attachments/assets/da91bf47-1348-4ac1-8fd4-2d24fc20c30e)
+
 
 ## Simulation Setup
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
