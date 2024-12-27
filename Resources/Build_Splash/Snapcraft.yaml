@@ -1,5 +1,5 @@
 name: splash
-version: '1.0'
+version: '0.2'
 summary: Your application summary
 description: Your application description
 base: core18
@@ -22,10 +22,10 @@ parts:
 
 # Second: run "snapcraft" [sudo snap install snapcraft --classic] in case it was not installed
 
-# Third: install and test the snap package >> sudo snap install --dangerous splash_1.0_amd64.snap
+# Third: install and test the snap package >> sudo snap install --dangerous splash_0.2_amd64.snap
 
 # Fourth: Push to snap store (optional)
 #snapcraft login
-#snapcraft push splash_1.0_amd64.snap
+#snapcraft push splash_0.2_amd64.snap
 
 # NOTE: The setup.py file is called inherently by snap. 

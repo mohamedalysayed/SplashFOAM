@@ -710,6 +710,9 @@ class VTKManager:
         """
         # Remove initial grid if present
         self.remove_initial_grid()
+        
+        # Rescale axes labels so it can look more pleasing 
+        self.rescale_axes_to_geometry()
      
         actor_name = os.path.basename(stl_file)  # Use file name as actor name
         self.remove_actor_by_name(actor_name)  # Remove any existing actor with the same name
@@ -896,5 +899,53 @@ class VTKManager:
         axes_length = max_extent * 0.1
         self.draw_axes(axes_length)
         print(f"Axes rescaled to length {axes_length:.2f} based on geometry bounds.")
+        
+        
+    # Attempt to rescale axes labels for better visuals     
+    def scale_axes_labels(self, scale_factor):
+        """
+        Scales the axes labels (X, Y, Z) dynamically based on a scale factor.
+        :param scale_factor: The scaling factor for the axes labels' font size.
+        """
+        axes_labels = [
+            self.axes_actor.GetXAxisCaptionActor2D(),
+            self.axes_actor.GetYAxisCaptionActor2D(),
+            self.axes_actor.GetZAxisCaptionActor2D()
+        ]
+
+        for label_actor in axes_labels:
+            text_property = label_actor.GetCaptionTextProperty()
+            current_size = text_property.GetFontSize()
+            # Update font size proportionally
+            text_property.SetFontSize(int(current_size * scale_factor))
+            # Optionally, adjust other properties (e.g., color, boldness)
+            # text_property.SetBold(True)
+            # text_property.SetColor(1, 1, 1)  # White labels
+
+        
+    def rescale_axes_to_geometry(self):
+        """
+        Rescales the axes actor and their labels based on the bounds of the geometry loaded in the renderer.
+        """
+        # Compute the bounds of all visible props
+        bounds = self.renderer.ComputeVisiblePropBounds()
+
+        if bounds == (0, -1, 0, -1, 0, -1):
+            print("No geometry found to compute bounds. Axes will not be rescaled.")
+            return
+
+        # Compute the largest extent of the geometry
+        max_extent = max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4])
+
+        # Scale the axes length proportionally (e.g., 10% of the max extent)
+        axes_length = max_extent * 0.1
+        self.draw_axes(axes_length)
+
+        # Scale the labels proportionally (e.g., scale factor = axes_length / default_length)
+        default_axes_length = 5.0  # The default axes length in `vtkAxesActor`
+        scale_factor = axes_length / default_axes_length
+        self.scale_axes_labels(scale_factor)
+
+        print(f"Axes rescaled to length {axes_length:.2f} and labels scaled with factor {scale_factor:.2f}.")
     
             

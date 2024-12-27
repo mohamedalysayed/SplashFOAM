@@ -52,7 +52,7 @@ class SplashFOAM:
     def __init__(self, root):
         self.root = root
         self.root.config(background="white")
-        self.root.title("SplashFOAM - v0.1")
+        self.root.title("SplashFOAM - v0.2")
         
         # Set the window icon using a PhotoImage
         icon_path = "../Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
@@ -339,7 +339,7 @@ class SplashFOAM:
         
         # Create a label for status messages
         self.status_label_title = ttk.Label(self.root, text="")
-        status_title = "SplashFOAM v0.1"
+        status_title = "SplashFOAM v0.2"
         self.status_label_title.grid(row=14, column=1, columnspan=1, pady=1, padx=10, sticky="nsew")  # Changed to sticky="nsew" for dynamic resizing
         self.status_label_title.config(text=status_title, font=("Helvetica", 14, "bold"), background="white", foreground="grey")
         
@@ -381,7 +381,7 @@ class SplashFOAM:
           =========                 |
           \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
            \\\\    /   O peration     | Website:  https://openfoam.org
-            \\\\  /    A nd           | Version:  SplashFOAM v0.1
+            \\\\  /    A nd           | Version:  SplashFOAM v0.2
              \\\\/     M anipulation  |
         \\*---------------------------------------------------------------------------*/\n"""
         
@@ -661,7 +661,7 @@ class SplashFOAM:
 
         # Create a Toplevel window for the welcome message
         popup = tk.Toplevel(self.root)
-        popup.title("SplashFOAM v0.1")
+        popup.title("SplashFOAM v0.2")
         popup.geometry("750x700")  # Adjust the size as needed
 
         # Create a Label in the Toplevel window to display the welcome message
@@ -2107,7 +2107,7 @@ _____________________________________________________
 
             # Create a Toplevel window for the message
             popup = tk.Toplevel(self.root)
-            popup.title("SplashFOAM v0.1")
+            popup.title("SplashFOAM v0.2")
             popup.geometry("800x600")  # Adjust the size as needed
 
             # Create a Label in the Toplevel window to display the message
@@ -2159,7 +2159,7 @@ _____________________________________________________
 if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', False)  # Disable menu tear-off
-    root.title("SplashFOAM v0.1")
-    root.wm_title("SplashFOAM v0.1")  # Window manager title
+    root.title("SplashFOAM v0.2")
+    root.wm_title("SplashFOAM v0.2")  # Window manager title
     app = SplashFOAM(root)
     root.mainloop()
