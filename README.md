@@ -68,8 +68,8 @@ Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.
 
   ```bash
   sudo apt-get install -y zenity
+![Screenshot from 2024-12-28 01-11-48](https://github.com/user-attachments/assets/b1c41934-9338-412b-b4b7-a0419ff9be51)
 
-![Screenshot from 2024-12-28 00-59-22](https://github.com/user-attachments/assets/b33970d0-fa7d-4a4b-8f43-99aa91e6e4a1)
 
 This will ensure that all required packages are installed. If needed, the user can install other secondary packages from the suggested list. 
 
