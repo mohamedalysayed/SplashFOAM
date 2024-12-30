@@ -2,7 +2,7 @@
 
 # Define required system and Python packages
 SYSTEM_PACKAGES=("python3" "python3-pip" "python3-setuptools" "python3-wheel" "gedit" "pipx")
-PYTHON_PACKAGES=("PySide6" "vtk" "scipy" "pillow" "meshio")  # Added meshio
+PYTHON_PACKAGES=("PySide6" "PySide2" "vtk" "scipy" "pillow" "meshio")  # Added PySide2
 PIP3_PACKAGES=("openpyxl")
 SCRIPT_NAME="PreInstaller_v0.2.py"
 
@@ -17,6 +17,17 @@ resolve_apt_conflicts() {
     sudo rm -f /etc/apt/sources.list.d/kitware.list
     sudo rm -f /etc/apt/sources.list.d/archive_uri-https_apt_kitware_com_ubuntu_-noble.list
     sudo apt-get update
+}
+
+# Configure pip to allow breaking system packages
+configure_pip() {
+    echo "Configuring pip to allow breaking system packages..."
+    python3 -m pip config set global.break-system-packages true
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Failed to configure pip. Exiting."
+        zenity --error --title="Configuration Failed" --text="Failed to configure pip. Please check your Python environment."
+        exit 1
+    fi
 }
 
 # Install system packages
@@ -93,6 +104,9 @@ launch_gui() {
 main() {
     # Resolve APT conflicts
     resolve_apt_conflicts
+
+    # Configure pip
+    configure_pip
 
     # Combine the list of packages into a single string
     ALL_PACKAGES=$(printf "%s\n" "${SYSTEM_PACKAGES[@]}" "${PYTHON_PACKAGES[@]}" "${PIP3_PACKAGES[@]}")
