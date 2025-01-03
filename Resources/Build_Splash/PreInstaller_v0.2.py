@@ -2,14 +2,25 @@ import os
 import subprocess
 import sys
 import time
-from PySide6.QtWidgets import (
-    QApplication, QVBoxLayout, QCheckBox, QPushButton, QLabel, QDialog, QMessageBox, QProgressBar, QTextEdit, QHBoxLayout, QLineEdit, QScrollArea, QWidget, QFrame
-)
+#from PySide6.QtWidgets import (QApplication, QVBoxLayout, QCheckBox, QPushButton, QLabel, QDialog, QMessageBox, QProgressBar, QTextEdit, QHBoxLayout, QLineEdit, QScrollArea, QWidget, QFrame)
+from PySide6.QtWidgets import *
 from PySide6.QtGui import QPixmap, QMovie
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtWidgets import QScrollArea, QWidget  
 from PySide6.QtCore import Qt, QThread, Signal, QSize
-
+    
+# Global definition for OpenFOAM packages
+OPENFOAM_PACKAGES = [
+    ("OF_Foundation_v11", "OpenFOAM Foundation v11 (Required)"),
+    ("OF_ESI_openfoam2306-default", "OpenFOAM ESI v2306 (Required)"),
+    ("OF_Foundation_v8", "OpenFOAM Foundation v8"),
+    ("OF_Foundation_v9", "OpenFOAM Foundation v9"),
+    ("OF_Foundation_v10", "OpenFOAM Foundation v10"),
+    ("OF_Foundation_v12", "OpenFOAM Foundation v12"),
+    ("OF_ESI_openfoam2206-default", "OpenFOAM ESI v2206"),
+    ("OF_ESI_openfoam2312-default", "OpenFOAM ESI v2312"),
+    ("OF_ESI_openfoam2406-default", "OpenFOAM ESI v2406 (Required)"),
+]
 
 class InstallationWorker(QThread):
     progress = Signal(int)  # Signal to update progress
@@ -17,59 +28,73 @@ class InstallationWorker(QThread):
     error = Signal(str)  # Signal to report errors
     finished = Signal()  # Signal when installation is complete
 
-    def __init__(self, packages, sudo_password):
+    def __init__(self, packages, openfoam_versions, sudo_password):
         super().__init__()
         self.packages = packages
+        self.openfoam_versions = openfoam_versions
         self.sudo_password = sudo_password
         self.start_time = None
         self.errors = []  # Track errors
-
+        
     def run(self):
         self.start_time = time.time()
+        total_steps = len(self.packages) + len(self.openfoam_versions) + 2  # +2 for repositories and APT update
+        step = 0
+
         try:
             self.log_message.emit("Adding required PPAs and repositories...")
             self.add_repositories()
-            self.log_message.emit("PPAs and repositories added successfully.")
+            step += 1
+            self.progress.emit(step)
             
-            self.log_message.emit("Updating APT package list...")
-            self.run_with_sudo(["apt-get", "update"])
-            self.log_message.emit("APT package list updated successfully.")
-            self.progress.emit(1)  # Increment progress for APT update
-        except subprocess.CalledProcessError as e:
-            self.errors.append("APT update failed")
-            self.log_message.emit(f"Failed to update APT package list: {str(e)}")
-            self.error.emit(f"Failed to update APT package list: {str(e)}")
-            self.finished.emit()
-            return
+            self.log_message.emit("PPAs and repositories added successfully.")
 
-        for index, package in enumerate(self.packages, start=2):  # Start progress from 2
-            try:
-                self.log_message.emit(f"Installing {package}...")
+            self.log_message.emit("Updating APT package list...")
+            self.run_with_sudo(["apt-get", "update"], shell=False)
+            step += 1
+            self.progress.emit(step)
+
+            self.log_message.emit("APT package list updated successfully.")
+
+            for version in self.openfoam_versions:
+                self.log_message.emit(f"Installing OpenFOAM version: {version}...")
+                self.install_openfoam(version)
+                step += 1
+                self.progress.emit(step)
+
+            for package in self.packages:
+                self.log_message.emit(f"Installing package: {package}...")
                 self.install_package(package)
-                self.progress.emit(index)
-                self.log_message.emit(f"{package} installed successfully.")
-            except Exception as e:
-                self.errors.append(package)
-                self.log_message.emit(f"Error installing {package}: {str(e)}")
-                self.error.emit(str(e))
-        self.finished.emit()
+                step += 1
+                self.progress.emit(step)
+
+        except Exception as e:
+            self.log_message.emit(str(e))
+            self.error.emit(str(e))
+        finally:
+            self.finished.emit()
 
 
     def install_package(self, package):
         try:
-            # Special handling for FreeCAD and ParaView
-            if package == "freecad":
-                self.log_message.emit("Attempting to install FreeCAD using APT...")
-                try:
-                    # Attempt APT installation
-                    self.run_with_sudo(["apt-get", "install", "-y", package])
-                except subprocess.CalledProcessError as e:
-                    self.log_message.emit("APT installation failed. Trying Snap installation for FreeCAD...")
-                    # Fall back to Snap if APT fails
-                    subprocess.check_call(["sudo", "apt-get", "install", "-y", "snapd"])
-                    self.run_with_sudo(["snap", "install", "freecad"])
-            elif package == "paraview":
-                self.log_message.emit("Attempting to install ParaView using APT...")
+            if package == "qtcreator":
+                # Detect the distribution
+                result = subprocess.run(["lsb_release", "-is"], capture_output=True, text=True)
+                distro = result.stdout.strip().lower()
+
+                self.log_message.emit(f"Installing Qt Creator on {distro}...")
+
+                if "ubuntu" in distro or "debian" in distro or "mint" in distro:
+                    # Install Qt Creator for Debian-based distributions
+                    self.run_with_sudo(["apt-get", "install", "-y", "qtcreator", "openjdk-11-jre", "build-essential"])
+                elif "fedora" in distro or "redhat" in distro or "centos" in distro:
+                    # Install Qt Creator for Red Hat-based distributions
+                    self.run_with_sudo(["yum", "install", "-y", "qt-creator"])
+                else:
+                    raise Exception(f"Unsupported distribution for Qt Creator: {distro}")
+
+            elif package in ["freecad", "paraview"]:
+                self.log_message.emit(f"Installing {package} using APT...")
                 self.run_with_sudo(["apt-get", "install", "-y", package])
             elif package in ["numpy-stl", "scipy", "customtkinter-common", "PyQt5"]:
                 # Install Python packages via pip
@@ -80,7 +105,7 @@ class InstallationWorker(QThread):
                 if "Candidate:" not in result.stdout or "none" in result.stdout:
                     raise Exception(f"Package {package} not found in repositories.")
                 self.run_with_sudo(["apt-get", "install", "-y", package])
-            
+
             self.log_message.emit(f"{package} installed successfully.")
         except subprocess.CalledProcessError as e:
             self.error.emit(f"Failed to install {package}: {str(e)}")
@@ -88,33 +113,75 @@ class InstallationWorker(QThread):
         except Exception as e:
             self.error.emit(str(e))
             raise
-        
-        
+         
     def add_repositories(self):
         repositories = [
-            "ppa:freecad-maintainers/freecad-stable",  # FreeCAD PPA
-            "deb [arch=amd64] https://apt.kitware.com/ubuntu/ focal main",  # Replace 'focal' with your Ubuntu codename if needed
+            {
+                "name": "Kitware",
+                "repo": "deb [arch=amd64 signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main",
+                "gpg_key_url": "https://apt.kitware.com/keys/kitware-archive-latest.asc",
+                "list_file": "/etc/apt/sources.list.d/kitware.list",
+                "keyring_file": "/usr/share/keyrings/kitware-archive-keyring.gpg"
+            },
+            {
+                "name": "OpenFOAM Foundation",
+                "commands": [
+                    'sudo sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"',
+                    "sudo add-apt-repository -y http://dl.openfoam.org/ubuntu"
+                ]
+            },
+            {
+                "name": "OpenFOAM ESI",
+                "commands": [
+                    "wget -q -O - https://dl.openfoam.com/add-debian-repo.sh | sudo bash"
+                ]
+            },
         ]
-        for repo in repositories:
-            try:
-                if "kitware" in repo:
-                    # Add the Kitware key and repository
-                    subprocess.check_call(
-                        "wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | sudo apt-key add -", 
-                        shell=True
-                    )
-                elif repo.startswith("ppa:"):
-                    # Add PPAs
-                    self.run_with_sudo(f"add-apt-repository -y {repo}")
-                else:
-                    # Add custom repositories
-                    self.run_with_sudo(f"add-apt-repository -y {repo}")
-                
-                self.log_message.emit(f"Repository added: {repo}")
-            except subprocess.CalledProcessError as e:
-                self.log_message.emit(f"Failed to add repository: {repo}. Error: {e}")
-                self.errors.append(f"Failed to add repository: {repo}")
 
+        for index, repo_info in enumerate(repositories, start=1):
+            try:
+                self.log_message.emit(f"Configuring repository: {repo_info['name']}...")
+
+                # Handle repositories with GPG key and repo URL
+                if "gpg_key_url" in repo_info:
+                    # Check if the GPG key file exists
+                    if not os.path.exists(repo_info["keyring_file"]):
+                        self.log_message.emit(f"Adding GPG key for {repo_info['name']}...")
+                        subprocess.run(
+                            f"wget -qO - {repo_info['gpg_key_url']} | sudo gpg --dearmor -o {repo_info['keyring_file']}",
+                            shell=True, check=True
+                        )
+                    else:
+                        self.log_message.emit(f"GPG key for {repo_info['name']} already exists.")
+
+                    # Check if the repository is already configured
+                    if os.path.exists(repo_info["list_file"]):
+                        with open(repo_info["list_file"], "r") as f:
+                            if repo_info["repo"] in f.read():
+                                self.log_message.emit(f"Repository for {repo_info['name']} is already configured.")
+                                continue
+
+                    # Add the repository
+                    self.log_message.emit(f"Adding repository for {repo_info['name']}...")
+                    subprocess.run(
+                        f'echo "{repo_info["repo"]}" | sudo tee {repo_info["list_file"]}',
+                        shell=True, check=True
+                    )
+
+                # Handle repositories with direct commands
+                elif "commands" in repo_info:
+                    for cmd in repo_info["commands"]:
+                        self.log_message.emit(f"Executing command for {repo_info['name']}: {cmd}")
+                        subprocess.run(cmd, shell=True, check=True)
+
+                self.log_message.emit(f"Repository added: {repo_info['name']}")
+                self.progress.emit(index)  # Increment progress for each repository
+            except subprocess.CalledProcessError as e:
+                error_message = f"Failed to configure repository: {repo_info['name']}. Error: {e}"
+                self.log_message.emit(error_message)
+                self.errors.append(repo_info['name'])  # Track errors by repository name
+            
+    
     def install_openfoam(self, version):
         try:
             self.log_message.emit("Setting up OpenFOAM repository...")
@@ -139,29 +206,44 @@ class InstallationWorker(QThread):
             self.log_message.emit(f"Error configuring OpenFOAM: {e}")
             raise Exception(f"Failed to configure OpenFOAM version {version}.")
 
-    def run_with_sudo(self, command):
+    def run_with_sudo(self, command, shell=False, **kwargs):
         try:
+            # Ensure command is correctly formatted based on shell usage
+            if shell and isinstance(command, list):
+                command = ' '.join(command)
+            
+            # Log the command being run
+            self.log_message.emit(f"Running command: {command if isinstance(command, str) else ' '.join(command)}")
+
+            # Prefix the command with sudo and set the environment variable
+            full_command = f"DEBIAN_FRONTEND=noninteractive {command if isinstance(command, str) else ' '.join(command)}"
+            
             process = subprocess.run(
-                f"echo {self.sudo_password} | sudo -S {' '.join(command) if isinstance(command, list) else command}",
-                shell=True,
+                ["sudo"] + full_command.split() if not shell else f"sudo {full_command}",
+                shell=shell,  # Use shell only if necessary
                 check=True,
                 text=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                **kwargs
             )
             self.log_message.emit(process.stdout)  # Log the output
         except subprocess.CalledProcessError as e:
-            raise Exception(f"Command failed: {e.stderr}")
-
+            error_msg = f"Command failed: {e.stderr.strip()}"
+            self.log_message.emit(error_msg)
+            raise Exception(error_msg)
+        
     def get_total_time(self):
         return time.time() - self.start_time if self.start_time else 0
 
-
+# ----------------------
+# Splash Installer Class
+# ---------------------- 
 class SplashFOAMInstaller(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SplashFOAM Pre-Installer v0.2")
-        self.setGeometry(100, 100, 800, 1300) # last 2 entries to resize
+        self.setGeometry(100, 100, 800, 1200) # last 2 entries to resize
 
         self.include_openfoam = True
         self.sudo_password = ""
@@ -285,6 +367,7 @@ class SplashFOAMInstaller(QDialog):
             ("ffmpeg", "Multimedia framework for audio and video processing"),
             ("vlc", "Media player"),
             ("grace", "2D plotting software"),
+            ("qtcreator", "Qt Creator IDE")  
         ]
 
         self.optional_checkboxes = []
@@ -292,19 +375,6 @@ class SplashFOAMInstaller(QDialog):
             checkbox = QCheckBox(f"{pkg}: {desc}")
             self.optional_checkboxes.append(checkbox)
             layout.addWidget(checkbox)
-
-        # OpenFOAM Packages
-        self.openfoam_packages = [
-            ("OF_Foundation_v11", "OpenFOAM Foundation v11 (Required)"),
-            ("OF_ESI_openfoam2306-default", "OpenFOAM ESI v2306 (Required)"),
-            ("OF_Foundation_v8", "OpenFOAM Foundation v8"),
-            ("OF_Foundation_v9", "OpenFOAM Foundation v9"),
-            ("OF_Foundation_v10", "OpenFOAM Foundation v10"),
-            ("OF_Foundation_v12", "OpenFOAM Foundation v12"),
-            ("OF_ESI_openfoam2206-default", "OpenFOAM ESI v2206"),
-            ("OF_ESI_openfoam2312-default", "OpenFOAM ESI v2312"),
-            ("OF_ESI_openfoam2406-default", "OpenFOAM ESI v2406"),
-        ]
 
         # Separator
         separator = QFrame()
@@ -323,9 +393,8 @@ class SplashFOAMInstaller(QDialog):
         foam_label.setStyleSheet("color: green;")
         layout.addWidget(foam_label)
 
-
         self.openfoam_checkboxes = []
-        for pkg, desc in self.openfoam_packages:
+        for pkg, desc in OPENFOAM_PACKAGES:
             checkbox = QCheckBox(f"{pkg}: {desc}")
             if "Required" in desc:
                 checkbox.setChecked(True)
@@ -401,7 +470,6 @@ class SplashFOAMInstaller(QDialog):
         if sender:
             sender.setText("Less Info" if checked else "More Info")
 
-
     def run_installation(self):
         self.sudo_password = self.password_field.text()
         if not self.sudo_password:
@@ -410,24 +478,22 @@ class SplashFOAMInstaller(QDialog):
 
         selected_packages = [pkg for i, (pkg, _) in enumerate(self.optional_packages) if self.optional_checkboxes[i].isChecked()]
         required_packages = [pkg for pkg, _ in self.required_packages]
-        foam_packages = [pkg for i, (pkg, _) in enumerate(self.openfoam_packages) if self.openfoam_checkboxes[i].isChecked()]
+        foam_packages = [pkg for i, (pkg, _) in enumerate(OPENFOAM_PACKAGES) if self.openfoam_checkboxes[i].isChecked()]  # OpenFOAM versions
 
         all_packages = required_packages + selected_packages
-        if self.include_openfoam:
-            all_packages += foam_packages
 
-        self.progress_bar.setMaximum(len(all_packages) + 1)  # +1 for APT update
+        self.progress_bar.setMaximum(len(all_packages) + len(foam_packages) + 2)  # +2 for APT update and repositories
 
         self.loading_label.setVisible(True)
         self.loading_animation.start()
 
-        self.worker = InstallationWorker(all_packages, self.sudo_password)
+        # Pass foam_packages to the InstallationWorker
+        self.worker = InstallationWorker(all_packages, foam_packages, self.sudo_password)
         self.worker.progress.connect(self.update_progress_bar)
         self.worker.log_message.connect(self.log)
         self.worker.error.connect(self.handle_error)
 
-        self.worker.finished.connect(self.finish_installation)  # No disconnect needed
-
+        self.worker.finished.connect(self.finish_installation)
         self.worker.start()
 
     def update_progress_bar(self, value):
