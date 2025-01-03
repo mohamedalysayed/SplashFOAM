@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>476</width>
-    <height>243</height>
+    <width>526</width>
+    <height>275</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>200</y>
+     <y>240</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>200</y>
+     <y>240</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -43,7 +43,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>200</y>
+     <y>240</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -56,7 +56,7 @@
    <property name="geometry">
     <rect>
      <x>290</x>
-     <y>200</y>
+     <y>240</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -65,12 +65,12 @@
     <string>Default</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBoxBasicMode">
+  <widget class="QComboBox" name="comboBoxMode">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>140</x>
      <y>10</y>
-     <width>281</width>
+     <width>371</width>
      <height>22</height>
     </rect>
    </property>
@@ -93,8 +93,8 @@
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>451</width>
-     <height>151</height>
+     <width>511</width>
+     <height>191</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -108,7 +108,7 @@
      <rect>
       <x>0</x>
       <y>60</y>
-      <width>141</width>
+      <width>111</width>
       <height>20</height>
      </rect>
     </property>
@@ -119,9 +119,9 @@
    <widget class="QComboBox" name="comboBoxDivScheme">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>130</x>
       <y>60</y>
-      <width>291</width>
+      <width>371</width>
       <height>22</height>
      </rect>
     </property>
@@ -131,7 +131,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>131</width>
+      <width>101</width>
       <height>16</height>
      </rect>
     </property>
@@ -142,9 +142,9 @@
    <widget class="QComboBox" name="comboBoxLaplacian">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>90</y>
-      <width>291</width>
+      <x>130</x>
+      <y>120</y>
+      <width>371</width>
       <height>22</height>
      </rect>
     </property>
@@ -152,9 +152,9 @@
    <widget class="QComboBox" name="comboBoxGradScheme">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>130</x>
       <y>30</y>
-      <width>291</width>
+      <width>371</width>
       <height>22</height>
      </rect>
     </property>
@@ -163,8 +163,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
-      <width>131</width>
+      <y>120</y>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
@@ -175,9 +175,9 @@
    <widget class="QComboBox" name="comboBoxTemporal">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>120</y>
-      <width>291</width>
+      <x>130</x>
+      <y>150</y>
+      <width>371</width>
       <height>22</height>
      </rect>
     </property>
@@ -186,8 +186,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>120</y>
-      <width>131</width>
+      <y>150</y>
+      <width>111</width>
       <height>20</height>
      </rect>
     </property>
@@ -206,6 +206,29 @@
     </property>
     <property name="text">
      <string>Advanced Mode</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBoxDivTurb">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>90</y>
+      <width>371</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>90</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Divergence (Turbulence)</string>
     </property>
    </widget>
   </widget>

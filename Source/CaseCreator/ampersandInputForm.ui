@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1426</width>
-    <height>885</height>
+    <width>1402</width>
+    <height>889</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -488,19 +488,6 @@ background-color: rgb(170, 255, 255);</string>
       <string>Manual</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButtonSave">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>650</y>
-       <width>211</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Save case</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="pushButtonSteadyTransient">
      <property name="geometry">
       <rect>
@@ -637,6 +624,19 @@ background-color: rgb(170, 255, 255);</string>
       <string/>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButtonPostProc">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>650</y>
+       <width>211</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Post Processing</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
@@ -765,7 +765,6 @@ background-color: rgb(170, 255, 255);</string>
      <font>
       <family>Ubuntu</family>
       <pointsize>12</pointsize>
-      <weight>50</weight>
       <italic>true</italic>
       <bold>false</bold>
      </font>
@@ -1007,7 +1006,7 @@ color: rgb(0, 0, 0);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1426</width>
+     <width>1402</width>
      <height>22</height>
     </rect>
    </property>

@@ -12,9 +12,20 @@ from PySide6.QtWidgets import QMessageBox
 import sys
 from time import sleep
 import os
+from gui_text_to_foam_dict import grad_schemes,div_schemes,temporal_schemes
+
+# to keep theme consistent
+from theme_switcher import apply_theme_dialog_boxes
+global_darkmode = True
 
 loader = QUiLoader()
+
 src = None
+
+# set theme
+def set_global_darkmode(darkmode):
+    global global_darkmode
+    global_darkmode = darkmode
 
 # set the path of the src folder
 def set_src(src_path):
@@ -40,6 +51,7 @@ class sphereDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.load_ui()
+        apply_theme_dialog_boxes(self.window, global_darkmode)
         self.surfaces = []
         self.centerX = 0.0
         self.centerY = 0.0
@@ -91,6 +103,7 @@ class inputDialog(QDialog):
         self.prompt = prompt
         self.input_type = input_type
         self.load_ui()
+        apply_theme_dialog_boxes(self.window, global_darkmode)
 
     def load_ui(self):
         #ui_path = r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src\inputDialog.ui"
@@ -141,6 +154,7 @@ class vectorInputDialog(QDialog):
         self.prompt = prompt
         self.input_type = input_type
         self.load_ui()
+        apply_theme_dialog_boxes(self.window, global_darkmode)
 
     def load_ui(self):
         #ui_path = r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src\vectorInputDialog.ui"
@@ -193,6 +207,8 @@ class STLDialog(QDialog):
     def __init__(self, stl_name="stl_file.stl",stlProperties=None):
         super().__init__()
         self.load_ui()
+        global global_darkmode
+        apply_theme_dialog_boxes(self.window, global_darkmode)
         self.stl_name = stl_name
         self.OK_clicked = False
         self.stl_properties = stlProperties
@@ -384,6 +400,8 @@ class physicalPropertiesDialog(QDialog):
             self.fluid,self.rho,self.nu,self.cp,self.turbulence_model = initialProperties
             self.mu = self.rho*self.nu
         self.load_ui()
+        global global_darkmode
+        apply_theme_dialog_boxes(self.window, global_darkmode)
         self.disable_advanced_physics()
         self.fill_fluid_types()
         self.fill_turbulence_models()
@@ -493,6 +511,8 @@ class boundaryConditionDialog(QDialog):
         self.pressureBC = None
         self.turbulenceBC = None
         self.load_ui()
+        global global_darkmode
+        apply_theme_dialog_boxes(self.window, global_darkmode)
         self.setNameAndType()
         self.window.setWindowTitle(f"Boundary Condition: {self.boundary['name']} ({self.boundary['purpose']})")
         self.disable_unnecessary_fields()
@@ -729,12 +749,32 @@ class boundaryConditionDialog(QDialog):
         pass
 
 class numericalSettingsDialog(QDialog):
-    def __init__(self):
+    def __init__(self,current_mode=0,numericalSettings=None):
         super().__init__()
-        self.load_ui()
-        self.initialize_values()
+        self.modes = ["Balanced (Blended 2nd Order schemes)","Stablity Mode (1st Order schemes)","Accuracy Mode (2nd Order schemes)","Advanced Mode"]
+        self.temporal_schemes = {"Steady State":"steadyState","Euler":"Euler","Backward Euler (2nd Order)":"backward","Crank-Nicolson (Blended 2nd Order)":"crankNicolson 0.5","Crank-Nicolson (2nd Order)":"crankNicolson 1.0"}
+        self.grad_schemes = grad_schemes
+        self.div_schemes = div_schemes
+        self.current_mode = current_mode
+        
         self.OK_clicked = False
-    
+        
+        # default values for numerical settings. 
+        self.numericalSettings = numericalSettings
+        self.basicMode = True
+        self.load_ui()
+        global global_darkmode
+        apply_theme_dialog_boxes(self.window, global_darkmode)
+        self.fill_comboBox_values()
+        self.prepare_events()
+
+    def prepare_events(self):
+        self.window.pushButtonOK.clicked.connect(self.on_pushButtonOK_clicked)
+        self.window.pushButtonCancel.clicked.connect(self.on_pushButtonCancel_clicked)
+        self.window.pushButtonApply.clicked.connect(self.on_pushButtonApply_clicked)
+        self.window.pushButtonDefault.clicked.connect(self.on_pushButtonDefault_clicked)
+        self.window.comboBoxMode.currentIndexChanged.connect(self.changeMode)
+       
     def load_ui(self):
         #ui_path = r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src\numericDialog.ui"
         ui_path = os.path.join(src, "numericDialog.ui")
@@ -744,44 +784,182 @@ class numericalSettingsDialog(QDialog):
         self.window = loader.load(ui_file, None)
         ui_file.close()
 
-    def initialize_values(self):
-        self.window.comboBoxBasicMode.addItem("Balanced (Blended 2nd Order schemes)")
-        self.window.comboBoxBasicMode.addItem("Stablity Mode (1st Order schemes)")
-        self.window.comboBoxBasicMode.addItem("Accuracy Mode (2nd Order schemes)")
-        self.window.comboBoxBasicMode.addItem("Advanced Mode")
+    def fill_comboBox_values(self):
+        for mode in self.modes:
+            self.window.comboBoxMode.addItem(mode)
+        self.window.comboBoxMode.setCurrentIndex(self.current_mode)
+        #self.window.comboBoxMode.addItem("Balanced (Blended 2nd Order schemes)")
+        #self.window.comboBoxMode.addItem("Stablity Mode (1st Order schemes)")
+        #self.window.comboBoxMode.addItem("Accuracy Mode (2nd Order schemes)")
+        #self.window.comboBoxMode.addItem("Advanced Mode")
         
         self.window.comboBoxGradScheme.addItem("Gauss Linear")
-        self.window.comboBoxGradScheme.addItem("cellLimited Gauss Linear")
-        self.window.comboBoxGradScheme.addItem("faceLimited Gauss Linear")
+        self.window.comboBoxGradScheme.addItem("Gauss Linear (Cell Limited)")
+        self.window.comboBoxGradScheme.addItem("Gauss Linear (Cell MD Limited)")
+        self.window.comboBoxGradScheme.addItem("Gauss Linear (Face Limited)")
+        self.window.comboBoxGradScheme.addItem("Gauss Linear (Face MD Limited)")
         self.window.comboBoxGradScheme.addItem("Least Squares")
+
+       
 
         self.window.comboBoxDivScheme.addItem("Gauss Linear")
         self.window.comboBoxDivScheme.addItem("Gauss Linear Upwind")
         self.window.comboBoxDivScheme.addItem("Gauss Upwind")  
         self.window.comboBoxDivScheme.addItem("Gauss LUST")      
         self.window.comboBoxDivScheme.addItem("Gauss Linear Limited")
+        self.window.comboBoxDivScheme.addItem("Gauss Linear LimitedV")
 
-        self.window.comboBoxLaplacian.addItem("Corrected")
-        self.window.comboBoxLaplacian.addItem("Limited 0.333")
-        self.window.comboBoxLaplacian.addItem("Limited 0.666")
-        self.window.comboBoxLaplacian.addItem("Limited 1.0")
+        #self.window.comboBoxGradScheme.addItem("grad(U)")
+
+        self.window.comboBoxDivTurb.addItem("Gauss Upwind") 
+        self.window.comboBoxDivTurb.addItem("Gauss Linear Limited")
+
+
+        self.window.comboBoxLaplacian.addItem("corrected")
+        
+        self.window.comboBoxLaplacian.addItem("limited 0.333")
+        self.window.comboBoxLaplacian.addItem("limited 0.666")
+        self.window.comboBoxLaplacian.addItem("limited 1.0")
 
         self.window.comboBoxTemporal.addItem("Steady State")
-        self.window.comboBoxTemporal.addItem("Euler (1st Order)")
+        self.window.comboBoxTemporal.addItem("Euler")
         self.window.comboBoxTemporal.addItem("Backward Euler (2nd Order)")
         self.window.comboBoxTemporal.addItem("Crank-Nicolson (Blended 2nd Order)")
         self.window.comboBoxTemporal.addItem("Crank-Nicolson (2nd Order)")
-
-        self.window.frame.setVisible(False)
+        if self.current_mode==0 or self.current_mode==1 or self.current_mode==2:
+            self.setBasicMode()
+            self.window.frame.setVisible(False)
+        else:
+            self.setAdvancedMode()
+            self.window.frame.setVisible(True)
+        
 
     def prepare_events(self):
         self.window.pushButtonOK.clicked.connect(self.on_pushButtonOK_clicked)
         self.window.pushButtonCancel.clicked.connect(self.on_pushButtonCancel_clicked)
         self.window.pushButtonApply.clicked.connect(self.on_pushButtonApply_clicked)
+        self.window.pushButtonDefault.clicked.connect(self.on_pushButtonDefault_clicked)
+        self.window.comboBoxMode.currentIndexChanged.connect(self.changeMode)
 
     def on_pushButtonOK_clicked(self):
         #print("Push Button OK Clicked")
+        self.on_pushButtonApply_clicked()
+        self.window.close()
+
+    def on_pushButtonCancel_clicked(self):
+        self.window.close()
+
+    def on_pushButtonDefault_clicked(self):
+        #self.window.close()
+        #print("Default Settings Choosen")
+        self.window.comboBoxMode.setCurrentText("Balanced (Blended 2nd Order schemes)")
+        self.setBasicMode()
+
+
+    def on_pushButtonApply_clicked(self):
         self.OK_clicked = True
+        self.current_mode = self.window.comboBoxMode.currentIndex()
+    
+    def print_numerical_settings(self):
+        print("ddtScheme",self.numericalSettings['ddtSchemes']['default'])
+        print("grad",self.numericalSettings['gradSchemes']['default'])
+        print("gradU",self.numericalSettings['gradSchemes']['grad(U)'])
+        print("div",self.numericalSettings['divSchemes']['default'])
+        print("div, convection",self.numericalSettings['divSchemes']['div(phi,U)'])
+        print("laplacian",self.numericalSettings['laplacianSchemes']['default'])
+        print("snGrad",self.numericalSettings['snGradSchemes']['default'])
+    
+    """
+    We have 3 basic modes: Balanced, Stability, Accuracy.
+    This function will set the numerical schemes based on the mode selected.
+    """
+    def setBasicMode(self):
+        self.basicMode = True
+        if(self.window.comboBoxMode.currentText()=="Balanced (Blended 2nd Order schemes)"):
+            #print("Balanced Mode")
+            #self.print_numerical_settings()
+            self.numericalSettings['ddtSchemes']['default'] = "Euler"
+            self.numericalSettings['gradSchemes']['default'] = "Gauss linear"
+            self.numericalSettings['gradSchemes']['grad(U)'] = "cellLimited Gauss linear 1"
+            self.numericalSettings['divSchemes']['default'] = "Gauss linear"
+            self.numericalSettings['divSchemes']['div(phi,U)'] = "Gauss linearUpwind grad(U)"
+            self.numericalSettings['laplacianSchemes']['default'] = "Gauss linear limited 0.666"
+            self.numericalSettings['snGradSchemes']['default'] = "limited 0.666"
+            pass
+        elif(self.window.comboBoxMode.currentText()=="Accuracy Mode (2nd Order schemes)"):
+            self.numericalSettings['ddtSchemes']['default'] = "Euler"
+            self.numericalSettings['gradSchemes']['default'] = "Gauss linear"
+            self.numericalSettings['divSchemes']['default'] = "Gauss linear"
+            self.numericalSettings['divSchemes']['div(phi,U)'] = "Gauss linear"
+            self.numericalSettings['laplacianSchemes']['default'] = "Gauss linear corrected"
+            self.numericalSettings['snGradSchemes']['default'] = "corrected"
+            #print("Accuracy Mode")
+            #self.print_numerical_settings() 
+        elif(self.window.comboBoxMode.currentText()=="Stablity Mode (1st Order schemes)"):
+            self.numericalSettings['ddtSchemes']['default'] = "Euler"
+            self.numericalSettings['gradSchemes']['default'] = "Gauss linear"
+            self.numericalSettings['gradSchemes']['grad(U)'] = "cellLimited Gauss linear 1"
+            self.numericalSettings['divSchemes']['default'] = "Gauss upwind"
+            self.numericalSettings['divSchemes']['div(phi,U)'] = "Gauss upwind"
+            self.numericalSettings['laplacianSchemes']['default'] = "Gauss linear limited 0.333"
+            self.numericalSettings['snGradSchemes']['default'] = "limited 0.333"
+            #print("Stability Mode")
+            #self.print_numerical_settings()
+        else:
+            self.setAdvancedMode()
+            #print("Advanced Mode")
+            
+        
+
+    def setAdvancedMode(self):
+        self.basicMode = False
+        self.numericalSettings['ddtSchemes']['default'] = self.temporal_schemes[self.window.comboBoxTemporal.currentText()]
+        self.numericalSettings['gradSchemes']['default'] = self.window.comboBoxGradScheme.currentText()
+        self.numericalSettings['gradSchemes']['grad(U)'] = self.window.comboBoxGradScheme.currentText()
+        self.numericalSettings['gradSchemes']['div(phi,U)'] = self.window.comboBoxDivScheme.currentText()
+        self.numericalSettings['laplacianSchemes']['default'] = "Gauss linear "+ self.window.comboBoxLaplacian.currentText()
+        self.numericalSettings['snGradSchemes']['default'] = self.window.comboBoxLaplacian.currentText()
+        #self.print_numerical_settings()
+    
+    def changeMode(self):
+        if(self.window.comboBoxMode.currentText()=="Advanced Mode"):
+            self.window.frame.setVisible(True)
+        else:
+            self.window.frame.setVisible(False) 
+            self.setBasicMode()
+
+    def assign_changes(self):
+        pass
+
+    def __del__(self):
+        pass
+
+class controlsDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.OK_clicked = False
+        self.load_ui()
+        global global_darkmode
+        apply_theme_dialog_boxes(self.window, global_darkmode)
+        self.prepare_events()
+
+    def load_ui(self):
+        #ui_path = r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src\controlsDialog.ui"
+        ui_path = os.path.join(src, "controlsDialog.ui")
+        ui_file = QFile(ui_path)
+        #ui_file = QFile("inputDialog.ui")
+        ui_file.open(QFile.ReadOnly)
+        self.window = loader.load(ui_file, None)
+        ui_file.close()
+
+    def prepare_events(self):
+        self.window.pushButtonOK.clicked.connect(self.on_pushButtonOK_clicked)
+        self.window.pushButtonCancel.clicked.connect(self.on_pushButtonCancel_clicked)
+        self.window.pushButtonApply.clicked.connect(self.on_pushButtonApply_clicked)
+        self.window.pushButtonDefault.clicked.connect(self.on_pushButtonDefault_clicked)
+
+    def on_pushButtonOK_clicked(self):
+        self.on_pushButtonApply_clicked()
         self.window.close()
 
     def on_pushButtonCancel_clicked(self):
@@ -789,12 +967,13 @@ class numericalSettingsDialog(QDialog):
 
     def on_pushButtonApply_clicked(self):
         self.OK_clicked = True
-        #self.window.close()
+        self.window.close()
 
+    def on_pushButtonDefault_clicked(self):
+        self.window.close()
 
     def __del__(self):
         pass
-
 
 #---------------------------------------------------------
 # Driver function for different dialog boxes
@@ -902,13 +1081,17 @@ def boundaryConditionDialogDriver(boundary=None):
     turbulenceBC = dialog.turbulenceBC
     return (velocityBC,pressureBC,turbulenceBC)
 
-def numericsDialogDriver():
-    dialog = numericalSettingsDialog()
+def numericsDialogDriver(current_mode=0,numericalSettings=None):
+    dialog = numericalSettingsDialog(current_mode=current_mode,numericalSettings=numericalSettings)
     dialog.window.exec()
     dialog.window.show()
+    return dialog.current_mode,dialog.numericalSettings
 
 def controlsDialogDriver():
-    pass
+    dialog = controlsDialog()
+    dialog.window.exec()
+    dialog.window.show()
+    return 
 
 def meshPointDialogDriver(locationInMesh=None):
     meshPoint = vectorInputDialogDriver(prompt="Enter mesh point",input_type="float",initial_values=locationInMesh)

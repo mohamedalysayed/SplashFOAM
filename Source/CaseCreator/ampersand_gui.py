@@ -27,6 +27,7 @@ from dialogBoxes import sphereDialogDriver, yesNoDialogDriver, yesNoCancelDialog
 from dialogBoxes import vectorInputDialogDriver, STLDialogDriver, physicalPropertiesDialogDriver
 from dialogBoxes import boundaryConditionDialogDriver, numericsDialogDriver, controlsDialogDriver
 from dialogBoxes import set_src, meshPointDialogDriver
+from dialogBoxes import global_darkmode, set_global_darkmode
 
 # VTK Libraries
 import vtk
@@ -70,6 +71,7 @@ class mainWindow(QMainWindow):
         self.lenX, self.lenY, self.lenZ = 1e-3, 1e-3, 1e-3
         self.current_stl_file = None
         self.colorCounter = 0
+        self.current_mode = 0 # balanced
         self.disableButtons()
         
         # Default to Dark Theme
@@ -130,7 +132,7 @@ class mainWindow(QMainWindow):
         #self.window.pushButtonCreate.setEnabled(False)
         #self.window.pushButtonOpen.setEnabled(False)
         self.window.pushButtonGenerate.setEnabled(False)
-        self.window.pushButtonSave.setEnabled(False)
+        self.window.pushButtonPostProc.setEnabled(False)
         self.window.lineEditMinX.setEnabled(False)
         self.window.lineEditMinY.setEnabled(False)
         self.window.lineEditMinZ.setEnabled(False)
@@ -161,7 +163,7 @@ class mainWindow(QMainWindow):
         self.window.pushButtonCreate.setEnabled(True)
         self.window.pushButtonOpen.setEnabled(True)
         self.window.pushButtonGenerate.setEnabled(True)
-        self.window.pushButtonSave.setEnabled(True)
+        self.window.pushButtonPostProc.setEnabled(True)
         self.window.pushButtonDomainAuto.setEnabled(True)
         self.window.pushButtonDomainManual.setEnabled(True)
         self.window.pushButtonSteadyTransient.setEnabled(True)
@@ -230,6 +232,7 @@ class mainWindow(QMainWindow):
         self.vtkBackground.addItems([
             "Cyan-Gray Gradient",
             "White-Black Gradient",
+            "Black-White Gradient",
             "Blue Gradient",
             "Solid White",
             "Solid Black",
@@ -261,7 +264,12 @@ class mainWindow(QMainWindow):
         Toggles between light and dark themes, applying the appropriate stylesheet
         and updating the VTK background via VTKManager.
         """
+        #global global_darkmode
         dark_mode = self.window.themeToggle.isChecked()
+        #global_darkmode = dark_mode
+        set_global_darkmode(dark_mode)
+        #print(f"Dark Mode: {dark_mode}")
+        #print(f"Global Dark Mode: {global_darkmode}")
         apply_theme(self.window, self.vtk_manager, dark_mode)
         
 
@@ -423,7 +431,7 @@ class mainWindow(QMainWindow):
         self.window.pushButtonCreate.clicked.connect(self.createCase)
         self.window.pushButtonOpen.clicked.connect(self.openCase)
         self.window.pushButtonGenerate.clicked.connect(self.generateCase)
-        self.window.pushButtonSave.clicked.connect(self.saveCase)
+        self.window.pushButtonPostProc.clicked.connect(self.postProcessDialog)
         self.window.radioButtonInternal.clicked.connect(self.chooseInternalFlow)
         self.window.radioButtonExternal.clicked.connect(self.chooseExternalFlow)
         self.window.listWidgetObjList.itemClicked.connect(self.listClicked)
@@ -652,19 +660,40 @@ class mainWindow(QMainWindow):
         """
         Dynamically resize widgets when the main window is resized.
         """
-        TERMINAL_HEIGHT = 302  # Adjust as needed
-        vtkWidgetHeight = self.window.height() - TERMINAL_HEIGHT - 20
-        vtkWidgetWidth = self.window.width() - 560
+        TERMINAL_HEIGHT = 300  # Adjust as needed
+        PROGRESS_BAR_HEIGHT = 20  # To adjust the progress bar and terminal positions
+        TABLE_WIDTH = 200  # Width of the properties table
+        TABLE_HEIGHT_FREE_SPACE = 410  # Window height - table height 
+        WINDOW_HEIGHT = self.window.height()
+        WINDOW_WIDTH = self.window.width()
+        table_height = WINDOW_HEIGHT - TABLE_HEIGHT_FREE_SPACE - 50
+        frame3_height = WINDOW_HEIGHT - 40 # height of the frame3 which contains the properties table
+        vtkWidgetHeight = WINDOW_HEIGHT - TERMINAL_HEIGHT - PROGRESS_BAR_HEIGHT - 20
+        vtkWidgetWidth = WINDOW_WIDTH - 560
+
         terminalX = self.window.widget.pos().x()
-        terminalY = self.window.widget.pos().y() + vtkWidgetHeight + 10
+        terminalY = self.window.widget.pos().y() + vtkWidgetHeight + 5
 
         self.window.widget.resize(vtkWidgetWidth, vtkWidgetHeight)
         self.vtkWidget.resize(vtkWidgetWidth, vtkWidgetHeight)
         self.vtkWidget.GetRenderWindow().Render()
 
+        # Resize the terminal, progress bar and properties table
+
         self.window.plainTextTerminal.move(terminalX, terminalY)
-        self.window.plainTextTerminal.resize(vtkWidgetWidth, TERMINAL_HEIGHT - 20)
+        self.window.plainTextTerminal.resize(vtkWidgetWidth, TERMINAL_HEIGHT - 70)
         self.window.plainTextTerminal.update()
+        self.window.plainTextTerminal.repaint()
+        self.window.progressBar.move(terminalX, terminalY+TERMINAL_HEIGHT-65)
+        self.window.progressBar.resize(vtkWidgetWidth, PROGRESS_BAR_HEIGHT)
+        self.window.progressBar.update()
+        self.window.progressBar.repaint()
+
+        #self.window.tableViewProperties.move(terminalX, terminalY + TERMINAL_HEIGHT + PROGRESS_BAR_HEIGHT + 2)
+        
+        print(f"Table Height: {table_height}")
+        self.window.frame_3.resize(self.window.frame_3.width(), frame3_height)
+        self.window.tableViewProperties.resize(TABLE_WIDTH, table_height)
         self.readyStatusBar()
 
     def closeEventTriggered(self, event):
@@ -821,6 +850,8 @@ class mainWindow(QMainWindow):
             ampersandIO.printWarning("No project found. Failed to open case directory.", GUIMode=True)
             self.updateTerminal("No project found. Failed to open case directory.")
             self.readyStatusBar()
+            # reset the background by adding initial grid
+            self.vtk_manager.add_initial_grid()
             return -1
 
         ampersandIO.printMessage(f"Project path: {self.project.project_path}", GUIMode=True, window=self)
@@ -994,7 +1025,6 @@ class mainWindow(QMainWindow):
             self.readyStatusBar()
 
     def physicalPropertiesDialog(self):
-
         # assign initial values from read data
         rho = self.project.physicalProperties['rho']
         nu = self.project.physicalProperties['nu']
@@ -1004,6 +1034,8 @@ class mainWindow(QMainWindow):
         initialProperties = (fluid,rho,nu,cp,turbulence_model)
         
         physicalProperties = physicalPropertiesDialogDriver(initialProperties)
+        if physicalProperties==None:
+            return 
         fluid,rho,nu,cp,turbulence_model = physicalProperties
         # update the project physical properties
         ampersandIO.printMessage("Updating Physical Properties",GUIMode=True)
@@ -1027,10 +1059,16 @@ class mainWindow(QMainWindow):
         self.project.set_boundary_condition(self.current_stl_file,boundaryConditions)
 
     def numericsDialog(self):
-        numerics = numericsDialogDriver()  
+        self.current_mode,self.project.numericalSettings = numericsDialogDriver(self.current_mode,self.project.numericalSettings)  
 
     def controlsDialog(self):
         controls = controlsDialogDriver()
+
+    
+    def postProcessDialog(self):
+        print("Post Process Dialog")
+        pass
+        
 
     def summarizeProject(self):
         self.project.summarize_project()
@@ -1100,7 +1138,8 @@ class mainWindow(QMainWindow):
 
     def vtkUpdateAxes(self):
         """Draw axes with a dynamic size based on project dimensions."""
-        char_len = max(self.project.lenX, self.project.lenY, self.project.lenZ) * 0.2
+        char_len = max(self.project.lenX, self.project.lenY, self.project.lenZ, 0.001) * 0.2
+        print(char_len)
         self.vtk_manager.draw_axes(char_len)
 
     def vtkDrawMeshPoint(self):

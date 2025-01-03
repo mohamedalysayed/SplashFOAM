@@ -433,6 +433,9 @@ class VTKManager:
         Updates the axes actor length dynamically.
         :param char_len: Length for axes.
         """
+        char_len = max(char_len, 1e-3)  # Minimum length of 1e-3
+        print("Char Length: ", char_len)
+        assert char_len < 0, "Invalid length for axes."
         self.axes_actor.SetTotalLength(char_len, char_len, char_len)
         self.renderer.RemoveActor(self.axes_actor)  # Re-add to ensure proper rendering order
         self.renderer.AddActor(self.axes_actor)
@@ -540,14 +543,18 @@ class VTKManager:
             self.renderer.GradientBackgroundOn()
             self.renderer.SetBackground(colors.GetColor3d("White"))  # Top color
             self.renderer.SetBackground2(colors.GetColor3d("Black"))  # Bottom color
-        elif index == 2:   # Blue Gradient
+        elif index == 2:   # Black-White Gradient 
+            self.renderer.GradientBackgroundOn()
+            self.renderer.SetBackground(colors.GetColor3d("Black"))  # Top color
+            self.renderer.SetBackground2(colors.GetColor3d("White"))  # Bottom color
+        elif index == 3:   # Blue Gradient
             self.renderer.GradientBackgroundOn()
             self.renderer.SetBackground(colors.GetColor3d("SkyBlue"))  # Top color
             self.renderer.SetBackground2(colors.GetColor3d("MidnightBlue"))  # Bottom color
-        elif index == 3:   # Solid White
+        elif index == 4:   # Solid White
             self.renderer.GradientBackgroundOff()
             self.renderer.SetBackground(colors.GetColor3d("White"))
-        elif index == 4:   # Solid Black
+        elif index == 5:   # Solid Black
             self.renderer.GradientBackgroundOff()
             self.renderer.SetBackground(colors.GetColor3d("Black"))
 
@@ -893,7 +900,8 @@ class VTKManager:
             return
 
         # Compute the largest extent of the geometry
-        max_extent = max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4])
+        # added 1e-3 to prevent zero lengths
+        max_extent = max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4], 1e-3)
         
         # Scale the axes length proportionally (e.g., 10% of the max extent)
         axes_length = max_extent * 0.1
