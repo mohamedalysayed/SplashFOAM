@@ -23,6 +23,17 @@ resolve_apt_conflicts() {
     sudo apt-get update
 }
 
+# Configure pip to allow breaking system packages
+configure_pip() {
+    echo "Configuring pip to allow breaking system packages..."
+    python3 -m pip config set global.break-system-packages true
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Failed to configure pip. Exiting."
+        zenity --error --title="Configuration Failed" --text="Failed to configure pip. Please check your Python environment."
+        exit 1
+    fi
+}
+
 # Install system packages
 install_system_packages() {
     for pkg in "${SYSTEM_PACKAGES[@]}"; do
@@ -107,6 +118,9 @@ launch_gui() {
 main() {
     # Resolve APT conflicts
     resolve_apt_conflicts
+
+    # Configure pip
+    configure_pip
 
     # Combine the list of packages into a single string
     ALL_PACKAGES=$(printf "%s\n" "${SYSTEM_PACKAGES[@]}" "${PYTHON_PACKAGES[@]}" "${PIP3_PACKAGES[@]}")

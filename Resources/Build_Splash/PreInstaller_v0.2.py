@@ -38,37 +38,41 @@ class InstallationWorker(QThread):
         
     def run(self):
         self.start_time = time.time()
+        total_steps = len(self.packages) + len(self.openfoam_versions) + 2  # +2 for repositories and APT update
+        step = 0
+
         try:
             self.log_message.emit("Adding required PPAs and repositories...")
             self.add_repositories()
+            step += 1
+            self.progress.emit(step)
+            
             self.log_message.emit("PPAs and repositories added successfully.")
 
-            # Install selected OpenFOAM versions immediately after repository setup
-            for version in self.openfoam_versions:
-                self.install_openfoam(version)
-
             self.log_message.emit("Updating APT package list...")
-            self.run_with_sudo("apt-get update", shell=True)
-            self.log_message.emit("APT package list updated successfully.")
-            self.progress.emit(1)  # Increment progress for APT update
-        except subprocess.CalledProcessError as e:
-            self.errors.append("APT update failed")
-            self.log_message.emit(f"Failed to update APT package list: {str(e)}")
-            self.error.emit(f"Failed to update APT package list: {str(e)}")
-            self.finished.emit()
-            return
+            self.run_with_sudo(["apt-get", "update"], shell=False)
+            step += 1
+            self.progress.emit(step)
 
-        for index, package in enumerate(self.packages, start=2):  # Start progress from 2
-            try:
-                self.log_message.emit(f"Installing {package}...")
+            self.log_message.emit("APT package list updated successfully.")
+
+            for version in self.openfoam_versions:
+                self.log_message.emit(f"Installing OpenFOAM version: {version}...")
+                self.install_openfoam(version)
+                step += 1
+                self.progress.emit(step)
+
+            for package in self.packages:
+                self.log_message.emit(f"Installing package: {package}...")
                 self.install_package(package)
-                self.progress.emit(index)
-                self.log_message.emit(f"{package} installed successfully.")
-            except Exception as e:
-                self.errors.append(package)
-                self.log_message.emit(f"Error installing {package}: {str(e)}")
-                self.error.emit(str(e))
-        self.finished.emit()
+                step += 1
+                self.progress.emit(step)
+
+        except Exception as e:
+            self.log_message.emit(str(e))
+            self.error.emit(str(e))
+        finally:
+            self.finished.emit()
 
     def install_package(self, package):
         try:
@@ -113,7 +117,6 @@ class InstallationWorker(QThread):
                 self.run_with_sudo(["apt-get", "install", "-y", alternatives[package]])
             else:
                 self.run_with_sudo(["apt-get", "install", "-y", package])
-
             self.log_message.emit(f"{package} (or alternative) installed successfully.")
         except subprocess.CalledProcessError as e:
             self.error.emit(f"Failed to install {package}: {str(e)}")
@@ -168,10 +171,12 @@ class InstallationWorker(QThread):
                         )
                 elif "commands" in repo_info:
                     for cmd in repo_info["commands"]:
+                        self.log_message.emit(f"Executing command for {repo_info['name']}: {cmd}")
                         subprocess.run(cmd, shell=True, check=True)
 
                 self.progress.emit(int(progress_increment * index))
                 self.log_message.emit(f"Repository added: {repo_info['name']}")
+                self.progress.emit(index)  # Increment progress for each repository
             except subprocess.CalledProcessError as e:
                 self.log_message.emit(f"Failed to configure repository: {repo_info['name']}. Error: {e}")
                 self.errors.append(f"Failed to configure repository: {repo_info['name']}")
@@ -211,6 +216,9 @@ class InstallationWorker(QThread):
             if shell and isinstance(command, list):
                 command = ' '.join(command)
             
+            # Log the command being run
+            self.log_message.emit(f"Running command: {command if isinstance(command, str) else ' '.join(command)}")
+
             # Prefix the command with sudo and set the environment variable
             full_command = f"DEBIAN_FRONTEND=noninteractive {command if isinstance(command, str) else ' '.join(command)}"
             
@@ -370,7 +378,6 @@ class SplashFOAMInstaller(QDialog):
             self.optional_checkboxes.append(checkbox)
             layout.addWidget(checkbox)
 
-
         # Separator
         separator = QFrame()
         separator.setFrameShape(QFrame.HLine)
@@ -477,7 +484,7 @@ class SplashFOAMInstaller(QDialog):
 
         all_packages = required_packages + selected_packages
 
-        self.progress_bar.setMaximum(len(all_packages) + len(foam_packages) + 1)  # +1 for APT update
+        self.progress_bar.setMaximum(len(all_packages) + len(foam_packages) + 2)  # +2 for APT update and repositories
 
         self.loading_label.setVisible(True)
         self.loading_animation.start()
