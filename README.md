@@ -9,8 +9,8 @@ A modular GUI for streamlined CFD workflows across all OpenFOAM versions.
 - [Features](#features)
   - [Geometry Import](#geometry-import)
   - [Meshing Tools](#meshing-tools)
+  - [Case Creator](#case-creator)
   - [Simulation Setup](#simulation-setup)
-  - [Configuration Management](#configuration-management)
   - [Run Simulation](#run-simulation)
   - [Post-Processing](#post-processing)
   - [Splash Cloud](#splash-cloud)
@@ -34,7 +34,7 @@ SplashFOAM includes a pre-installation script to ensure your system is ready:
 - **Automated Dependency Installation**: The script checks for required packages and installs them if missing, including OpenFOAM, FreeCAD, Gmsh, and more.
 - **WSL Compatibility**: Special considerations for users running SplashFOAM on Windows Subsystem for Linux (WSL), including setting up display configurations.
 
-Whether you are running Ubuntu natively, through VirtualBox, or WSL, you must execute the `Ubuntu_MEL.sh` script prior to launching SplashFOAM.
+Whether you are running Ubuntu natively, through VirtualBox, or WSL, you must execute the `Ubuntu_MEL.sh` script before launching SplashFOAM.
 
 Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.5 LTS**).
 
@@ -45,27 +45,33 @@ Currently, SplashFOAM is supported on **Ubuntu** (recommended to run on **22.04.
   Clone the SplashFOAM repository to your local machine by running:
 
   ```bash
-  git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git
+  git clone https://github.com/mohamedalysayed/Splash-OpenFOAM.git 
 
 - **Step 2: Switch to the Correct Branch**
 
-  Ensure you are on the Standard-release branch to access the latest stable version:
-
-  ```bash
-  cd SplashFOAM
-  git checkout Standard-release
-
-- **Step 3: Install Necessary Packages**
-
-  Navigate to the SplashFOAM/Resources/Build_Splash/ directory and run the Ubuntu_MEL.sh script to install all the necessary dependencies:
+   From the cloned code, navigate to the SplashFOAM/Resources/Build_Splash/ directory. 
 
   ```bash
   cd SplashFOAM/Resources/Build_Splash/
-  chmod +x PreInstaller.sh
-  ./PreInstaller.sh
-![Splash-PreInstallerII](https://github.com/user-attachments/assets/ca9f7879-b72f-4b4e-9ea5-1ee81fa7fd9a)
 
-This will ensure that all required packages are installed. The user can install other secondary packages from the suggested list if needed. 
+
+- **Step 3: Install Necessary Packages**
+
+
+  Run the run_PreInstaller.sh script to install all the necessary dependencies:
+
+  ```bash
+  chmod +x run_PreInstaller.sh
+  ./run_PreInstaller.sh
+
+- Ensure you have Zenity installed. If not, execute the command below:
+
+  ```bash
+  sudo apt-get install -y zenity
+![Screenshot from 2024-12-28 01-11-48](https://github.com/user-attachments/assets/b1c41934-9338-412b-b4b7-a0419ff9be51)
+
+
+This will ensure that all required packages are installed. If needed, the user can install other secondary packages from the suggested list. 
 
 - **Step 4: Launch SplashFOAM**
 
@@ -74,6 +80,13 @@ This will ensure that all required packages are installed. The user can install 
   ```bash
   cd ../../Sources/
   python3 SplashFOAM.py
+
+### Configuration Management
+Easily manage configuration files for different versions of OpenFOAM:
+
+- **Automatic Detection of Installed OpenFOAM Versions**: SplashFOAM identifies available versions on your system and sets up the necessary environment variables.
+- **Alias Setup**: Aliases for various OpenFOAM versions are added to the _bashrc_ during installation (according to the user's choice), ensuring easy access to different versions.
+
 
 ## Features
 ### Geometry Import
@@ -129,20 +142,37 @@ Splash Mesher offers the option to add refinement objects to the domain. As show
 ![Screenshot from 2024-11-13 03-27-19](https://github.com/user-attachments/assets/4ff61616-0f20-47f7-ac4a-2fcf01214ead)
 
 
+## Case Creator 
+
+SplashFOAM’s Case Creator streamlines the generation of OpenFOAM cases for both internal and external flow scenarios. Accessible from the main window under File > Create Case, this tool now comes with enhanced functionality and visualization capabilities:
+
+- Built-In VTK Viewer: The Case Creator integrates a VTK-based geometry viewer, allowing users to:
+- Visualize imported geometries with real-time rendering.
+- Build and display a bounding box around the geometry to verify domain boundaries.
+- Define probes (mesh points) at critical locations for debugging problematic cases.
+- Enhanced Workflow: Quickly create cases with intuitive tools to set up boundary conditions, fluid properties, and simulation parameters, with a focus on efficiency and accuracy.
+- Guided Input Assistance: Case Creator provides a guided interface to ensure that input files are correctly set up for various OpenFOAM solvers, minimizing the risk of configuration errors.
+
+![image](https://github.com/user-attachments/assets/da91bf47-1348-4ac1-8fd4-2d24fc20c30e)
+
+
 ## Simulation Setup
+
 SplashFOAM simplifies the setup of OpenFOAM cases by providing:
-![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
 
-- **Case Directory Management**: Seamlessly load, configure and organize case directories.
-- **Simulation Configuration**: Adjust boundary conditions, solvers, and other simulation parameters through a graphical interface.
+- **Case Directory Management**: Seamlessly load, configure, and organize case directories.
+- **Mesh Refinement Levels**: Users can specify refinement levels for different regions to improve mesh quality and resolution.
+- **Physical Properties**: Easily define physical properties for the simulation, with the option to select from pre-saved fluid property profiles for common fluids.
+- **Turbulence Models**: Choose from a wide range of turbulence models tailored to specific flow regimes.
+- **Numerical Schemes**: Define numerical schemes for discretization and solution accuracy directly in the GUI.
+- **Boundary Conditions**: Seamlessly configure boundary conditions through a guided interface.
+- **Simulation Controls**:
+  - Start and end time of the simulation.
+  - Time-stepping configurations.
+  - Solution reports to monitor progress and convergence.
+  - Function objects for calculating derived quantities and other post-processing tasks.
 - **Initialization and Execution**: Directly initialize and run simulations from within the SplashFOAM environment. These set the simulation to its initial state and set up the necessary parameters to launch the case.
-Note: SplashFOAM does not allow direct changes in boundary condition (BC) files. If BC changes are needed, users may set up the case manually and then load it in SplashFOAM for further processing.
-
-## Configuration Management
-Easily manage configuration files for different versions of OpenFOAM:
-
-- **Automatic Detection of Installed OpenFOAM Versions**: SplashFOAM identifies available versions on your system and sets up the necessary environment variables.
-- **Alias Setup**: Aliases for various OpenFOAM versions are added to .bashrc during installation, ensuring easy access to different versions.
+Note: SplashFOAM does not allow direct changes in boundary condition (BC) files. If BC changes are needed, users may set up the case in **_Case Creator_** and then load the case again in SplashFOAM for further processing.
 
 ## Run Simulation
 SplashFOAM can launch a simulation locally or on a remote HPC cluster (Cloud HPC):
@@ -174,7 +204,7 @@ SplashFOAM integrates with popular post-processing tools to streamline analysis:
 - **Advanced 3D Rendering**: Experience glossy, interactive 3D rendering for geometries in formats like STL, OBJ, and STEP, with seamless camera control and enhanced lighting for precision inspections.
 - **Seamless Integration with SplashFOAM**: Prepare OpenFOAM-ready cases effortlessly, as Splash-Cloud outputs configurations that are fully compatible with SplashFOAM.
 - **No Installation Required**: Accessible on any device with an internet connection—eliminating setup hassle.
-- **Collaboration Made Easy**: Share geometries and configurations in real time with teammates.
+- **Collaboration Made Easy**: Share geometries and configurations in real-time with teammates.
 
 ## Documentation
 The manual is currently under development. In the meantime, please check the repository for updates or contact the [CFD Dose](https://cfddose.substack.com/) community for help.
@@ -190,6 +220,8 @@ Feel free to contribute to SplashFOAM by submitting issues or feature suggestion
  [*_Please refer to this GitHub repository when using any of the images below (proper referencing is required)_]
  
  - **Motorbike OpenFOAM Case - Steady State**
+
+![Screenshot from 2024-09-27 07-33-48](https://github.com/user-attachments/assets/3ea5904f-aa5d-4489-8027-2e4cbaf22173)
    
 ![motorbike5](https://github.com/user-attachments/assets/ab5d46b3-7389-41e9-8210-cc619085df60)
 

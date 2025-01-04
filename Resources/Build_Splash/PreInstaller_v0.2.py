@@ -74,47 +74,58 @@ class InstallationWorker(QThread):
         finally:
             self.finished.emit()
 
-
     def install_package(self, package):
         try:
-            if package == "qtcreator":
-                # Detect the distribution
-                result = subprocess.run(["lsb_release", "-is"], capture_output=True, text=True)
-                distro = result.stdout.strip().lower()
+            # Define known alternatives for missing packages
+            alternatives = {
+                "libxcb-cursor0": "libxcb-cursor-dev",
+                "libx11-xcb-dev": "libx11-dev",
+                "libxcb-render0-dev": "libxcb-render0",
+                "grace": "grace",  # Direct installation
+                "x11-apps": "x11-utils",
+                "meld": "meld"  # Direct installation
+            }
 
-                self.log_message.emit(f"Installing Qt Creator on {distro}...")
+            # Special handling for Python packages
+            if package in ["scipy", "PyQt5"]:
+                self.log_message.emit(f"Installing {package} with pip as fallback...")
+                try:
+                    # Try installing with pip
+                    subprocess.run(
+                        [sys.executable, "-m", "pip", "install", package],
+                        check=True,
+                        text=True
+                    )
+                except subprocess.CalledProcessError:
+                    # Fallback installation for scipy using apt
+                    if package == "scipy":
+                        self.log_message.emit("Trying fallback method for scipy...")
+                        self.run_with_sudo(["apt-get", "install", "-y", "python3-pip"])
+                        subprocess.run(
+                            [sys.executable, "-m", "pip", "install", "numpy", "scipy"],
+                            check=True,
+                            text=True
+                        )
+                    elif package == "PyQt5":
+                        self.log_message.emit("Trying fallback method for PyQt5...")
+                        self.run_with_sudo(["apt-get", "install", "-y", "python3-pyqt5"])
+                self.log_message.emit(f"{package} installed successfully.")
+                return  # Skip to avoid using alternatives for these packages
 
-                if "ubuntu" in distro or "debian" in distro or "mint" in distro:
-                    # Install Qt Creator for Debian-based distributions
-                    self.run_with_sudo(["apt-get", "install", "-y", "qtcreator", "openjdk-11-jre", "build-essential"])
-                elif "fedora" in distro or "redhat" in distro or "centos" in distro:
-                    # Install Qt Creator for Red Hat-based distributions
-                    self.run_with_sudo(["yum", "install", "-y", "qt-creator"])
-                else:
-                    raise Exception(f"Unsupported distribution for Qt Creator: {distro}")
-
-            elif package in ["freecad", "paraview"]:
-                self.log_message.emit(f"Installing {package} using APT...")
-                self.run_with_sudo(["apt-get", "install", "-y", package])
-            elif package in ["numpy-stl", "scipy", "customtkinter-common", "PyQt5"]:
-                # Install Python packages via pip
-                subprocess.check_call([sys.executable, "-m", "pip", "install", package, "--break-system-packages"])
+            if package in alternatives:
+                self.log_message.emit(f"Installing {package} or its alternative: {alternatives[package]}...")
+                self.run_with_sudo(["apt-get", "install", "-y", alternatives[package]])
             else:
-                # General system-level package installation via apt
-                result = subprocess.run(["apt-cache", "policy", package], capture_output=True, text=True)
-                if "Candidate:" not in result.stdout or "none" in result.stdout:
-                    raise Exception(f"Package {package} not found in repositories.")
                 self.run_with_sudo(["apt-get", "install", "-y", package])
-
-            self.log_message.emit(f"{package} installed successfully.")
+            self.log_message.emit(f"{package} (or alternative) installed successfully.")
         except subprocess.CalledProcessError as e:
             self.error.emit(f"Failed to install {package}: {str(e)}")
             raise Exception(f"Error installing {package}: {str(e)}")
-        except Exception as e:
-            self.error.emit(str(e))
-            raise
-         
+        
     def add_repositories(self):
+        total_repos = len(self.openfoam_versions) + len(self.packages)
+        progress_increment = 100 / total_repos
+
         repositories = [
             {
                 "name": "Kitware",
@@ -141,10 +152,8 @@ class InstallationWorker(QThread):
         for index, repo_info in enumerate(repositories, start=1):
             try:
                 self.log_message.emit(f"Configuring repository: {repo_info['name']}...")
-
                 # Handle repositories with GPG key and repo URL
                 if "gpg_key_url" in repo_info:
-                    # Check if the GPG key file exists
                     if not os.path.exists(repo_info["keyring_file"]):
                         self.log_message.emit(f"Adding GPG key for {repo_info['name']}...")
                         subprocess.run(
@@ -154,35 +163,28 @@ class InstallationWorker(QThread):
                     else:
                         self.log_message.emit(f"GPG key for {repo_info['name']} already exists.")
 
-                    # Check if the repository is already configured
-                    if os.path.exists(repo_info["list_file"]):
-                        with open(repo_info["list_file"], "r") as f:
-                            if repo_info["repo"] in f.read():
-                                self.log_message.emit(f"Repository for {repo_info['name']} is already configured.")
-                                continue
-
-                    # Add the repository
-                    self.log_message.emit(f"Adding repository for {repo_info['name']}...")
-                    subprocess.run(
-                        f'echo "{repo_info["repo"]}" | sudo tee {repo_info["list_file"]}',
-                        shell=True, check=True
-                    )
-
-                # Handle repositories with direct commands
+                    if not os.path.exists(repo_info["list_file"]):
+                        self.log_message.emit(f"Adding repository for {repo_info['name']}...")
+                        subprocess.run(
+                            f'echo "{repo_info["repo"]}" | sudo tee {repo_info["list_file"]}',
+                            shell=True, check=True
+                        )
                 elif "commands" in repo_info:
                     for cmd in repo_info["commands"]:
                         self.log_message.emit(f"Executing command for {repo_info['name']}: {cmd}")
                         subprocess.run(cmd, shell=True, check=True)
 
+                self.progress.emit(int(progress_increment * index))
                 self.log_message.emit(f"Repository added: {repo_info['name']}")
                 self.progress.emit(index)  # Increment progress for each repository
             except subprocess.CalledProcessError as e:
-                error_message = f"Failed to configure repository: {repo_info['name']}. Error: {e}"
-                self.log_message.emit(error_message)
-                self.errors.append(repo_info['name'])  # Track errors by repository name
+                self.log_message.emit(f"Failed to configure repository: {repo_info['name']}. Error: {e}")
+                self.errors.append(f"Failed to configure repository: {repo_info['name']}")
             
-    
     def install_openfoam(self, version):
+        total_foam_versions = len(self.openfoam_versions)
+        progress_increment = 100 / total_foam_versions
+
         try:
             self.log_message.emit("Setting up OpenFOAM repository...")
             repo_setup_cmd = "curl -s https://dl.openfoam.com/add-debian-repo.sh | sudo bash"
@@ -202,8 +204,10 @@ class InstallationWorker(QThread):
 
             self.log_message.emit(f"Installing OpenFOAM package: {package_name}")
             self.run_with_sudo(["apt-get", "install", "-y", package_name])
+            self.progress.emit(int(progress_increment * (self.openfoam_versions.index(version) + 1)))
         except subprocess.CalledProcessError as e:
             self.log_message.emit(f"Error configuring OpenFOAM: {e}")
+            self.errors.append(f"Failed to configure OpenFOAM version: {version}")
             raise Exception(f"Failed to configure OpenFOAM version {version}.")
 
     def run_with_sudo(self, command, shell=False, **kwargs):
@@ -326,8 +330,7 @@ class SplashFOAMInstaller(QDialog):
             ("libxcb-render0-dev", "XCB rendering library"),
             ("grace", "2D plotting software"),
             ("x11-apps", "X11 applications for GUI"),
-            ("gedit", "Text editor"),
-            ("meld", "Visual diff and merge tool"),
+
         ]
 
         self.required_checkboxes = []
@@ -366,8 +369,7 @@ class SplashFOAMInstaller(QDialog):
             ("htop", "Interactive process viewer for Unix systems"),
             ("ffmpeg", "Multimedia framework for audio and video processing"),
             ("vlc", "Media player"),
-            ("grace", "2D plotting software"),
-            ("qtcreator", "Qt Creator IDE")  
+            ("meld", "Visual diff and merge tool"),
         ]
 
         self.optional_checkboxes = []
