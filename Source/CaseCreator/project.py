@@ -460,6 +460,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     # write current settings to the project_settings.yaml file inside the project directory
     def write_settings(self):
         self.meshSettings['onGround'] = self.onGround
+        self.simulationSettings['transient'] = self.transient  
         settings = {
             'meshSettings': self.meshSettings,
             'physicalProperties': self.physicalProperties,
