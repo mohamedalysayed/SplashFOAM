@@ -1932,7 +1932,7 @@ _____________________________________________________
             "9": "/opt/openfoam9/etc/bashrc",
             "10": "/opt/openfoam10/etc/bashrc",
             "11": "/opt/openfoam11/etc/bashrc",
-            "12": "/opt/openfoam11/etc/bashrc",
+            "12": "/opt/openfoam12/etc/bashrc",
             "2212": "/usr/lib/openfoam/openfoam2212/etc/bashrc",
             "2306": "/usr/lib/openfoam/openfoam2306/etc/bashrc",
             "2312": "/usr/lib/openfoam/openfoam2312/etc/bashrc",
