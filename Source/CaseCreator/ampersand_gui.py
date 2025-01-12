@@ -130,6 +130,9 @@ class mainWindow(QMainWindow):
         self.window.pushButtonAddSTL.setEnabled(False)
         self.window.pushButtonRemoveSTL.setEnabled(False)
         self.window.pushButtonMeshPoint.setEnabled(False)
+
+        #self.window.pushButtonCreate.setEnabled(False)
+        #self.window.pushButtonOpen.setEnabled(False)
         self.window.pushButtonGenerate.setEnabled(False)
         self.window.pushButtonPostProc.setEnabled(False)
         self.window.lineEditMinX.setEnabled(False)
@@ -181,6 +184,7 @@ class mainWindow(QMainWindow):
         self.window.pushButtonAddSTL.setEnabled(True)
         self.window.pushButtonRemoveSTL.setEnabled(True)
         self.window.pushButtonMeshPoint.setEnabled(True)
+
         self.window.lineEditMinX.setEnabled(True)
         self.window.lineEditMinY.setEnabled(True)
         self.window.lineEditMinZ.setEnabled(True)
