@@ -16,7 +16,6 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 
-
 # Utility functions for writing STL files
 def write_box_stl(file_path, width, length, height):
     vertices = [
@@ -273,7 +272,6 @@ class ShapeSTLApp(QWidget):
             QMessageBox.warning(self, "Input Error", "Please enter valid numeric values.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An unexpected error occurred: {str(e)}")
-
 
 # Run the Application
 if __name__ == '__main__':
