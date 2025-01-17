@@ -33,6 +33,7 @@ from dialogBoxes import global_darkmode, set_global_darkmode
 # VTK Libraries
 import vtk
 import vtkmodules.vtkInteractionStyle
+
 # noinspection PyUnresolvedReferences
 import vtkmodules.vtkRenderingOpenGL2
 from vtkmodules.vtkCommonColor import vtkNamedColors
@@ -46,10 +47,7 @@ from vtkmodules.vtkRenderingCore import (
     vtkRenderWindowInteractor,
     vtkRenderer
 )
-# End of VTK Libraries
 
-
-#os.chdir(r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src")
 # get the absolute path of the current directory
 src = os.path.dirname(os.path.abspath(__file__))
 
@@ -131,8 +129,6 @@ class mainWindow(QMainWindow):
         self.window.pushButtonRemoveSTL.setEnabled(False)
         self.window.pushButtonMeshPoint.setEnabled(False)
 
-        #self.window.pushButtonCreate.setEnabled(False)
-        #self.window.pushButtonOpen.setEnabled(False)
         self.window.pushButtonGenerate.setEnabled(False)
         self.window.pushButtonPostProc.setEnabled(False)
         self.window.lineEditMinX.setEnabled(False)
@@ -701,7 +697,6 @@ class mainWindow(QMainWindow):
 
     def closeEventTriggered(self, event):
         self.close()
-
 
     def chooseInternalFlow(self):
         """
