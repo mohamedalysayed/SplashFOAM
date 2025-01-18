@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SplashFOAM Pre-Installer Run Script 
+# Splash Pre-Installer Run Script 
 # Author: Mohamed A. Sayed 
 # Version: 0.2
 
@@ -127,7 +127,7 @@ main() {
 
     # Show a Zenity confirmation dialog
     zenity --question \
-        --title="SplashFOAM Installer" \
+        --title="Splash Installer" \
         --width=400 \
         --height=300 \
         --text="The following packages will be installed:\n\n<b>System Packages:</b>\n$(printf '%s\n' "${SYSTEM_PACKAGES[@]}")\n\n<b>Python Packages:</b>\n$(printf '%s\n' "${PYTHON_PACKAGES[@]}")\n\n<b>Pip3 Packages:</b>\n$(printf '%s\n' "${PIP3_PACKAGES[@]}")\n\nDo you want to proceed?"

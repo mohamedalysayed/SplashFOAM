@@ -19,10 +19,9 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtCore import QFile
 from PySide6.QtWidgets import QMainWindow
-from PySide6.QtCore import QTimer, QTime 
+from PySide6.QtCore import QTimer, QTime # for Timer
 from PySide6.QtCore import Qt
 from PySide6 import QtWidgets
-from PySide6.QtWidgets import QButtonGroup
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from dialogBoxes import sphereDialogDriver, yesNoDialogDriver, yesNoCancelDialogDriver
 from dialogBoxes import vectorInputDialogDriver, STLDialogDriver, physicalPropertiesDialogDriver
@@ -33,7 +32,6 @@ from dialogBoxes import global_darkmode, set_global_darkmode
 # VTK Libraries
 import vtk
 import vtkmodules.vtkInteractionStyle
-
 # noinspection PyUnresolvedReferences
 import vtkmodules.vtkRenderingOpenGL2
 from vtkmodules.vtkCommonColor import vtkNamedColors
@@ -47,7 +45,10 @@ from vtkmodules.vtkRenderingCore import (
     vtkRenderWindowInteractor,
     vtkRenderer
 )
+# End of VTK Libraries
 
+
+#os.chdir(r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src")
 # get the absolute path of the current directory
 src = os.path.dirname(os.path.abspath(__file__))
 
@@ -112,8 +113,7 @@ class mainWindow(QMainWindow):
         self.window.pushButtonControls.setEnabled(False)
         self.window.pushButtonDomainAuto.setEnabled(False)
         self.window.pushButtonDomainManual.setEnabled(False)
-        self.window.SteadyState.setEnabled(False) 
-        self.window.Transient.setEnabled(False)
+        self.window.pushButtonSteadyTransient.setEnabled(False)
         self.window.pushButtonSummarize.setEnabled(False)
         self.window.pushButtonFitAll.setEnabled(False)
         self.window.pushButtonPlusX.setEnabled(False)
@@ -129,6 +129,8 @@ class mainWindow(QMainWindow):
         self.window.pushButtonRemoveSTL.setEnabled(False)
         self.window.pushButtonMeshPoint.setEnabled(False)
 
+        #self.window.pushButtonCreate.setEnabled(False)
+        #self.window.pushButtonOpen.setEnabled(False)
         self.window.pushButtonGenerate.setEnabled(False)
         self.window.pushButtonPostProc.setEnabled(False)
         self.window.lineEditMinX.setEnabled(False)
@@ -143,7 +145,7 @@ class mainWindow(QMainWindow):
         
         # change color of widget 
         self.window.widget.setStyleSheet('''background-color: lightgrey;''')
-        self.window.plainTextTerminal.appendPlainText("Welcome to SplashFOAM Case Creator")
+        self.window.plainTextTerminal.appendPlainText("Welcome to Splash Case Creator")
        
     def enableButtons(self):
         self.window.pushButtonSTLImport.setEnabled(True)
@@ -152,8 +154,6 @@ class mainWindow(QMainWindow):
         self.window.pushButtonCylinder.setEnabled(True)
         self.window.radioButtonInternal.setEnabled(True)
         self.window.radioButtonExternal.setEnabled(True)
-        self.window.SteadyState.setEnabled(True)  
-        self.window.Transient.setEnabled(True)    
         self.window.checkBoxOnGround.setEnabled(True)
         self.window.pushButtonSTLProperties.setEnabled(True)
         self.window.pushButtonPhysicalProperties.setEnabled(True)
@@ -166,6 +166,7 @@ class mainWindow(QMainWindow):
         self.window.pushButtonPostProc.setEnabled(True)
         self.window.pushButtonDomainAuto.setEnabled(True)
         self.window.pushButtonDomainManual.setEnabled(True)
+        self.window.pushButtonSteadyTransient.setEnabled(True)
         self.window.pushButtonSummarize.setEnabled(True)
         self.window.pushButtonFitAll.setEnabled(True)
         self.window.pushButtonPlusX.setEnabled(True)
@@ -200,32 +201,14 @@ class mainWindow(QMainWindow):
         ui_file.close()
         self.setCentralWidget(self.window)
         self.setGeometry(100, 100, 1400, 880)
-        self.setWindowTitle("SplashFOAM Case Creator")
+        self.setWindowTitle("Splash Case Creator")
         
-        # Group flow configuration buttons
-        self.flowConfigGroup = QButtonGroup(self)
-        self.flowConfigGroup.addButton(self.window.radioButtonInternal)
-        self.flowConfigGroup.addButton(self.window.radioButtonExternal)
-
-        # Group simulation type buttons
-        self.simulationTypeGroup = QButtonGroup(self)
-        self.simulationTypeGroup.addButton(self.window.SteadyState)
-        self.simulationTypeGroup.addButton(self.window.Transient)
-
-        # Ensure default selections for flow configuration and simulation type
-        self.window.radioButtonExternal.setChecked(True)  # Default to External Flow
-        self.window.SteadyState.setChecked(True)         # Default to Steady State
-
         # Add timer label programmatically
         self.timerLabel = self.window.findChild(QtWidgets.QLabel, "timerLabel")
         if not self.timerLabel:
             print("Error: 'timerLabel' not found in the UI.")
             return
         
-        # Add a keyboard shortcut for "Save Case"
-        self.window.actionSave_Case.setShortcut("Ctrl+S")
-        self.window.actionSave_Case.triggered.connect(self.saveCase)
-    
         # Set up VTK widget
         self.vl = QVBoxLayout()
         self.vtkWidget = QVTKRenderWindowInteractor(self.window.widget)
@@ -260,17 +243,15 @@ class mainWindow(QMainWindow):
         
         # Connect theme toggle
         self.window.themeToggle.stateChanged.connect(self.toggle_theme)
-        
-        # Group flow configuration buttons
-        self.flowConfigGroup = QButtonGroup(self)
-        self.flowConfigGroup.addButton(self.window.radioButtonInternal)
-        self.flowConfigGroup.addButton(self.window.radioButtonExternal)
-        
-        # Group simulation type buttons
-        self.simulationTypeGroup = QButtonGroup(self)
-        self.simulationTypeGroup.addButton(self.window.SteadyState)
-        self.simulationTypeGroup.addButton(self.window.Transient)
     
+#    def toggle_theme(self):
+#        """
+#        Toggles between light and dark themes, applying the appropriate stylesheet
+#        and updating the VTK background via VTKManager.
+#        """
+#        dark_mode = self.window.themeToggle.isChecked()
+#        apply_theme(self.window, self.vtk_manager, dark_mode)
+
     def apply_default_theme(self):
         """
         Apply the default theme (dark) at application startup.
@@ -451,12 +432,8 @@ class mainWindow(QMainWindow):
         self.window.pushButtonOpen.clicked.connect(self.openCase)
         self.window.pushButtonGenerate.clicked.connect(self.generateCase)
         self.window.pushButtonPostProc.clicked.connect(self.postProcessDialog)
-        
         self.window.radioButtonInternal.clicked.connect(self.chooseInternalFlow)
         self.window.radioButtonExternal.clicked.connect(self.chooseExternalFlow)
-        self.window.SteadyState.toggled.connect(self.toggleSteadyTransient)
-        self.window.Transient.toggled.connect(self.toggleSteadyTransient)
-
         self.window.listWidgetObjList.itemClicked.connect(self.listClicked)
         self.window.pushButtonDomainAuto.clicked.connect(self.autoDomainDriver)
         self.window.pushButtonDomainManual.clicked.connect(self.manualDomain)
@@ -465,7 +442,7 @@ class mainWindow(QMainWindow):
         self.window.pushButtonBoundaryCondition.clicked.connect(self.boundaryConditionDialog)
         self.window.pushButtonNumerics.clicked.connect(self.numericsDialog)
         self.window.pushButtonControls.clicked.connect(self.controlsDialog)
-
+        self.window.pushButtonSteadyTransient.clicked.connect(self.toggleSteadyTransient)
         self.window.pushButtonSummarize.clicked.connect(self.summarizeProject)
         self.window.pushButtonAddSTL.clicked.connect(self.importSTL)
         self.window.pushButtonRemoveSTL.clicked.connect(self.removeSTL)
@@ -658,6 +635,27 @@ class mainWindow(QMainWindow):
             print("Radius: ",r)
         self.readyStatusBar()
 
+##    def resizeEvent(self, event):
+##        terminalHeight = 302
+##        vtkWidgetWidth = self.window.width()-560
+##        vtkWidgetHeight = self.window.height()-terminalHeight-20
+##        terminalX = self.window.widget.pos().x()
+##        terminalY = self.window.widget.pos().y()+vtkWidgetHeight+10
+##        terminalWidth = vtkWidgetWidth
+##        
+##        self.window.widget.resize(vtkWidgetWidth,vtkWidgetHeight)
+##        self.vtkWidget.resize(vtkWidgetWidth,vtkWidgetHeight)
+##        self.vtkWidget.GetRenderWindow().Render()
+##        self.window.plainTextTerminal.resize(self.window.width()-560,self.window.plainTextTerminal.height())
+##       
+##        self.window.plainTextTerminal.move(terminalX,terminalY)
+##        self.window.plainTextTerminal.resize(terminalWidth,terminalHeight-20)
+##        self.window.plainTextTerminal.update()
+##        self.window.plainTextTerminal.repaint()
+##        self.readyStatusBar()
+
+    
+
     def resizeEvent(self, event):
         """
         Dynamically resize widgets when the main window is resized.
@@ -681,6 +679,7 @@ class mainWindow(QMainWindow):
         self.vtkWidget.GetRenderWindow().Render()
 
         # Resize the terminal, progress bar and properties table
+
         self.window.plainTextTerminal.move(terminalX, terminalY)
         self.window.plainTextTerminal.resize(vtkWidgetWidth, TERMINAL_HEIGHT - 70)
         self.window.plainTextTerminal.update()
@@ -689,6 +688,8 @@ class mainWindow(QMainWindow):
         self.window.progressBar.resize(vtkWidgetWidth, PROGRESS_BAR_HEIGHT)
         self.window.progressBar.update()
         self.window.progressBar.repaint()
+
+        #self.window.tableViewProperties.move(terminalX, terminalY + TERMINAL_HEIGHT + PROGRESS_BAR_HEIGHT + 2)
         
         print(f"Table Height: {table_height}")
         self.window.frame_3.resize(self.window.frame_3.width(), frame3_height)
@@ -698,45 +699,17 @@ class mainWindow(QMainWindow):
     def closeEventTriggered(self, event):
         self.close()
 
-    def chooseInternalFlow(self):
-        """
-        Handles selection of the internal flow configuration.
-        """
-        self.project.internalFlow = True
-        self.project.meshSettings['internalFlow'] = True
-        self.project.onGround = False
-        self.window.checkBoxOnGround.setEnabled(False)
-        self.updateStatusBar("Internal flow selected.")
-        self.readyStatusBar()
-
-    def chooseExternalFlow(self):
-        """
-        Handles selection of the external flow configuration.
-        """
-        self.project.internalFlow = False
-        self.project.meshSettings['internalFlow'] = False
-        self.window.checkBoxOnGround.setEnabled(True)
-        self.project.meshSettings['onGround'] = self.window.checkBoxOnGround.isChecked()
-        self.project.onGround = self.window.checkBoxOnGround.isChecked()
-        self.updateStatusBar("External flow selected.")
-        self.readyStatusBar()
-
     def toggleSteadyTransient(self):
-        """
-        Updates the simulation type based on the selected radio button for steady/transient state.
-        """
-        if self.window.SteadyState.isChecked():
-            if not self.project.transient:
-                return
-            self.project.transient = False
-            self.updateStatusBar("Steady-state simulation selected.")
-        elif self.window.Transient.isChecked():
-            if self.project.transient:
-                return
+        buttonText = self.window.pushButtonSteadyTransient.text()
+        if buttonText=="Steady-State":
+            self.window.pushButtonSteadyTransient.setText("Transient")
+            ampersandIO.printMessage("Transient Flow Selected",GUIMode=True,window=self)
             self.project.transient = True
-            self.updateStatusBar("Transient simulation selected.")
         else:
-            self.updateStatusBar("No simulation type selected.")
+            self.window.pushButtonSteadyTransient.setText("Steady-State")
+            ampersandIO.printMessage("Steady-State Flow Selected",GUIMode=True,window=self)
+            self.project.transient = False
+        self.project.set_transient_settings()
         self.readyStatusBar()
 
     def chooseInternalFlow(self):

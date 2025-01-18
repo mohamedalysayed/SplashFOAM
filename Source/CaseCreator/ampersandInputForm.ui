@@ -36,7 +36,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>60</y>
+       <y>50</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -53,7 +53,7 @@ background-color: rgb(170, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>60</y>
+       <y>50</y>
        <width>61</width>
        <height>31</height>
       </rect>
@@ -66,7 +66,7 @@ background-color: rgb(170, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>60</y>
+       <y>50</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -79,7 +79,7 @@ background-color: rgb(170, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>60</y>
+       <y>50</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -108,13 +108,10 @@ background-color: rgb(170, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>100</y>
+       <y>90</y>
        <width>111</width>
        <height>20</height>
       </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;Sans Serif&quot;;</string>
      </property>
      <property name="text">
       <string>Internal Flow</string>
@@ -124,32 +121,26 @@ background-color: rgb(170, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>120</y>
+       <y>110</y>
        <width>121</width>
        <height>20</height>
       </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;Sans Serif&quot;;</string>
      </property>
      <property name="text">
       <string>External Flow</string>
      </property>
      <property name="checked">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QCheckBox" name="checkBoxOnGround">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>160</y>
+       <x>150</x>
+       <y>110</y>
        <width>101</width>
        <height>20</height>
       </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;Sans Serif&quot;;</string>
      </property>
      <property name="text">
       <string>On Ground</string>
@@ -497,6 +488,19 @@ background-color: rgb(170, 255, 255);</string>
       <string>Manual</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButtonSteadyTransient">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>140</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Steady-State</string>
+     </property>
+    </widget>
     <widget class="QPushButton" name="pushButtonSummarize">
      <property name="geometry">
       <rect>
@@ -633,41 +637,6 @@ background-color: rgb(170, 255, 255);</string>
       <string>Post Processing</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="SteadyState">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>100</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;Sans Serif&quot;;</string>
-     </property>
-     <property name="text">
-      <string>Steady State</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="Transient">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>120</y>
-       <width>121</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;Sans Serif&quot;;</string>
-     </property>
-     <property name="text">
-      <string>Transient</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
    </widget>
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
@@ -789,7 +758,7 @@ background-color: rgb(170, 255, 255);</string>
       <x>550</x>
       <y>640</y>
       <width>831</width>
-      <height>161</height>
+      <height>121</height>
      </rect>
     </property>
     <property name="font">

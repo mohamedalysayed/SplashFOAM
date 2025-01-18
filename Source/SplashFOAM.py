@@ -6,8 +6,8 @@ import signal
 import time
 import datetime
 import glob
-import shutil 
-import threading 
+import shutil # For file copying
+import threading # For running a process in a separate thread
 import tkinter as tk
 import webbrowser
 import matplotlib
@@ -48,14 +48,14 @@ def view_toolbar():
 # TERMINAL APP 
 #______________           
 
-class SplashFOAM:  
+class Splash:  
     def __init__(self, root):
         self.root = root
         self.root.config(background="white")
-        self.root.title("SplashFOAM - v0.2")
+        self.root.title("Splash - v0.2")
         
         # Set the window icon using a PhotoImage
-        icon_path = "../Resources/Logos/simulitica_icon_logo.png"  
+        icon_path = "../Resources/Logos/simulitica_icon_logo.png"  # Replace with the actual path to your icon file
         icon_image = tk.PhotoImage(file=icon_path)
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon_image)
         
@@ -93,7 +93,7 @@ class SplashFOAM:
         help_menu.add_command(label="Manual", command=self.splash_online_manual, background="black", foreground="cyan")
         help_menu.add_command(label="Splash-GPT", command=self.splash_GPT_page, background="black", foreground="pink")
         help_menu.add_command(label="Report an issue", command=self.open_contact_page, background="black", foreground="red")
-        help_menu.add_command(label="Support SplashFOAM", command=self.support_SplashFOAM, background="black", foreground="lightgreen")
+        help_menu.add_command(label="Support Splash", command=self.support_Splash, background="black", foreground="lightgreen")
         help_menu.add_command(label="Cloud HPC", command=self.cloud_HPC, background="black", foreground="white")
         menubar.add_cascade(label="Help", menu=help_menu)
         
@@ -106,16 +106,17 @@ class SplashFOAM:
         self.start_time = time.time()
         self.license_start_date_file = "license_start_date.txt"  # File to store the start date
         self.license_duration = 1 * 365 * 24 * 3600  # 1 year in seconds
+        #self.license_duration = 14 * 24 * 3600  # 14 days in seconds
         self.notice_period_before_end = 15 * 24 * 3600  # Notify 15 days before the license expires
-        self.elapsed_time_file = ".elapsed_time.txt" 
+        self.elapsed_time_file = ".elapsed_time.txt"  # Making the file name start with a dot to "hide" it in Unix/Linux
         
         # Create a label for the "Elapsed Time" text
         self.elapsed_time_label = tk.Label(root, text="Elapsed Time", font=("Helvetica", 24), bg="white", fg="darkblue")
-        self.elapsed_time_label.grid(row=0, column=7, sticky="nsew") 
+        self.elapsed_time_label.grid(row=0, column=7, sticky="nsew")  # Updated to sticky="nsew" for dynamic resizing
         
         # Create a label for the timer
         self.timer_label = tk.Label(root, text="00:00:00.0", font=("Helvetica", 35, "bold"), bg="white", fg="darkblue")
-        self.timer_label.grid(row=1, column=7, sticky="nsew")  
+        self.timer_label.grid(row=1, column=7, sticky="nsew")  # Updated to sticky="nsew" for dynamic resizing
         
         # Start updating the timer
         self.update_timer()
@@ -140,9 +141,9 @@ class SplashFOAM:
         self.show_welcome_message()
         
         # Ensure that the column and row have weight to resize dynamically
-        self.root.grid_columnconfigure(10, weight=1)  
-        self.root.grid_rowconfigure(2, weight=1)  
-        self.root.grid_rowconfigure(3, weight=1)  
+        self.root.grid_columnconfigure(10, weight=1)  # Ensures that the column with index 10 resizes dynamically
+        self.root.grid_rowconfigure(2, weight=1)  # Ensures that the row with index 2 (Elapsed Time label) resizes
+        self.root.grid_rowconfigure(3, weight=1)  # Ensures that the row with index 3 (Timer label) resizes
 
         # Add logos
         self.add_logos()
@@ -338,7 +339,7 @@ class SplashFOAM:
         
         # Create a label for status messages
         self.status_label_title = ttk.Label(self.root, text="")
-        status_title = "SplashFOAM v0.2"
+        status_title = "Splash v0.2"
         self.status_label_title.grid(row=14, column=1, columnspan=1, pady=1, padx=10, sticky="nsew")  # Changed to sticky="nsew" for dynamic resizing
         self.status_label_title.config(text=status_title, font=("Helvetica", 14, "bold"), background="white", foreground="grey")
         
@@ -380,12 +381,13 @@ class SplashFOAM:
           =========                 |
           \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
            \\\\    /   O peration     | Website:  https://openfoam.org
-            \\\\  /    A nd           | Version:  SplashFOAM v0.2
+            \\\\  /    A nd           | Version:  Splash v0.2
              \\\\/     M anipulation  |
         \\*---------------------------------------------------------------------------*/\n"""
         
         self.thermo_type_params = ["type", "mixture", "transport", "thermo", "equationOfState", "specie", "energy"]
         self.mixture_params = ["molWeight", "rho", "rho0", "p0", "B", "gamma", "Cv", "Cp", "Hf", "mu", "Pr"]
+
 
     # Creating an empty text file
     def file_new(self):
@@ -465,6 +467,8 @@ class SplashFOAM:
             cursor="hand2"  # Make it clear it's clickable
         )
         self.OF_version_button.grid(row=9, column=0, pady=1, padx=5, sticky="nsew")  # Use nsew for proper resizing
+
+
 
         # Add the Simulitica logo
         self.simLabel = tk.Label(self.root, image=self.logo_simulitica)
@@ -614,7 +618,7 @@ class SplashFOAM:
     def show_welcome_message(self):
         welcome_message = (
             "\n"
-            "Welcome to SplashFOAM!\n\n"
+            "Welcome to Splash!\n\n"
             "Your interactive OpenFOAM simulation platform.\n"
             "_____________________________________________________________________________\n"
             "\n"
@@ -643,7 +647,7 @@ class SplashFOAM:
     def show_about_message(self):
         about_message = (
             "\n"
-            "Welcome to SplashFOAM!\n\n"
+            "Welcome to Splash!\n\n"
             "Your interactive OpenFOAM simulation platform.\n"
             "_____________________________________________________________________________\n"
             "\n"
@@ -657,7 +661,7 @@ class SplashFOAM:
 
         # Create a Toplevel window for the welcome message
         popup = tk.Toplevel(self.root)
-        popup.title("SplashFOAM v0.2")
+        popup.title("Splash v0.2")
         popup.geometry("750x700")  # Adjust the size as needed
 
         # Create a Label in the Toplevel window to display the welcome message
@@ -673,6 +677,57 @@ class SplashFOAM:
     # -------------- Welcome Message -------------------------- 
      
     # -------------- Splash background image(s) -------------------------->  
+
+##    # Clickable background image (process STL file)
+##    #______________________________________________
+##    def add_bgImage(self):
+##        # Specify the image path
+##        image_path = "../Resources/Images/racing-car.png"
+
+##        # Create a tk.PhotoImage object directly from the file
+##        self.splash_bgImage = tk.PhotoImage(file=image_path)
+
+##        # Adjust the subsample as needed
+##        self.splash_bgImage = self.splash_bgImage.subsample(6, 6)
+
+##        # Create a button with the image, and bind it to the process_stl function
+##        self.splash_bgImage_button = tk.Button(
+##            self.root, 
+##            image=self.splash_bgImage, 
+##            bg="white",  # Set background color to white
+##            activebackground="white",  # Set active background to white to prevent color change on click
+##            bd=0,  # Remove border
+##            command=self.process_stl_click,  # Attach the function directly
+##            cursor="hand2",  # Set cursor to hand on hover
+##            relief="flat"  # Flat border style
+##        )
+
+##        # Use grid() for layout
+##        self.splash_bgImage_button.grid(row=2, column=7, pady=5, padx=10, sticky="nsew", rowspan=6)
+
+
+         # Clickable background image (website link)
+         #______________________________________________
+#        # Create a label to display the image, initially without the frame effect [FLAG: Do we need this at all?!]
+#        self.splash_bgImage_label = tk.Label(self.root, image=self.splash_bgImage, bg="white", cursor="hand2")
+#        self.splash_bgImage_label.grid(row=2, column=7, pady=1, padx=10, sticky="nsew", rowspan=4)
+
+#        # Bind the hover effect
+#        self.splash_bgImage_label.bind("<Enter>", self.on_hover)
+#        self.splash_bgImage_label.bind("<Leave>", self.off_hover)
+
+#        # Make the image clickable
+#        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.buymeacoffee.com/simulitica/membership"))
+#        #self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.skool.com/cfd-dose-5227/about"))
+#        self.splash_bgImage_label.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.cfddose.substack.com"))
+
+#    def on_hover(self, event):
+#        # Change the label appearance to simulate a frame around it on hover
+#        event.widget.config(bg="white", bd=1, relief="groove")
+
+#    def off_hover(self, event):
+#        # Revert the label appearance when not hovering over it
+#        event.widget.config(bg="white", bd=0, relief="flat")
 
     def add_bgImage(self):
         # Specify the image path
@@ -701,7 +756,7 @@ class SplashFOAM:
 
     # -------------- Splash background image(s) --------------------------< 
             
-    # --------------------- Importing the geometry ----------------------->    
+    # ------------------------------------- Importing the geometry ------------------------------------->    
     def import_geometry(self):
         file_path = filedialog.askopenfilename(
             title="Select Geometry File",
@@ -916,7 +971,7 @@ class SplashFOAM:
 
         else:
             tk.messagebox.showerror("Error", "No file selected for import")
-   # ---------------------- Importing the geometry -------------------<    
+   # ------------------------------------- Importing the geometry -------------------------------------<    
         
     def visualize_stl(self, file_path):
         # Read the STL file
@@ -974,6 +1029,7 @@ class SplashFOAM:
 
             # Define the source directory for Allmesh* files and "system" directory
             meshing_directory = os.path.join(os.path.dirname(os.getcwd()), "Meshing")
+
 
             # Check if the destination path is the same as the meshing directory
             if os.path.normpath(self.geometry_dest_path) != os.path.normpath(meshing_directory):
@@ -1479,7 +1535,7 @@ _____________________________________________________
 
             # Insert or replace source command after the first line
             if len(lines) > 1 and lines[1].strip().startswith('. '):
-                lines[1] = source_command  
+                lines[1] = source_command  # Replace the existing source command
             else:
                 lines.insert(1, source_command)  # Insert a new source command after the shebang line
 
@@ -1868,7 +1924,7 @@ _____________________________________________________
         # Wait for Gnuplot to finish
         gnuplot_process.wait()
         
-    #______________________ Sourcing OF ________________________>    
+    #____________________________________________ sourcing OF __________________________________________________    
     # Sourcing openfoam (version option)
     def source_openfoam(self, version, popup):
         paths = {
@@ -1966,14 +2022,15 @@ _____________________________________________________
         popup.transient(self.root)
         popup.grab_set()
         self.root.wait_window(popup)
-    #______________________ Sourcing OF ________________________<       
+        
+    #____________________________________________ sourcing OF __________________________________________________    
              
     def open_contact_page(self, event=None):
         webbrowser.open_new("https://www.simulitica.com/contact")
-    def support_SplashFOAM(self, event=None):
+    def support_Splash(self, event=None):
         webbrowser.open_new("https://www.buymeacoffee.com/simulitica")
     def splash_online_manual(self, event=None):
-        webbrowser.open_new("https://github.com/mohamedalysayed/SplashFOAM/tree/main")
+        webbrowser.open_new("https://github.com/mohamedalysayed/Splash/tree/main")
     def splash_GPT_page(self, event=None):
         webbrowser.open_new("https://chat.openai.com/g/g-RGYvE3TsL-splash-gpt")
     def cloud_HPC(self, event=None):
@@ -2050,7 +2107,7 @@ _____________________________________________________
 
             # Create a Toplevel window for the message
             popup = tk.Toplevel(self.root)
-            popup.title("SplashFOAM v0.2")
+            popup.title("Splash v0.2")
             popup.geometry("800x600")  # Adjust the size as needed
 
             # Create a Label in the Toplevel window to display the message
@@ -2074,7 +2131,6 @@ _____________________________________________________
 # https://www.udemy.com/course/t-flows-crash-course-cfd/ -> T-Flows on Udemy
 # ---------------------------------------------------------------------------<
 
-    # Read last recorded time 
     def load_last_recorded_time(self):
         if os.path.exists(self.elapsed_time_file):
             with open(self.elapsed_time_file, "r") as file:
@@ -2103,7 +2159,7 @@ _____________________________________________________
 if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', False)  # Disable menu tear-off
-    root.title("SplashFOAM v0.2")
-    root.wm_title("SplashFOAM v0.2")  # Window manager title
-    app = SplashFOAM(root)
+    root.title("Splash v0.2")
+    root.wm_title("Splash v0.2")  # Window manager title
+    app = Splash(root)
     root.mainloop()
