@@ -93,7 +93,7 @@ background-color: rgb(170, 255, 255);</string>
       <rect>
        <x>100</x>
        <y>20</y>
-       <width>81</width>
+       <width>91</width>
        <height>21</height>
       </rect>
      </property>
@@ -151,7 +151,7 @@ background-color: rgb(170, 255, 255);</string>
       <rect>
        <x>80</x>
        <y>200</y>
-       <width>101</width>
+       <width>131</width>
        <height>21</height>
       </rect>
      </property>
@@ -530,9 +530,9 @@ background-color: rgb(170, 255, 255);</string>
     <widget class="QLabel" name="label_19">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>60</x>
        <y>370</y>
-       <width>131</width>
+       <width>171</width>
        <height>21</height>
       </rect>
      </property>
@@ -666,9 +666,9 @@ background-color: rgb(170, 255, 255);</string>
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>60</x>
        <y>10</y>
-       <width>91</width>
+       <width>111</width>
        <height>21</height>
       </rect>
      </property>
@@ -761,7 +761,7 @@ background-color: rgb(170, 255, 255);</string>
       <x>550</x>
       <y>640</y>
       <width>831</width>
-      <height>121</height>
+      <height>151</height>
      </rect>
     </property>
     <property name="font">
@@ -953,9 +953,9 @@ color: rgb(0, 0, 0);</string>
    <widget class="QComboBox" name="vtkBackground">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>770</x>
       <y>10</y>
-      <width>131</width>
+      <width>111</width>
       <height>31</height>
      </rect>
     </property>
@@ -980,9 +980,9 @@ color: rgb(0, 0, 0);</string>
    <widget class="QLabel" name="timerLabel">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>680</x>
       <y>10</y>
-      <width>71</width>
+      <width>81</width>
       <height>31</height>
      </rect>
     </property>
@@ -995,7 +995,7 @@ color: rgb(0, 0, 0);</string>
      <rect>
       <x>550</x>
       <y>10</y>
-      <width>111</width>
+      <width>121</width>
       <height>31</height>
      </rect>
     </property>
@@ -1010,7 +1010,7 @@ color: rgb(0, 0, 0);</string>
      <x>0</x>
      <y>0</y>
      <width>1402</width>
-     <height>22</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
