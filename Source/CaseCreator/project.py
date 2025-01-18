@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -17,7 +17,7 @@
  */
 """
 
-# backend module for the ampersandCFD project
+# backend module for the SplashCaseCreatorCFD project
 # Description: This file contains the code for managing project structure and
 # generate OpenFOAM files
 
@@ -25,8 +25,8 @@
 import yaml
 import os
 import shutil
-from headers import get_ampersand_header
-from primitives import ampersandPrimitives, ampersandIO, ampersandDataInput
+from headers import get_SplashCaseCreator_header
+from primitives import SplashCaseCreatorPrimitives, SplashCaseCreatorIO, SplashCaseCreatorDataInput
 from constants import meshSettings, physicalProperties, numericalSettings, inletValues
 from constants import solverSettings, boundaryConditions, simulationSettings
 from constants import simulationFlowSettings, parallelSettings, postProcessSettings
@@ -49,7 +49,7 @@ from mod_project import mod_project
 #from ../constants/constants import meshSettings
 
 
-class ampersandProject: # ampersandProject class to handle the project creation and manipulation
+class SplashCaseCreatorProject: # SplashCaseCreatorProject class to handle the project creation and manipulation
     # this class will contain the methods to handle the logic and program flow
     def __init__(self,GUIMode=False,window=None):
         # project path = project_directory_path/user_name/project_name
@@ -99,30 +99,30 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     #--------------------------------------------------------------------
     
     def summarize_boundary_conditions(self):
-        bcs = ampersandPrimitives.list_boundary_conditions(self.meshSettings)
+        bcs = SplashCaseCreatorPrimitives.list_boundary_conditions(self.meshSettings)
         return bcs
     
     def ask_boundary_type(self):
         bcTypes = ["inlet","outlet","wall","symmetry","cyclic","empty","movingWall",]
-        ampersandIO.printMessage("List of boundary types")
-        ampersandIO.print_numbered_list(bcTypes)
-        bcType = ampersandIO.get_input_int("Enter the number of the boundary type: ")
+        SplashCaseCreatorIO.printMessage("List of boundary types")
+        SplashCaseCreatorIO.print_numbered_list(bcTypes)
+        bcType = SplashCaseCreatorIO.get_input_int("Enter the number of the boundary type: ")
         if bcType <= 0 or bcType > len(bcTypes):
-            ampersandIO.printMessage("Invalid boundary type. Setting to wall")
+            SplashCaseCreatorIO.printMessage("Invalid boundary type. Setting to wall")
             return "wall"
         return bcTypes[bcType-1]
 
     def summarize_project(self):
         trueFalse = {True: 'Yes', False: 'No'}
-        ampersandIO.show_title("Project Summary",GUIMode=self.GUIMode,window=self.window)
-        #ampersandIO.printMessage(f"Project directory: {self.project_directory_path}")
-        ampersandIO.printFormat("Project name", self.project_name, GUIMode=self.GUIMode,window=self.window)
-        ampersandIO.printFormat("Project path", self.project_path, GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.show_title("Project Summary",GUIMode=self.GUIMode,window=self.window)
+        #SplashCaseCreatorIO.printMessage(f"Project directory: {self.project_directory_path}")
+        SplashCaseCreatorIO.printFormat("Project name", self.project_name, GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printFormat("Project path", self.project_path, GUIMode=self.GUIMode,window=self.window)
         
-        ampersandIO.printMessage(f"Internal Flow: {trueFalse[self.internalFlow]}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Internal Flow: {trueFalse[self.internalFlow]}",GUIMode=self.GUIMode,window=self.window)
         if(self.internalFlow==False):
-            ampersandIO.printMessage(f"On Ground: {trueFalse[self.onGround]}",GUIMode=self.GUIMode,window=self.window)
-        ampersandIO.printMessage(f"Transient: {trueFalse[self.transient]}",GUIMode=self.GUIMode,window=self.window)
+            SplashCaseCreatorIO.printMessage(f"On Ground: {trueFalse[self.onGround]}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Transient: {trueFalse[self.transient]}",GUIMode=self.GUIMode,window=self.window)
         self.summarize_background_mesh()
         self.list_stl_files()
         
@@ -138,11 +138,11 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         nx = self.meshSettings['domain']['nx']
         ny = self.meshSettings['domain']['ny']
         nz = self.meshSettings['domain']['nz']
-        ampersandIO.printMessage(f"Domain size:{'X':>10}{'Y':>10}{'Z':>10}",GUIMode=self.GUIMode,window=self.window)
-        ampersandIO.printMessage(f"Min         {minX:>10.3f}{minY:>10.3f}{minZ:>10.3f}",GUIMode=self.GUIMode,window=self.window)
-        ampersandIO.printMessage(f"Max         {maxX:>10.3f}{maxY:>10.3f}{maxZ:>10.3f}",GUIMode=self.GUIMode,window=self.window)
-        ampersandIO.printMessage(f"Background mesh size: {nx}x{ny}x{nz} cells",GUIMode=self.GUIMode,window=self.window)
-        ampersandIO.printMessage(f"Background cell size: {self.meshSettings['maxCellSize']} m",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Domain size:{'X':>10}{'Y':>10}{'Z':>10}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Min         {minX:>10.3f}{minY:>10.3f}{minZ:>10.3f}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Max         {maxX:>10.3f}{maxY:>10.3f}{maxZ:>10.3f}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Background mesh size: {nx}x{ny}x{nz} cells",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Background cell size: {self.meshSettings['maxCellSize']} m",GUIMode=self.GUIMode,window=self.window)
     
       
     def change_boundary_condition(self,bcName,newBC):
@@ -151,31 +151,31 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             for aPatch in self.meshSettings['patches']:
                 if bcName == aPatch['name']:
                     aPatch['type'] = newBC
-                    ampersandIO.printMessage(f"Boundary condition {bcName} changed to {newBC}",GUIMode=self.GUIMode,window=self.window)
+                    SplashCaseCreatorIO.printMessage(f"Boundary condition {bcName} changed to {newBC}",GUIMode=self.GUIMode,window=self.window)
                     return 0
             if bcName in bcPatches:
                 self.meshSettings['patches'][bcName]['type'] = newBC
                 self.meshSettings['bcPatches'][bcName]['purpose'] = newBC
                 newProperty = self.set_property(newBC)
                 self.meshSettings['bcPatches'][bcName]['property'] = newProperty
-                ampersandIO.printMessage(f"Boundary condition {bcName} changed to {newBC}",GUIMode=self.GUIMode,window=self.window)
+                SplashCaseCreatorIO.printMessage(f"Boundary condition {bcName} changed to {newBC}",GUIMode=self.GUIMode,window=self.window)
                 return 0
             else:
-                ampersandIO.printMessage("Boundary condition not found in the list")
+                SplashCaseCreatorIO.printMessage("Boundary condition not found in the list")
         geometry = self.meshSettings['geometry']
         for stl in geometry:
             if stl['name'] == bcName:
                 stl['purpose'] = newBC
                 newProperty = self.set_property(newBC)
                 self.meshSettings['bcPatches'][bcName]['property'] = newProperty
-                ampersandIO.printMessage(f"Boundary condition of {bcName} changed to {newBC}",GUIMode=self.GUIMode,window=self.window)
+                SplashCaseCreatorIO.printMessage(f"Boundary condition of {bcName} changed to {newBC}",GUIMode=self.GUIMode,window=self.window)
                 return 0
         return -1
 
     def change_stl_refinement_level(self,stl_file_number=0):
-        ampersandIO.printMessage("Changing refinement level")
-        refMin = ampersandIO.get_input_int("Enter new refMin: ")
-        refMax = ampersandIO.get_input_int("Enter new refMax: ")
+        SplashCaseCreatorIO.printMessage("Changing refinement level")
+        refMin = SplashCaseCreatorIO.get_input_int("Enter new refMin: ")
+        refMax = SplashCaseCreatorIO.get_input_int("Enter new refMax: ")
         self.stl_files[stl_file_number]['refineMin'] = refMin
         self.stl_files[stl_file_number]['refineMax'] = refMax
         #stl_name = project.stl_files[stl_file_number]['name']
@@ -189,29 +189,29 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                 stl['featureLevel'] = refMax
                 break
         if not fileFound:
-            ampersandIO.printMessage("STL file not found in the geometry list")
+            SplashCaseCreatorIO.printMessage("STL file not found in the geometry list")
         
         #return project
 
     
     
     def choose_modification(self):
-        current_modification = ampersandIO.get_option_choice(prompt="Choose any option for project modification: ",
+        current_modification = SplashCaseCreatorIO.get_option_choice(prompt="Choose any option for project modification: ",
                                       options=self.mod_options,title="\nModify Project Settings")
         self.current_modification = self.mod_options[current_modification]
-        ampersandIO.printMessage(f"Current modification: {self.current_modification}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Current modification: {self.current_modification}",GUIMode=self.GUIMode,window=self.window)
         
     def choose_modification_categorized(self):
         options = ['Mesh','Boundary Conditions','Fluid Properties','Numerical Settings','Simulation Control Settings','Turbulence Model','Post Processing Settings']
-        current_modification = ampersandIO.get_option_choice(prompt="Choose any option for project modification: ",
+        current_modification = SplashCaseCreatorIO.get_option_choice(prompt="Choose any option for project modification: ",
                                       options=options,title="\nModify Project Settings")
         mesh_options = ['Background Mesh','Mesh Point','Add Geometry','Refinement Levels']
         
         if current_modification < 0 or current_modification > len(options)-1:
-            ampersandIO.printMessage("Invalid option. Aborting operation")
+            SplashCaseCreatorIO.printMessage("Invalid option. Aborting operation")
             return -1
         if current_modification == 0:
-            self.current_modification = mesh_options[ampersandIO.get_option_choice(prompt="Choose any option for mesh modification: ",
+            self.current_modification = mesh_options[SplashCaseCreatorIO.get_option_choice(prompt="Choose any option for mesh modification: ",
                                       options=mesh_options,title="\nModify Mesh Settings")]
         else:
             self.current_modification = options[current_modification]
@@ -239,7 +239,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         elif self.current_modification=="Post Processing Settings":
             mod_project.change_post_process_settings(self)
         else:
-            ampersandIO.printMessage("Invalid option. Aborting operation")
+            SplashCaseCreatorIO.printMessage("Invalid option. Aborting operation")
             return -1
         return 0
     
@@ -254,7 +254,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                 seen.add(t)
                 new_list.append(d)
         self.stl_files = new_list
-        self.meshSettings['geometry'] = ampersandPrimitives.remove_duplicate_dicts(self.meshSettings['geometry'])
+        self.meshSettings['geometry'] = SplashCaseCreatorPrimitives.remove_duplicate_dicts(self.meshSettings['geometry'])
         #print("stl_files",self.stl_files)
         #print("Mesh settings",self.meshSettings["geometry"])
 
@@ -265,14 +265,14 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             stopWhenError = True
         if project_directory_path is None:
             if stopWhenError:
-                ampersandIO.printMessage("No directory selected. Aborting project creation.")
+                SplashCaseCreatorIO.printMessage("No directory selected. Aborting project creation.")
                 exit()
             else:
                 return -1
         #assert os.path.exists(project_directory_path), "The chosen directory does not exist"
         if not os.path.exists(project_directory_path):
             if stopWhenError:
-                ampersandIO.printMessage("The chosen directory does not exist. Aborting project creation.")
+                SplashCaseCreatorIO.printMessage("The chosen directory does not exist. Aborting project creation.")
                 exit()
             else:
                 self.project_directory_path = None
@@ -288,14 +288,14 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     # create the project path for the user and project name
     def create_project_path_user(self):
         if not self.project_directory_path:
-            ampersandIO.printWarning("No directory selected. Aborting project creation.",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printWarning("No directory selected. Aborting project creation.",GUIMode=self.GUIMode)
             return -1
         self.project_path = os.path.join(self.project_directory_path, self.user_name, self.project_name)
         
     # To create the project path for a new project with the project name
     def create_project_path(self):
         if not self.project_directory_path:
-            ampersandIO.printWarning("No directory selected. Aborting project creation.")
+            SplashCaseCreatorIO.printWarning("No directory selected. Aborting project creation.")
             return -1
         self.project_path = os.path.join(self.project_directory_path, self.project_name)
     
@@ -304,34 +304,34 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     def set_project_path(self,project_path):
         if project_path is None:
             if self.GUIMode==False:
-                ampersandIO.printWarning("No project path selected. Aborting project creation.",GUIMode=self.GUIMode)   
-            #ampersandIO.printWarning("No project path selected. Aborting project creation/modification.",GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printWarning("No project path selected. Aborting project creation.",GUIMode=self.GUIMode)   
+            #SplashCaseCreatorIO.printWarning("No project path selected. Aborting project creation/modification.",GUIMode=self.GUIMode)
             return -1
             #exit()
         if os.path.exists(project_path):
             settings_file = os.path.join(project_path, "project_settings.yaml")
             if os.path.exists(settings_file):
-                ampersandIO.printMessage("Project found, loading project settings",GUIMode=self.GUIMode,window=self.window)
+                SplashCaseCreatorIO.printMessage("Project found, loading project settings",GUIMode=self.GUIMode,window=self.window)
                 self.existing_project = True
                 self.project_path = project_path
                 return 0
             else:
                 if self.GUIMode==False:
-                    ampersandIO.printWarning("Settings file not found. Please open an Ampersand case directory.",GUIMode=self.GUIMode)
-                #ampersandIO.printWarning("Settings file not found. Please open an Ampersand case directory.",GUIMode=self.GUIMode)
+                    SplashCaseCreatorIO.printWarning("Settings file not found. Please open an SplashCaseCreator case directory.",GUIMode=self.GUIMode)
+                #SplashCaseCreatorIO.printWarning("Settings file not found. Please open an SplashCaseCreator case directory.",GUIMode=self.GUIMode)
                 # TO DO: Add the code socket to create a new project here
                 return -1
         else:
             if self.GUIMode==False:
-                ampersandIO.printWarning("Project path does not exist. Aborting project creation/opening.",GUIMode=self.GUIMode)
-            #ampersandIO.printWarning("Project path does not exist. Aborting project creation/opening.",GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printWarning("Project path does not exist. Aborting project creation/opening.",GUIMode=self.GUIMode)
+            #SplashCaseCreatorIO.printWarning("Project path does not exist. Aborting project creation/opening.",GUIMode=self.GUIMode)
             return -1
 
     def check_project_path(self): # check if the project path exists and if the project is already existing
         if os.path.exists(self.project_path):
             settings_file = os.path.join(self.project_path, "project_settings.yaml")
             if os.path.exists(settings_file):
-                ampersandIO.printWarning("Project already exists, loading project settings",GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printWarning("Project already exists, loading project settings",GUIMode=self.GUIMode)
                 self.existing_project = True
                 return 0
             else:
@@ -346,45 +346,45 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         try:
             os.chdir(self.project_path)
         except OSError as error:
-                ampersandIO.printError(error)
+                SplashCaseCreatorIO.printError(error)
         cwd = os.getcwd()
-        ampersandIO.printMessage(f"Working directory: {cwd}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Working directory: {cwd}",GUIMode=self.GUIMode,window=self.window)
         self.inside_project_directory = True
 
     # Check if the 0 directory exists in the project directory
     def check_0_directory(self):
         if not os.path.exists("0"):
-            ampersandIO.printWarning("0 directory does not exist.",GUIMode=self.GUIMode)
-            ampersandIO.printMessage("Checking for 0.orig directory",GUIMode=self.GUIMode,window=self.window)
+            SplashCaseCreatorIO.printWarning("0 directory does not exist.",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printMessage("Checking for 0.orig directory",GUIMode=self.GUIMode,window=self.window)
             if os.path.exists("0.orig"):
-                ampersandIO.printMessage("0.orig directory found. Copying to 0 directory",GUIMode=self.GUIMode,window=self.window)
+                SplashCaseCreatorIO.printMessage("0.orig directory found. Copying to 0 directory",GUIMode=self.GUIMode,window=self.window)
                 shutil.copytree("0.orig", "0")
             else:
-                ampersandIO.printWarning("0.orig directory not found. Aborting project creation.",GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printWarning("0.orig directory not found. Aborting project creation.",GUIMode=self.GUIMode)
                 return -1
         return 0
     
     # Check if the constant directory exists in the project directory
     def check_constant_directory(self):
         if not os.path.exists("constant"):
-            ampersandIO.printWarning("constant directory does not exist.",GUIMode=self.GUIMode)
-            #ampersandIO.printError("constant directory is necessary for the project")
+            SplashCaseCreatorIO.printWarning("constant directory does not exist.",GUIMode=self.GUIMode)
+            #SplashCaseCreatorIO.printError("constant directory is necessary for the project")
             return -1
         return 0
     
     # Check if the system directory exists in the project directory
     def check_system_directory(self):
         if not os.path.exists("system"):
-            ampersandIO.printWarning("system directory does not exist.",GUIMode=self.GUIMode)
-            #ampersandIO.printError("system directory is necessary for the project")
+            SplashCaseCreatorIO.printWarning("system directory does not exist.",GUIMode=self.GUIMode)
+            #SplashCaseCreatorIO.printError("system directory is necessary for the project")
             return -1
         return 0
     
     # Check if the constant/triSurface directory exists in the project directory
     def check_triSurface_directory(self):
         if not os.path.exists("constant/triSurface"):
-            ampersandIO.printWarning("triSurface directory does not exist.",GUIMode=self.GUIMode)
-            #ampersandIO.printError("triSurface directory is necessary for the project")
+            SplashCaseCreatorIO.printWarning("triSurface directory does not exist.",GUIMode=self.GUIMode)
+            #SplashCaseCreatorIO.printError("triSurface directory is necessary for the project")
             return -1
         # if exists, check if the stl files are present
         stl_files = os.listdir("constant/triSurface")
@@ -393,31 +393,31 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     def check_log_files(self):
         log_files = os.listdir()
         if 'log.simpleFoam' in log_files:
-            ampersandIO.printMessage("Simulation log file found",GUIMode=self.GUIMode,window=self.window)
+            SplashCaseCreatorIO.printMessage("Simulation log file found",GUIMode=self.GUIMode,window=self.window)
             return 1
         if 'log.pimpleFoam' in log_files:
-            ampersandIO.printMessage("Simulation log file found",GUIMode=self.GUIMode,window=self.window)
+            SplashCaseCreatorIO.printMessage("Simulation log file found",GUIMode=self.GUIMode,window=self.window)
             return 1
         return 0
     
     # to check whether the U and p files are present in the postProcess directory
     def check_post_process_files(self):
         if(not os.path.exists("postProcessing/probe/0")):
-            ampersandIO.printWarning("postProcess directory does not exist",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printWarning("postProcess directory does not exist",GUIMode=self.GUIMode)
             return 0
         postProcess_files = os.listdir("postProcessing/probe/0")
         if 'U' in postProcess_files and 'p' in postProcess_files:
-            ampersandIO.printMessage("U and p files found in postProcess directory",GUIMode=self.GUIMode,window=self.window)
+            SplashCaseCreatorIO.printMessage("U and p files found in postProcess directory",GUIMode=self.GUIMode,window=self.window)
             return 1
         return 0
     
     def check_forces_files(self):
         if(not os.path.exists("postProcessing/forces/0")):
-            ampersandIO.printWarning("forces directory does not exist",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printWarning("forces directory does not exist",GUIMode=self.GUIMode)
             return 0
         forces_files = os.listdir("postProcessing/forces/0")
         if 'force.dat' in forces_files:
-            ampersandIO.printMessage("force.dat found in forces directory")
+            SplashCaseCreatorIO.printMessage("force.dat found in forces directory")
             return 1
         return 0
 
@@ -427,24 +427,24 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     def create_project(self):
         # check if the project path exists
         if self.project_path is None:
-            ampersandIO.printError("No project path selected. Aborting project creation.",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printError("No project path selected. Aborting project creation.",GUIMode=self.GUIMode)
             return -1
         if os.path.exists(self.project_path):
-            ampersandIO.printWarning("Project already exists. Skipping the creation of directories",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printWarning("Project already exists. Skipping the creation of directories",GUIMode=self.GUIMode)
             self.existing_project = True
         else:
-            ampersandIO.printMessage("Creating project directory")
+            SplashCaseCreatorIO.printMessage("Creating project directory")
             try:
                 os.makedirs(self.project_path)
                 
             except OSError as error:
-                ampersandIO.printError(error)
+                SplashCaseCreatorIO.printError(error)
         try:
             os.chdir(self.project_path)
         except OSError as error:
-                ampersandIO.printError(error)
+                SplashCaseCreatorIO.printError(error)
         cwd = os.getcwd()
-        ampersandIO.printMessage(f"Working directory: {cwd}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Working directory: {cwd}",GUIMode=self.GUIMode,window=self.window)
 
         # create 0, constant and system directory
         try:
@@ -453,7 +453,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             os.mkdir("system")
             os.mkdir("constant/triSurface")
         except OSError as error:
-            ampersandIO.printError("File system already exists. Skipping the creation of directories",GUIMode=self.GUIMode)   
+            SplashCaseCreatorIO.printError("File system already exists. Skipping the creation of directories",GUIMode=self.GUIMode)   
             return -1
         return 0 # return 0 if the project is created successfully 
 
@@ -477,13 +477,13 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         #print(self.numericalSettings)
         #print(self.inletValues)
         #print(self.boundaryConditions)
-        ampersandIO.printMessage("Writing settings to project_settings.yaml",GUIMode=self.GUIMode,window=self.window)
-        ampersandPrimitives.dict_to_yaml(settings, 'project_settings.yaml')
+        SplashCaseCreatorIO.printMessage("Writing settings to project_settings.yaml",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorPrimitives.dict_to_yaml(settings, 'project_settings.yaml')
 
     # If the project is already existing, load the settings from the project_settings.yaml file
     def load_settings(self):
-        ampersandIO.printMessage("Loading project settings",GUIMode=self.GUIMode,window=self.window)
-        settings = ampersandPrimitives.yaml_to_dict('project_settings.yaml')
+        SplashCaseCreatorIO.printMessage("Loading project settings",GUIMode=self.GUIMode,window=self.window)
+        settings = SplashCaseCreatorPrimitives.yaml_to_dict('project_settings.yaml')
         self.meshSettings = settings['meshSettings']
         self.physicalProperties = settings['physicalProperties']
         self.numericalSettings = settings['numericalSettings']
@@ -497,7 +497,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         for geometry in self.meshSettings['geometry']:
             if(geometry['type']=='triSurfaceMesh'):
                 if(geometry['name'] in self.stl_names):
-                    ampersandIO.printMessage(f"STL file {geometry['name']} already exists in the project, skipping the addition")
+                    SplashCaseCreatorIO.printMessage(f"STL file {geometry['name']} already exists in the project, skipping the addition")
                 else:
                     self.stl_files.append(geometry)
                     self.stl_names.append(geometry['name'])
@@ -513,31 +513,31 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         project_name = self.project_path.split("/")[-1]
         self.project_name = project_name
         # treat bounds as tuple
-        self.meshSettings["geometry"] = ampersandPrimitives.treat_bounds(self.meshSettings["geometry"])
+        self.meshSettings["geometry"] = SplashCaseCreatorPrimitives.treat_bounds(self.meshSettings["geometry"])
 
         
     def show_settings(self):
-        ampersandIO.printMessage("Project settings")
-        ampersandIO.printMessage("Mesh Settings")
-        ampersandIO.print_dict(self.meshSettings)
-        ampersandIO.printMessage("Physical Properties")
-        ampersandIO.print_dict(self.physicalProperties)
-        ampersandIO.printMessage("Numerical Settings")
-        ampersandIO.print_dict(self.numericalSettings)
-        ampersandIO.printMessage("Inlet Values")
-        ampersandIO.print_dict(self.inletValues)
-        ampersandIO.printMessage("Boundary Conditions")
-        ampersandIO.print_dict(self.boundaryConditions)
-        ampersandIO.printMessage("Solver Settings")
-        ampersandIO.print_dict(self.solverSettings)
-        ampersandIO.printMessage("Simulation Settings")
-        ampersandIO.print_dict(self.simulationSettings)
-        ampersandIO.printMessage("Parallel Settings")
-        ampersandIO.print_dict(self.parallelSettings)
-        ampersandIO.printMessage("Simulation Flow Settings")
-        ampersandIO.print_dict(self.simulationFlowSettings)
-        ampersandIO.printMessage("Post Process Settings")
-        ampersandIO.print_dict(self.postProcessSettings)
+        SplashCaseCreatorIO.printMessage("Project settings")
+        SplashCaseCreatorIO.printMessage("Mesh Settings")
+        SplashCaseCreatorIO.print_dict(self.meshSettings)
+        SplashCaseCreatorIO.printMessage("Physical Properties")
+        SplashCaseCreatorIO.print_dict(self.physicalProperties)
+        SplashCaseCreatorIO.printMessage("Numerical Settings")
+        SplashCaseCreatorIO.print_dict(self.numericalSettings)
+        SplashCaseCreatorIO.printMessage("Inlet Values")
+        SplashCaseCreatorIO.print_dict(self.inletValues)
+        SplashCaseCreatorIO.printMessage("Boundary Conditions")
+        SplashCaseCreatorIO.print_dict(self.boundaryConditions)
+        SplashCaseCreatorIO.printMessage("Solver Settings")
+        SplashCaseCreatorIO.print_dict(self.solverSettings)
+        SplashCaseCreatorIO.printMessage("Simulation Settings")
+        SplashCaseCreatorIO.print_dict(self.simulationSettings)
+        SplashCaseCreatorIO.printMessage("Parallel Settings")
+        SplashCaseCreatorIO.print_dict(self.parallelSettings)
+        SplashCaseCreatorIO.printMessage("Simulation Flow Settings")
+        SplashCaseCreatorIO.print_dict(self.simulationFlowSettings)
+        SplashCaseCreatorIO.printMessage("Post Process Settings")
+        SplashCaseCreatorIO.print_dict(self.postProcessSettings)
 
     
 
@@ -559,11 +559,11 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     # Create the settings for the project or load the existing settings
     def create_settings(self):
         if self.existing_project:
-            ampersandIO.printMessage("Project already exists. Loading project settings")
+            SplashCaseCreatorIO.printMessage("Project already exists. Loading project settings")
             try:
                 self.load_settings()
             except FileNotFoundError:
-                ampersandIO.printMessage("Settings file not found. Loading default settings")
+                SplashCaseCreatorIO.printMessage("Settings file not found. Loading default settings")
                 self.load_default_settings()
                 self.write_settings()
         else:
@@ -594,7 +594,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         # list all the stl files in the project
         for stl_name in self.stl_names:
             if stl_name == stl_['name']:
-                ampersandIO.printMessage(f"STL file {stl_name} already exists in the project")
+                SplashCaseCreatorIO.printMessage(f"STL file {stl_name} already exists in the project")
                 already_exists = True
                 break
             idx += 1
@@ -621,11 +621,11 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     def ask_purpose(self):
         purposes = ['wall', 'inlet','outlet', 'refinementRegion', 'refinementSurface', 
                     'cellZone', 'baffles','symmetry','cyclic','empty',]
-        ampersandIO.printMessage(f"Enter purpose for this STL geometry")
-        ampersandIO.print_numbered_list(purposes)
-        purpose_no = ampersandIO.get_input_int("Enter purpose number: ")-1
+        SplashCaseCreatorIO.printMessage(f"Enter purpose for this STL geometry")
+        SplashCaseCreatorIO.print_numbered_list(purposes)
+        purpose_no = SplashCaseCreatorIO.get_input_int("Enter purpose number: ")-1
         if(purpose_no < 0 or purpose_no > len(purposes)-1):
-                ampersandIO.printMessage("Invalid purpose number. Setting purpose to wall")
+                SplashCaseCreatorIO.printMessage("Invalid purpose number. Setting purpose to wall")
                 purpose = 'wall'
         else:
             purpose = purposes[purpose_no]
@@ -633,18 +633,18 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     
     def set_property(self,purpose='wall'):
         if purpose == 'inlet':
-            U = ampersandDataInput.get_inlet_values()
+            U = SplashCaseCreatorDataInput.get_inlet_values()
             property = tuple(U)
-            ampersandIO.printMessage(f"Setting property of {purpose} to {property}")
+            SplashCaseCreatorIO.printMessage(f"Setting property of {purpose} to {property}")
         elif purpose == 'refinementRegion' :
-            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
+            refLevel = SplashCaseCreatorIO.get_input_int("Enter refinement level: ")
             property = refLevel
         elif purpose == 'cellZone':
-            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
-            createPatches = ampersandIO.get_input_bool("Create patches for this cellZone? (y/N): ")
+            refLevel = SplashCaseCreatorIO.get_input_int("Enter refinement level: ")
+            createPatches = SplashCaseCreatorIO.get_input_bool("Create patches for this cellZone? (y/N): ")
             property = (refLevel, createPatches,0) # 0 is just a placeholder for listing the patches
         elif purpose == 'refinementSurface':
-            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
+            refLevel = SplashCaseCreatorIO.get_input_int("Enter refinement level: ")
             property = refLevel
         else:
             property = None
@@ -655,18 +655,18 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     
     def set_property_gui(self,purpose='wall'):
         if purpose == 'inlet':
-            U = ampersandDataInput.get_inlet_values(GUIMode=self.GUIMode,window=self.window)
+            U = SplashCaseCreatorDataInput.get_inlet_values(GUIMode=self.GUIMode,window=self.window)
             property = tuple(U)
-            ampersandIO.printMessage(f"Setting property of {purpose} to {property}")
+            SplashCaseCreatorIO.printMessage(f"Setting property of {purpose} to {property}")
         elif purpose == 'refinementRegion' :
-            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
+            refLevel = SplashCaseCreatorIO.get_input_int("Enter refinement level: ")
             property = refLevel
         elif purpose == 'cellZone':
-            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
-            createPatches = ampersandIO.get_input_bool("Create patches for this cellZone? (y/N): ")
+            refLevel = SplashCaseCreatorIO.get_input_int("Enter refinement level: ")
+            createPatches = SplashCaseCreatorIO.get_input_bool("Create patches for this cellZone? (y/N): ")
             property = (refLevel, createPatches,0) # 0 is just a placeholder for listing the patches
         elif purpose == 'refinementSurface':
-            refLevel = ampersandIO.get_input_int("Enter refinement level: ")
+            refLevel = SplashCaseCreatorIO.get_input_int("Enter refinement level: ")
             property = refLevel
         else:
             property = None
@@ -674,16 +674,16 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     
    
     def ask_stl_settings(self,stl_file):
-        ampersandIO.printMessage(f"Settings of the {stl_file['name']} file")
-        stl_file['refineMin'] = ampersandIO.get_input("Min Refinement: ")
-        stl_file['refineMax'] = ampersandIO.get_input("Max Refinement: ")
-        featureEdges = ampersandIO.get_input("Refine Feature Edges?: (y/N) ")
+        SplashCaseCreatorIO.printMessage(f"Settings of the {stl_file['name']} file")
+        stl_file['refineMin'] = SplashCaseCreatorIO.get_input("Min Refinement: ")
+        stl_file['refineMax'] = SplashCaseCreatorIO.get_input("Max Refinement: ")
+        featureEdges = SplashCaseCreatorIO.get_input("Refine Feature Edges?: (y/N) ")
         if(featureEdges == 'y'):
             stl_file['featureEdges'] = True
         else:    
             stl_file['featureEdges'] = False
-        stl_file['featureLevel'] = ampersandIO.get_input("Feature Level: ")
-        stl_file['nLayers'] = ampersandIO.get_input("Number of Layers: ")
+        stl_file['featureLevel'] = SplashCaseCreatorIO.get_input("Feature Level: ")
+        stl_file['nLayers'] = SplashCaseCreatorIO.get_input("Number of Layers: ")
 
     def change_stl_property(self,stl_file_name,property):
         for stl in self.meshSettings['geometry']:
@@ -714,15 +714,15 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     
     def show_stl_properties(self,stl_file_name):
         purpose,refMin,refMax,featureEdges,featureLevel,nLayers,property,bounds = self.get_stl_properties(stl_file_name)
-        ampersandIO.printMessage(f"STL file: {stl_file_name}")
-        ampersandIO.printMessage(f"Purpose: {purpose}")
-        ampersandIO.printMessage(f"Refinement Min: {refMin}")
-        ampersandIO.printMessage(f"Refinement Max: {refMax}")
-        ampersandIO.printMessage(f"Feature Edges: {featureEdges}")
-        ampersandIO.printMessage(f"Feature Level: {featureLevel}")
-        ampersandIO.printMessage(f"Number of Layers: {nLayers}")
-        ampersandIO.printMessage(f"Property: {property}")
-        ampersandIO.printMessage(f"Bounds: {bounds}")
+        SplashCaseCreatorIO.printMessage(f"STL file: {stl_file_name}")
+        SplashCaseCreatorIO.printMessage(f"Purpose: {purpose}")
+        SplashCaseCreatorIO.printMessage(f"Refinement Min: {refMin}")
+        SplashCaseCreatorIO.printMessage(f"Refinement Max: {refMax}")
+        SplashCaseCreatorIO.printMessage(f"Feature Edges: {featureEdges}")
+        SplashCaseCreatorIO.printMessage(f"Feature Level: {featureLevel}")
+        SplashCaseCreatorIO.printMessage(f"Number of Layers: {nLayers}")
+        SplashCaseCreatorIO.printMessage(f"Property: {property}")
+        SplashCaseCreatorIO.printMessage(f"Bounds: {bounds}")
     
     def get_stl(self,stl_file_name):
         for stl in self.stl_files:
@@ -788,10 +788,10 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         self.remove_duplicate_stl_files()
 
     def add_stl_file(self): # to only copy the STL file to the project directory and add it to the STL list
-        stl_file = ampersandPrimitives.ask_for_file([("STL Geometry", "*.stl"), ("OBJ Geometry", "*.obj")],self.GUIMode)
+        stl_file = SplashCaseCreatorPrimitives.ask_for_file([("STL Geometry", "*.stl"), ("OBJ Geometry", "*.obj")],self.GUIMode)
         if stl_file is None:
-            #ampersandIO.printWarning("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode)
-            ampersandIO.printMessage("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode,window=self.window)
+            #SplashCaseCreatorIO.printWarning("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printMessage("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode,window=self.window)
             return -1
         if os.path.exists(stl_file):
             # add the stl file to the project
@@ -800,8 +800,8 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             file_path_to_token = stl_file.split("/")
             stl_name = file_path_to_token[-1]
             if stl_name in self.stl_names:
-                #ampersandIO.printWarning(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode)
-                ampersandIO.printMessage(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode,window=self.window)
+                #SplashCaseCreatorIO.printWarning(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printMessage(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode,window=self.window)
                 return -1
             else: # this is to prevent the bug of having the same file added multiple times
                 if self.GUIMode:
@@ -812,7 +812,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                     property = self.set_property(purpose)
                 bounds = stlAnalysis.compute_bounding_box(stl_file)
                 bounds = tuple(bounds)
-                ampersandIO.printMessage(f"Bounds of the geometry: {bounds}",GUIMode=self.GUIMode,window=self.window)
+                SplashCaseCreatorIO.printMessage(f"Bounds of the geometry: {bounds}",GUIMode=self.GUIMode,window=self.window)
                 if purpose == 'refinementRegion' or purpose == 'refinementSurface':
                     featureEdges = False
                 else:  
@@ -821,27 +821,27 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             # this is the path to the constant/triSurface inside project directory where STL will be copied
             stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_name)
             try:
-                ampersandIO.printMessage(f"Copying {stl_name} to the project directory",GUIMode=self.GUIMode,window=self.window)
+                SplashCaseCreatorIO.printMessage(f"Copying {stl_name} to the project directory",GUIMode=self.GUIMode,window=self.window)
                 shutil.copy(stl_file, stl_path)
             except OSError as error:
-                ampersandIO.printError(error,GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printError(error,GUIMode=self.GUIMode)
                 return -1
             try:
                 stlAnalysis.set_stl_solid_name(stl_path)
             except Exception as error:
-                ampersandIO.printError(error,GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printError(error,GUIMode=self.GUIMode)
                 return -1
         else:
-            ampersandIO.printError("File does not exist. Aborting project creation.",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printError("File does not exist. Aborting project creation.",GUIMode=self.GUIMode)
             return -1
         self.current_stl_file = stl_path
         return 0
     
     def add_one_stl_file(self,stl_file): # to only copy the STL file to the project directory and add it to the STL list
-        #stl_file = ampersandPrimitives.ask_for_file([("STL Geometry", "*.stl"), ("OBJ Geometry", "*.obj")],self.GUIMode)
+        #stl_file = SplashCaseCreatorPrimitives.ask_for_file([("STL Geometry", "*.stl"), ("OBJ Geometry", "*.obj")],self.GUIMode)
         if stl_file is None:
-            #ampersandIO.printWarning("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode)
-            ampersandIO.printMessage("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode,window=self.window)
+            #SplashCaseCreatorIO.printWarning("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printMessage("No file selected. Please select STL file if necessary.",GUIMode=self.GUIMode,window=self.window)
             return -1
         if os.path.exists(stl_file):
             # add the stl file to the project
@@ -850,8 +850,8 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             file_path_to_token = stl_file.split("/")
             stl_name = file_path_to_token[-1]
             if stl_name in self.stl_names:
-                #ampersandIO.printWarning(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode)
-                ampersandIO.printMessage(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode,window=self.window)
+                #SplashCaseCreatorIO.printWarning(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printMessage(f"STL file {stl_name} already exists in the project",GUIMode=self.GUIMode,window=self.window)
                 return -1
             else: # this is to prevent the bug of having the same file added multiple times
                 if self.GUIMode:
@@ -862,7 +862,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                     property = self.set_property(purpose)
                 bounds = stlAnalysis.compute_bounding_box(stl_file)
                 bounds = tuple(bounds)
-                ampersandIO.printMessage(f"Bounds of the geometry: {bounds}",GUIMode=self.GUIMode,window=self.window)
+                SplashCaseCreatorIO.printMessage(f"Bounds of the geometry: {bounds}",GUIMode=self.GUIMode,window=self.window)
                 if purpose == 'refinementRegion' or purpose == 'refinementSurface':
                     featureEdges = False
                 else:  
@@ -871,31 +871,31 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             # this is the path to the constant/triSurface inside project directory where STL will be copied
             stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_name)
             try:
-                ampersandIO.printMessage(f"Copying {stl_name} to the project directory",GUIMode=self.GUIMode,window=self.window)
+                SplashCaseCreatorIO.printMessage(f"Copying {stl_name} to the project directory",GUIMode=self.GUIMode,window=self.window)
                 shutil.copy(stl_file, stl_path)
             except OSError as error:
-                ampersandIO.printError(error,GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printError(error,GUIMode=self.GUIMode)
                 return -1
             try:
                 stlAnalysis.set_stl_solid_name(stl_path)
             except Exception as error:
-                ampersandIO.printError(error,GUIMode=self.GUIMode)
+                SplashCaseCreatorIO.printError(error,GUIMode=self.GUIMode)
                 return -1
         else:
-            ampersandIO.printError("File does not exist. Aborting project creation.",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printError("File does not exist. Aborting project creation.",GUIMode=self.GUIMode)
             return -1
         self.current_stl_file = stl_path
         return 0
             
     # this is a wrapper of the primitives 
     def list_stl_files(self):
-        ampersandPrimitives.list_stl_files(self.stl_files,self.GUIMode,self.window)
+        SplashCaseCreatorPrimitives.list_stl_files(self.stl_files,self.GUIMode,self.window)
 
     def list_stl_paths(self):
         stl_paths = []
         for stl_file in self.stl_files:
             stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_file['name'])
-            #ampersandIO.printMessage(stl_path)
+            #SplashCaseCreatorIO.printMessage(stl_path)
             stl_paths.append(stl_path)
         return stl_paths
     
@@ -912,7 +912,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                 #try:
                 #    os.remove(stl_path)
                 #except OSError as error:
-                #    ampersandIO.printError(error)
+                #    SplashCaseCreatorIO.printError(error)
                 #    return -1
                 print(f"STL file {stl_name} removed from the project")
                 self.list_stl_files()
@@ -924,14 +924,14 @@ class ampersandProject: # ampersandProject class to handle the project creation 
 
     def remove_stl_file(self,stl_file_number=0):
         #self.list_stl_files()
-        #stl_file_number = ampersandIO.get_input("Enter the number of the file to remove: ")
+        #stl_file_number = SplashCaseCreatorIO.get_input("Enter the number of the file to remove: ")
         try:
             stl_file_number = int(stl_file_number)
         except ValueError:
-            ampersandIO.printMessage("Invalid input. Aborting operation")
+            SplashCaseCreatorIO.printMessage("Invalid input. Aborting operation")
             return -1
         if stl_file_number < 0 or stl_file_number > len(self.stl_files):
-            ampersandIO.printMessage("Invalid file number. Aborting operation")
+            SplashCaseCreatorIO.printMessage("Invalid file number. Aborting operation")
             return -1
         stl_file = self.stl_files[stl_file_number]
         stl_name = stl_file['name']
@@ -941,12 +941,12 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         try:
             os.remove(stl_path)
         except OSError as error:
-            ampersandIO.printError(error)
+            SplashCaseCreatorIO.printError(error)
             return -1
         return 0
 
     def ask_flow_type(self):
-        flow_type = ampersandIO.get_input("Internal or External Flow (I/E)?: ")
+        flow_type = SplashCaseCreatorIO.get_input("Internal or External Flow (I/E)?: ")
         if flow_type.lower() == 'i':
             self.internalFlow = True
         else:
@@ -958,19 +958,19 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         self.meshSettings['internalFlow'] = self.internalFlow
 
     def ask_transient(self):
-        transient = ampersandIO.get_input("Transient or Steady State (T/S)?: ")
+        transient = SplashCaseCreatorIO.get_input("Transient or Steady State (T/S)?: ")
         if transient.lower() == 't':
             self.transient = True
         else:
             self.transient = False
 
     def ask_half_model(self):
-        half_model = ampersandIO.get_input_bool("Half Model (y/N)?: ")
+        half_model = SplashCaseCreatorIO.get_input_bool("Half Model (y/N)?: ")
         if half_model==True:
             self.halfModel = True
             self.meshSettings['halfModel'] = True
             # if the model is half, the back patch should be symmetry
-            ampersandPrimitives.change_patch_type(self.meshSettings['patches'],patch_name='back'
+            SplashCaseCreatorPrimitives.change_patch_type(self.meshSettings['patches'],patch_name='back'
                                                   ,new_type='symmetry')
         else:
             self.halfModel = False
@@ -1020,12 +1020,12 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         
     def set_domain_size(self,stl_name):
         if stl_name is None:
-            ampersandIO.printError("No stl file selected. Aborting operation",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printError("No stl file selected. Aborting operation",GUIMode=self.GUIMode)
             return -1
         
         stl_idx = self.get_stl_index(stl_name)
         if stl_idx == -1:
-            ampersandIO.printError("STL file not found. Aborting operation",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printError("STL file not found. Aborting operation",GUIMode=self.GUIMode)
             return -1
         stl_file = self.stl_files[stl_idx]
         stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_name)
@@ -1041,14 +1041,14 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         try:
             stl_file_number = int(stl_file_number)
         except ValueError:
-            ampersandIO.printError("Invalid input. Aborting operation",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printError("Invalid input. Aborting operation",GUIMode=self.GUIMode)
             return -1
         if stl_file_number < 0 or stl_file_number > len(self.stl_files):
-            ampersandIO.printError("Invalid file number. Aborting operation",GUIMode=self.GUIMode)
+            SplashCaseCreatorIO.printError("Invalid file number. Aborting operation",GUIMode=self.GUIMode)
             return -1
         stl_file = self.stl_files[stl_file_number]
         stl_name = stl_file['name']
-        ampersandIO.printMessage(f"Analyzing {stl_name}",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage(f"Analyzing {stl_name}",GUIMode=self.GUIMode,window=self.window)
         stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_name)
         stlBoundingBox = stlAnalysis.compute_bounding_box(stl_path)
         domain_size, nx, ny, nz, refLevel,target_y,nLayers = stlAnalysis.calc_mesh_settings(stlBoundingBox, nu, rho,U=U,maxCellSize=2.0,expansion_ratio=ER,
@@ -1074,7 +1074,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
     
     def adjust_domain_size(self):
         # adjust the domain size based on the bounding box of the stl files
-        ampersandIO.printMessage("Adjusting domain size based on the bounding box of the stl files",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage("Adjusting domain size based on the bounding box of the stl files",GUIMode=self.GUIMode,window=self.window)
         for stl_file in self.stl_files:
             stl_name = stl_file['name']
             stl_path = os.path.join(self.project_path, "constant", "triSurface", stl_name)
@@ -1098,12 +1098,12 @@ class ampersandProject: # ampersandProject class to handle the project creation 
            
     def set_inlet_values(self):
         if(not self.internalFlow): # external flow
-            U = ampersandDataInput.get_inlet_values()
+            U = SplashCaseCreatorDataInput.get_inlet_values()
             self.inletValues['U'] = U
             self.boundaryConditions['velocityInlet']['u_value'] = U
         else: # internal flow
             # Use inlet values from the stl file
-            ampersandIO.printMessage("Setting inlet values for various inlet boundaries")
+            SplashCaseCreatorIO.printMessage("Setting inlet values for various inlet boundaries")
             for stl_file in self.stl_files:
                 if stl_file['purpose'] == 'inlet':
                     U = list(stl_file['property'])
@@ -1112,18 +1112,18 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         
 
     def set_fluid_properties(self):
-        fluid = ampersandDataInput.choose_fluid_properties()
+        fluid = SplashCaseCreatorDataInput.choose_fluid_properties()
         if fluid == -1:
-            rho, nu = ampersandDataInput.get_physical_properties()
+            rho, nu = SplashCaseCreatorDataInput.get_physical_properties()
             fluid = {'rho':rho, 'nu':nu}
         self.physicalProperties['rho'] = fluid['rho']
         self.physicalProperties['nu'] = fluid['nu']
 
     #def set_transient(self):
-    #    self.transient = ampersandIO.get_input_bool("Transient simulation (y/N)?: ")
+    #    self.transient = SplashCaseCreatorIO.get_input_bool("Transient simulation (y/N)?: ")
 
     def set_parallel(self):
-        n_core = ampersandIO.get_input_int("Number of cores for parallel simulation: ")
+        n_core = SplashCaseCreatorIO.get_input_int("Number of cores for parallel simulation: ")
         self.parallelSettings['numberOfSubdomains'] = n_core
 
     # setting the purpose of a patch. Used for setting the boundary conditions
@@ -1132,30 +1132,30 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                     'cellZone', 'baffles','symmetry','cyclic','empty',]
         #purposes = ['wall', 'inlet','outlet', 'refinementRegion', 'refinementSurface', 'cellZone', 'baffles']
         if purpose not in purposes:
-            ampersandIO.printMessage("Invalid purpose. Setting purpose to wall")
+            SplashCaseCreatorIO.printMessage("Invalid purpose. Setting purpose to wall")
             purpose = 'wall'
         patch['purpose'] = purpose
 
     # choose turbulence model for the simulation
     def choose_turbulence_model(self):
         turbulence_models = ['kOmegaSST', 'kEpsilon', 'SpalartAllmaras']
-        turbulence_model = ampersandDataInput.get_option_choice("Choose turbulence model: ", turbulence_models)
+        turbulence_model = SplashCaseCreatorDataInput.get_option_choice("Choose turbulence model: ", turbulence_models)
         self.solverSettings['turbulenceModel'] = turbulence_model
 
     # set the turbulence model for the simulation
     def set_turbulence_model(self,turbulence_model='kOmegaSST'):
-        turbulence_model = ampersandDataInput.choose_turbulence_model()
+        turbulence_model = SplashCaseCreatorDataInput.choose_turbulence_model()
         self.solverSettings['turbulenceModel'] = turbulence_model
     
     def ask_transient_settings(self):
-        self.simulationSettings['endTime'] = ampersandIO.get_input_float("End time: ")
-        self.simulationSettings['writeInterval'] = ampersandIO.get_input_float("Write interval: ")
-        self.simulationSettings['deltaT'] = ampersandIO.get_input_float("Time step: ")
+        self.simulationSettings['endTime'] = SplashCaseCreatorIO.get_input_float("End time: ")
+        self.simulationSettings['writeInterval'] = SplashCaseCreatorIO.get_input_float("Write interval: ")
+        self.simulationSettings['deltaT'] = SplashCaseCreatorIO.get_input_float("Time step: ")
     
     def set_transient_settings(self):
         #self.ask_transient()
         if self.transient:
-            ampersandIO.printMessage("Transient simulation settings")
+            SplashCaseCreatorIO.printMessage("Transient simulation settings")
             self.simulationSettings['transient'] = True
             self.simulationSettings['application'] = 'pimpleFoam'
             self.simulationFlowSettings['solver'] = 'pimpleFoam'
@@ -1163,9 +1163,9 @@ class ampersandProject: # ampersandProject class to handle the project creation 
                 self.ask_transient_settings()
             else:
                 pass
-                #self.simulationSettings['endTime'] = ampersandIO.get_input_float("End time: ")
-                #self.simulationSettings['writeInterval'] = ampersandIO.get_input_float("Write interval: ")
-                #self.simulationSettings['deltaT'] = ampersandIO.get_input_float("Time step: ")
+                #self.simulationSettings['endTime'] = SplashCaseCreatorIO.get_input_float("End time: ")
+                #self.simulationSettings['writeInterval'] = SplashCaseCreatorIO.get_input_float("Write interval: ")
+                #self.simulationSettings['deltaT'] = SplashCaseCreatorIO.get_input_float("Time step: ")
             self.simulationSettings['adjustTimeStep'] = 'no'
             self.simulationSettings['maxCo'] = 0.9
             self.numericalSettings['ddtSchemes']['default'] = 'Euler'
@@ -1175,18 +1175,18 @@ class ampersandProject: # ampersandProject class to handle the project creation 
             
 
     def ask_ground_type(self):
-        ground_type = ampersandIO.get_input_bool("Is the ground touching the body (y/N): ")
+        ground_type = SplashCaseCreatorIO.get_input_bool("Is the ground touching the body (y/N): ")
         if ground_type:
             self.onGround = True
             self.meshSettings['onGround'] = True
-            ampersandPrimitives.change_patch_type(self.meshSettings['patches'],patch_name='ground',
+            SplashCaseCreatorPrimitives.change_patch_type(self.meshSettings['patches'],patch_name='ground',
                                                     new_type='wall')
         else:
             self.onGround = False
             self.meshSettings['onGround'] = False
 
     def ask_refinement_level(self):
-        self.refinement = ampersandDataInput.get_mesh_refinement_level()
+        self.refinement = SplashCaseCreatorDataInput.get_mesh_refinement_level()
         self.meshSettings['fineLevel'] = self.refinement
 
     def set_global_refinement_level(self,refinement=0):
@@ -1216,7 +1216,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         #(meshSettings, physicalProperties, numericalSettings, inletValues, boundaryConditions)=caseSettings
         # check if the current working directory is the project directory
         if not os.path.exists(self.project_path):
-            ampersandIO.printMessage("Project directory does not exist. Aborting project creation.")
+            SplashCaseCreatorIO.printMessage("Project directory does not exist. Aborting project creation.")
             return -1
         if os.getcwd() != self.project_path:
             os.chdir(self.project_path)
@@ -1226,7 +1226,7 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         if os.path.exists("0.orig"):
             shutil.rmtree("0.orig")
         # create the initial conditions file
-        ampersandIO.printMessage("Creating boundary conditions",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage("Creating boundary conditions",GUIMode=self.GUIMode,window=self.window)
         # check if the 0 directory exists
         if not os.path.exists("0"):
             # create the 0 directory
@@ -1238,79 +1238,79 @@ class ampersandProject: # ampersandProject class to handle the project creation 
         os.chdir("..")
         # go inside the constant directory
         os.chdir("constant")
-        ampersandIO.printMessage("Creating physical properties and turbulence properties",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage("Creating physical properties and turbulence properties",GUIMode=self.GUIMode,window=self.window)
         # create transportProperties file
         tranP = create_transportPropertiesDict(self.physicalProperties)
         # create turbulenceProperties file
         turbP = create_turbulencePropertiesDict(self.physicalProperties)
-        ampersandPrimitives.write_dict_to_file("transportProperties", tranP)
-        ampersandPrimitives.write_dict_to_file("turbulenceProperties", turbP)
+        SplashCaseCreatorPrimitives.write_dict_to_file("transportProperties", tranP)
+        SplashCaseCreatorPrimitives.write_dict_to_file("turbulenceProperties", turbP)
         # go back to the main directory
         os.chdir("..")
         
         # go inside the system directory
         os.chdir("system")
         # create the controlDict file
-        ampersandIO.printMessage("Creating the system files",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage("Creating the system files",GUIMode=self.GUIMode,window=self.window)
         controlDict = createControlDict(self.simulationSettings)
-        ampersandPrimitives.write_dict_to_file("controlDict", controlDict)
+        SplashCaseCreatorPrimitives.write_dict_to_file("controlDict", controlDict)
         blockMeshDict = generate_blockMeshDict(self.meshSettings)
-        ampersandPrimitives.write_dict_to_file("blockMeshDict", blockMeshDict)
+        SplashCaseCreatorPrimitives.write_dict_to_file("blockMeshDict", blockMeshDict)
         snappyHexMeshDict = generate_snappyHexMeshDict(self.meshSettings)
-        ampersandPrimitives.write_dict_to_file("snappyHexMeshDict", snappyHexMeshDict)
+        SplashCaseCreatorPrimitives.write_dict_to_file("snappyHexMeshDict", snappyHexMeshDict)
         surfaceFeatureExtractDict = create_surfaceFeatureExtractDict(self.meshSettings)
-        ampersandPrimitives.write_dict_to_file("surfaceFeatureExtractDict", surfaceFeatureExtractDict)
+        SplashCaseCreatorPrimitives.write_dict_to_file("surfaceFeatureExtractDict", surfaceFeatureExtractDict)
         fvSchemesDict = create_fvSchemesDict(self.numericalSettings)
-        ampersandPrimitives.write_dict_to_file("fvSchemes", fvSchemesDict)
+        SplashCaseCreatorPrimitives.write_dict_to_file("fvSchemes", fvSchemesDict)
         fvSolutionDict = create_fvSolutionDict(self.numericalSettings, self.solverSettings)
-        ampersandPrimitives.write_dict_to_file("fvSolution", fvSolutionDict)
+        SplashCaseCreatorPrimitives.write_dict_to_file("fvSolution", fvSolutionDict)
         decomposeParDict = createDecomposeParDict(self.parallelSettings)
-        ampersandPrimitives.write_dict_to_file("decomposeParDict", decomposeParDict)
+        SplashCaseCreatorPrimitives.write_dict_to_file("decomposeParDict", decomposeParDict)
         FODict = postProcess.create_FOs(self.meshSettings,self.postProcessSettings,useFOs=self.useFOs)
-        ampersandPrimitives.write_dict_to_file("FOs", FODict)
+        SplashCaseCreatorPrimitives.write_dict_to_file("FOs", FODict)
         # go back to the main directory
         os.chdir("..")
         # create mesh script
-        ampersandIO.printMessage("Creating scripts for meshing and running the simulation",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage("Creating scripts for meshing and running the simulation",GUIMode=self.GUIMode,window=self.window)
         meshScript = ScriptGenerator.generate_mesh_script(self.simulationFlowSettings)
-        ampersandPrimitives.write_dict_to_file("mesh", meshScript)
+        SplashCaseCreatorPrimitives.write_dict_to_file("mesh", meshScript)
         # create simulation script
         simulationScript = ScriptGenerator.generate_simulation_script(self.simulationFlowSettings)
-        ampersandPrimitives.write_dict_to_file("run", simulationScript)
-        ampersandPrimitives.crlf_to_LF("mesh")
-        ampersandPrimitives.crlf_to_LF("run")
+        SplashCaseCreatorPrimitives.write_dict_to_file("run", simulationScript)
+        SplashCaseCreatorPrimitives.crlf_to_LF("mesh")
+        SplashCaseCreatorPrimitives.crlf_to_LF("run")
         if os.name != 'nt':
             os.chmod("mesh", 0o755)
             os.chmod("run", 0o755)
         # go back to the main directory
         os.chdir("..")
-        ampersandIO.printMessage("\n-----------------------------------",GUIMode=self.GUIMode,window=self.window)
-        ampersandIO.printMessage("Project files created successfully!",GUIMode=self.GUIMode,window=self.window)
-        ampersandIO.printMessage("-----------------------------------\n",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage("\n-----------------------------------",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage("Project files created successfully!",GUIMode=self.GUIMode,window=self.window)
+        SplashCaseCreatorIO.printMessage("-----------------------------------\n",GUIMode=self.GUIMode,window=self.window)
         return 0
 
 
 
 def main():
-    project = ampersandProject()
+    project = SplashCaseCreatorProject()
     # Clear the screen
     os.system('cls' if os.name == 'nt' else 'clear')
-    ampersandIO.printMessage(get_ampersand_header())
-    project.set_project_directory(ampersandPrimitives.ask_for_directory())
-    project_name = ampersandIO.get_input("Enter the project name: ")
+    SplashCaseCreatorIO.printMessage(get_SplashCaseCreator_header())
+    project.set_project_directory(SplashCaseCreatorPrimitives.ask_for_directory())
+    project_name = SplashCaseCreatorIO.get_input("Enter the project name: ")
     project.set_project_name(project_name)
     #user_name = input("Enter the user name: ")
     #project.set_user_name(user_name)
     project.create_project_path()
-    ampersandIO.printMessage("Creating the project")
-    ampersandIO.printMessage(f"Project path: {project.project_path}")
-    #project.project_path = r"C:\Users\Ridwa\Desktop\CFD\ampersandTests\drivAer2"
+    SplashCaseCreatorIO.printMessage("Creating the project")
+    SplashCaseCreatorIO.printMessage(f"Project path: {project.project_path}")
+    #project.project_path = r"C:\Users\Ridwa\Desktop\CFD\SplashCaseCreatorTests\drivAer2"
     project.create_project()
     project.create_settings()
-    yN = ampersandIO.get_input("Add STL file to the project (y/N)?: ")
+    yN = SplashCaseCreatorIO.get_input("Add STL file to the project (y/N)?: ")
     while yN.lower() == 'y':
         project.add_stl_file()
-        yN = ampersandIO.get_input("Add another STL file to the project (y/N)?: ")
+        yN = SplashCaseCreatorIO.get_input("Add another STL file to the project (y/N)?: ")
     project.add_stl_to_project()
     # Before creating the project files, the settings are flushed to the project_settings.yaml file
     project.list_stl_files()
@@ -1329,8 +1329,8 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        ampersandIO.printMessage("\nKeyboardInterrupt detected! Aborting project creation")
+        SplashCaseCreatorIO.printMessage("\nKeyboardInterrupt detected! Aborting project creation")
         exit()
     except Exception as error:
-        ampersandIO.printError(error)
+        SplashCaseCreatorIO.printError(error)
         exit()

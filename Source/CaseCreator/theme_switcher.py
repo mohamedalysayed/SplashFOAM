@@ -112,6 +112,21 @@ def apply_theme_dialog_boxes(window, dark_mode):
             color: #ECEFF4;
             border: 1px solid #4C566A;
         }
+        QTabWidget {
+            background-color: #3B4252;
+            color: #000000;  
+            border: 1px solid #4C566A;
+        }
+        QTabWidget::pane {
+            background-color: #3B4252;
+            color: #ECEFF4;
+            border: #4C566A;
+        }
+        QTabBar::tab {
+            background-color: #3B4252;
+            color: #000000; 
+            #border: 3px solid #000000;
+        }
         """
         window.setStyleSheet(dark_stylesheet)
 
@@ -138,6 +153,11 @@ def apply_theme_dialog_boxes(window, dark_mode):
             border: 1px solid #CCCCCC;
         }
         QListWidget {
+            background-color: #FFFFFF;
+            color: #000000;
+            border: 1px solid #CCCCCC;
+        }
+        QTabWidget {
             background-color: #FFFFFF;
             color: #000000;
             border: 1px solid #CCCCCC;

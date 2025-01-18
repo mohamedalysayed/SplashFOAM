@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -20,9 +20,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-from project import ampersandProject
-from primitives import ampersandPrimitives, ampersandIO
-from headers import get_ampersand_header
+from project import SplashCaseCreatorProject
+from primitives import SplashCaseCreatorPrimitives, SplashCaseCreatorIO
+from headers import get_SplashCaseCreator_header
 import os
 
 # this code is to watch the simulation convergence
@@ -185,22 +185,22 @@ def watch_residuals_live(logfile, interval=500):
 
             
 def watch_sim():
-    project = ampersandProject()
+    project = SplashCaseCreatorProject()
     # Clear the screen
     os.system('cls' if os.name == 'nt' else 'clear')
-    ampersandIO.printMessage(get_ampersand_header())
-    ampersandIO.printMessage("Please select the project directory to open")
-    projectFound = project.set_project_path(ampersandPrimitives.ask_for_directory())
-    ampersandIO.printMessage(f"Project path: {project.project_path}")
+    SplashCaseCreatorIO.printMessage(get_SplashCaseCreator_header())
+    SplashCaseCreatorIO.printMessage("Please select the project directory to open")
+    projectFound = project.set_project_path(SplashCaseCreatorPrimitives.ask_for_directory())
+    SplashCaseCreatorIO.printMessage(f"Project path: {project.project_path}")
     if projectFound==-1:
-        ampersandIO.printError("No project found. Exiting the program")
+        SplashCaseCreatorIO.printError("No project found. Exiting the program")
         return -1
-    ampersandIO.printMessage("Loading the project")
+    SplashCaseCreatorIO.printMessage("Loading the project")
     project.go_inside_directory()
     
     project.load_settings()
     project.check_0_directory()
-    ampersandIO.printMessage("Project loaded successfully")
+    SplashCaseCreatorIO.printMessage("Project loaded successfully")
     project.summarize_project()
     if project.check_log_files():
         watch_residuals('log.simpleFoam')

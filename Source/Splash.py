@@ -411,8 +411,8 @@ class Splash:
     
     def case_creator(self):
         """Launch the Case Creator GUI built with PySide."""
-        # Script path for ampersand_gui.py
-        script_path = os.path.abspath(os.path.join("CaseCreator", "ampersand_gui.py"))
+        # Script path for SplashCaseCreator
+        script_path = os.path.abspath(os.path.join("CaseCreator", "SplashCaseCreator_gui.py"))
 
         try:
             print(f"Launching Case Creator at: {script_path}")

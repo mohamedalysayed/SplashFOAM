@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -18,7 +18,7 @@
 """
 
 from constants import meshSettings
-from primitives import ampersandPrimitives
+from primitives import SplashCaseCreatorPrimitives
 def generate_snappyHexMeshDict(meshSettings):
     """
     Create a snappyHexMeshDict for OpenFOAM.
@@ -33,7 +33,7 @@ def generate_snappyHexMeshDict(meshSettings):
     """
     snappyHexMeshDict = f""
     trueFalse = {True: "true", False: "false"}
-    header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="snappyHexMeshDict")
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="dictionary", objectName="snappyHexMeshDict")
 
     steps = f"""
 castellatedMesh {meshSettings['snappyHexSteps']['castellatedMesh']};
@@ -325,7 +325,7 @@ def write_snappyHexMeshDict(snappyHexMeshDict):
    
 # Example usage
 if __name__ == "__main__":
-    meshSettings = ampersandPrimitives.yaml_to_dict("meshSettings.yaml")
+    meshSettings = SplashCaseCreatorPrimitives.yaml_to_dict("meshSettings.yaml")
 
 
     snappy_hex_mesh_dict_content = generate_snappyHexMeshDict(meshSettings)

@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -18,10 +18,10 @@
 """
 
 from constants import numericalSettings, solverSettings
-from primitives import ampersandPrimitives
+from primitives import SplashCaseCreatorPrimitives
 
 def create_algorithmDict(numericalSettings):
-    #header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="pimpleDict")
+    #header = SplashCaseCreatorPrimitives.createFoamHeader(className="dictionary", objectName="pimpleDict")
     algorithmDict = f""
     algorithmDict += f"""
 PIMPLE
@@ -132,7 +132,7 @@ def create_solverFinalDict(solverSettings,solverName="U"):
     return solverDict
 
 def create_fvSolutionDict(numericalSettings,solverSettings):
-    header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="fvSolution")
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="dictionary", objectName="fvSolution")
     fvSolutionDict = f""+header
     fvSolutionDict += f"""
 solvers
@@ -148,7 +148,7 @@ solvers
     return fvSolutionDict
 
 def create_fvSchemesDict(numericalSettings):
-    header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="fvSchemes")
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="dictionary", objectName="fvSchemes")
     fvSchemesDict = f""+header
     fvSchemesDict += f"""
 ddtSchemes

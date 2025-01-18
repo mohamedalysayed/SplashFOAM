@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -269,8 +269,8 @@ def get_word(word):
         output += "\n"
     return output
 
-def get_ampersand_header():
-    word = get_word("ampersand")
+def get_SplashCaseCreator_header():
+    word = get_word("SplashCaseCreator")
     output = "-------------------------------------------------------------------------------\n"
     output += word
     output += "-------------------------------------------------------------------------------\n"
@@ -279,6 +279,6 @@ def get_ampersand_header():
 
 if __name__ == '__main__':
     output = "-------------------------------------------------------------------------------\n"
-    output += get_ampersand_header()
+    output += get_SplashCaseCreator_header()
     output += "-------------------------------------------------------------------------------\n"
     print(output)

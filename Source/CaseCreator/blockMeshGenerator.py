@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -18,10 +18,10 @@
 """
 
 from constants import meshSettings
-from primitives import ampersandPrimitives
+from primitives import SplashCaseCreatorPrimitives
 
 def generate_blockMeshDict(meshSettings):
-    header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="blockMeshDict")
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="dictionary", objectName="blockMeshDict")
     blockMeshDict = header+f"""
 
 // ********* Domain *********
@@ -75,7 +75,7 @@ mergePatchPairs
 # Generate blockMeshDict
 # read in data to meshSettings from meshSettings.yaml
 if __name__ == "__main__":
-    meshSettings = ampersandPrimitives.yaml_to_dict("meshSettings.yaml")
+    meshSettings = SplashCaseCreatorPrimitives.yaml_to_dict("meshSettings.yaml")
     blockMeshDict = generate_blockMeshDict(meshSettings)
 
     # Save to file

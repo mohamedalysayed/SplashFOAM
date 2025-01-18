@@ -709,6 +709,20 @@ class VTKManager:
                 break
         self.render_all()
 
+    def remove_stl(self,stl_file):
+        """
+        Removes an actor from the renderer by its assigned name.
+        :param name: Name of the actor to remove.
+        """
+        actors = self.renderer.GetActors()
+        actors.InitTraversal()
+        for _ in range(actors.GetNumberOfItems()):
+            actor = actors.GetNextActor()
+            if actor.GetObjectName() == stl_file:
+                self.renderer.RemoveActor(actor)
+                break
+        self.render_all()
+
     def render_stl(self, stl_file, color=(0.5, 0.5, 0.5)):
         """
         Renders an STL file in the VTK renderer and rescales the axes.

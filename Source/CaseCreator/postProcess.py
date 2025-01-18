@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -17,7 +17,7 @@
  */
 """
 
-from primitives import ampersandPrimitives, ampersandIO
+from primitives import SplashCaseCreatorPrimitives, SplashCaseCreatorIO
 from constants import meshSettings, postProcessSettings
 
 class postProcess:
@@ -153,7 +153,7 @@ streamLines
     
     @staticmethod
     def get_probe_location():
-        probeLocation = ampersandIO.get_input_vector("Enter probe location (x y z): ")
+        probeLocation = SplashCaseCreatorIO.get_input_vector("Enter probe location (x y z): ")
         return probeLocation
     
     @staticmethod

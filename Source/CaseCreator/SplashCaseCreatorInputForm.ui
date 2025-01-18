@@ -698,6 +698,9 @@ background-color: rgb(170, 255, 255);</string>
        <height>411</height>
       </rect>
      </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
     </widget>
     <widget class="QPushButton" name="pushButtonUpList">
      <property name="geometry">

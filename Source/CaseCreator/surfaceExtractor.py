@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -18,11 +18,11 @@
 """
 
 import yaml
-from primitives import ampersandPrimitives
+from primitives import SplashCaseCreatorPrimitives
 from constants import meshSettings
 
 def create_surfaceFeatureExtractDict(meshSettings):
-    header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="surfaceFeatureExtractDict")
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="dictionary", objectName="surfaceFeatureExtractDict")
     surfaceFeatureExtractDict = f""+header
     for anEntry in meshSettings['geometry']:
         if anEntry['type'] == 'triSurfaceMesh':
@@ -45,7 +45,7 @@ def create_surfaceFeatureExtractDict(meshSettings):
 
 
 if __name__ == "__main__":
-    meshSettings = ampersandPrimitives.yaml_to_dict('meshSettings.yaml')
+    meshSettings = SplashCaseCreatorPrimitives.yaml_to_dict('meshSettings.yaml')
     surfaceFeatureExtractDict = create_surfaceFeatureExtractDict(meshSettings)
     #print(surfaceFeatureExtractDict)
     with open('surfaceFeatureExtractDict', 'w') as file:

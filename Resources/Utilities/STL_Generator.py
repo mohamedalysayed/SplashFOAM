@@ -218,17 +218,17 @@ class ShapeSTLApp(QWidget):
             self.width_input = QLineEdit()
             self.length_input = QLineEdit()
             self.height_input = QLineEdit()
-            self.inputs_layout.addRow("Width (mm):", self.width_input)
-            self.inputs_layout.addRow("Length (mm):", self.length_input)
-            self.inputs_layout.addRow("Height (mm):", self.height_input)
+            self.inputs_layout.addRow("Width (m):", self.width_input)
+            self.inputs_layout.addRow("Length (m):", self.length_input)
+            self.inputs_layout.addRow("Height (m):", self.height_input)
         elif shape == "Cylinder":
             self.radius_input = QLineEdit()
             self.height_input = QLineEdit()
-            self.inputs_layout.addRow("Radius (mm):", self.radius_input)
-            self.inputs_layout.addRow("Height (mm):", self.height_input)
+            self.inputs_layout.addRow("Radius (m):", self.radius_input)
+            self.inputs_layout.addRow("Height (m):", self.height_input)
         elif shape == "Sphere":
             self.radius_input = QLineEdit()
-            self.inputs_layout.addRow("Radius (mm):", self.radius_input)
+            self.inputs_layout.addRow("Radius (m):", self.radius_input)
 
     def generate_stl(self):
         shape = self.shape_selector.currentText()

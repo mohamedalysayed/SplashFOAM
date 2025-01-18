@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -22,7 +22,7 @@
 # This is an early version of the script and will be updated in the future.
 # Brute force writing is used instead of a more elegant solution.
 #import yaml
-from primitives import ampersandPrimitives, ampersandIO
+from primitives import SplashCaseCreatorPrimitives, SplashCaseCreatorIO
 from constants import meshSettings, boundaryConditions, inletValues
 from stlAnalysis import stlAnalysis
 
@@ -66,9 +66,9 @@ def write_vector_boundary_condition(patch="inlet1", purpose="inlet", property=No
     return bc
 
 def create_scalar_file(meshSettings,boundaryConditions,objName="k",dimensions=(0,2,-2)):
-    header = ampersandPrimitives.createFoamHeader(className="volScalarField", objectName=objName)
-    dims = ampersandPrimitives.createDimensions(M=dimensions[0],L=dimensions[1],T=dimensions[2])
-    internalField = ampersandPrimitives.createInternalFieldScalar(type="uniform", value=0.0)
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="volScalarField", objectName=objName)
+    dims = SplashCaseCreatorPrimitives.createDimensions(M=dimensions[0],L=dimensions[1],T=dimensions[2])
+    internalField = SplashCaseCreatorPrimitives.createInternalFieldScalar(type="uniform", value=0.0)
     s_file = f""+header+dims+internalField+"\n"+"""\nboundaryField 
 {"""
 
@@ -168,9 +168,9 @@ def write_pressure_boundary_condition(patch="inlet1", purpose="inlet",
 
 
 def create_u_file(meshSettings,boundaryConditions):
-    header = ampersandPrimitives.createFoamHeader(className="volVectorField", objectName="U")
-    dims = ampersandPrimitives.createDimensions(M=0,L=1,T=-1)
-    internalField = ampersandPrimitives.createInternalFieldVector(type="uniform", value=boundaryConditions['velocityInlet']['u_value'])
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="volVectorField", objectName="U")
+    dims = SplashCaseCreatorPrimitives.createDimensions(M=0,L=1,T=-1)
+    internalField = SplashCaseCreatorPrimitives.createInternalFieldVector(type="uniform", value=boundaryConditions['velocityInlet']['u_value'])
     U_file = f""+header+dims+internalField+"\n"+"""\nboundaryField 
 {"""
 
@@ -206,9 +206,9 @@ def create_omega_file(meshSettings,boundaryConditions):
     return omega_file
 
 def create_nut_file(meshSettings,boundaryConditions=None):
-    header = ampersandPrimitives.createFoamHeader(className="volScalarField", objectName="nut")
-    dims = ampersandPrimitives.createDimensions(M=0,L=2,T=-1)
-    internalField = ampersandPrimitives.createInternalFieldScalar(type="calculated", value=0.0)
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="volScalarField", objectName="nut")
+    dims = SplashCaseCreatorPrimitives.createDimensions(M=0,L=2,T=-1)
+    internalField = SplashCaseCreatorPrimitives.createInternalFieldScalar(type="calculated", value=0.0)
     nut_file = f""+header+dims+internalField+"\n"+"""\nboundaryField 
 {"""
 
@@ -261,14 +261,14 @@ def create_boundary_conditions(meshSettings, boundaryConditions):
     #print(p_file)
     #print(u_file)
     #print("Creating boundary conditions files")
-    ampersandPrimitives.write_to_file("U", u_file)
+    SplashCaseCreatorPrimitives.write_to_file("U", u_file)
    
-    ampersandPrimitives.write_to_file("p", p_file)
+    SplashCaseCreatorPrimitives.write_to_file("p", p_file)
     
-    ampersandPrimitives.write_to_file("k", k_file)
+    SplashCaseCreatorPrimitives.write_to_file("k", k_file)
    
-    ampersandPrimitives.write_to_file("omega", omega_file)
+    SplashCaseCreatorPrimitives.write_to_file("omega", omega_file)
 
-    ampersandPrimitives.write_to_file("epsilon", epsilon_file)
+    SplashCaseCreatorPrimitives.write_to_file("epsilon", epsilon_file)
 
-    ampersandPrimitives.write_to_file("nut", nut_file)
+    SplashCaseCreatorPrimitives.write_to_file("nut", nut_file)

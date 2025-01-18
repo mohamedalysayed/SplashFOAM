@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -18,11 +18,11 @@
 """
 
 import yaml
-from primitives import ampersandPrimitives
+from primitives import SplashCaseCreatorPrimitives
 from constants import meshSettings, physicalProperties
 
 def create_transportPropertiesDict(transportProperties):
-    header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="transportProperties")
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="dictionary", objectName="transportProperties")
     transportPropertiesDict = f""+header
     transportProperties_ = f"""
 transportModel  Newtonian;
@@ -32,7 +32,7 @@ nu              nu [ 0 2 -1 0 0 0 0 ] {transportProperties['nu']};
     return transportPropertiesDict
 
 def create_turbulencePropertiesDict(turbulenceProperties):
-    header = ampersandPrimitives.createFoamHeader(className="dictionary", objectName="turbulenceProperties")
+    header = SplashCaseCreatorPrimitives.createFoamHeader(className="dictionary", objectName="turbulenceProperties")
     turbulenceModel = turbulenceProperties['turbulenceModel']
     if turbulenceModel == "laminar":
         turbulencePropertiesDict = f""+header

@@ -4,9 +4,9 @@ import os
 from time import sleep # maybe this line can be deleted
 import time
 
-# Connection to the Ampersand Backend
-from project import ampersandProject
-from primitives import ampersandPrimitives, ampersandIO
+# Connection to the SplashCaseCreator Backend
+from project import SplashCaseCreatorProject
+from primitives import SplashCaseCreatorPrimitives, SplashCaseCreatorIO
 
 #Importing separate classes and functions
 from vtk_manager import VTKManager
@@ -24,9 +24,9 @@ from PySide6.QtCore import Qt
 from PySide6 import QtWidgets
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from dialogBoxes import sphereDialogDriver, yesNoDialogDriver, yesNoCancelDialogDriver
-from dialogBoxes import vectorInputDialogDriver, STLDialogDriver, physicalPropertiesDialogDriver
+from dialogBoxes import vectorInputDialogDriver, STLDialogDriver, physicalModelsDialogDriver
 from dialogBoxes import boundaryConditionDialogDriver, numericsDialogDriver, controlsDialogDriver
-from dialogBoxes import set_src, meshPointDialogDriver
+from dialogBoxes import set_src, meshPointDialogDriver,postProcessDialogDriver
 from dialogBoxes import global_darkmode, set_global_darkmode
 
 # VTK Libraries
@@ -45,10 +45,7 @@ from vtkmodules.vtkRenderingCore import (
     vtkRenderWindowInteractor,
     vtkRenderer
 )
-# End of VTK Libraries
 
-
-#os.chdir(r"C:\Users\Ridwa\Desktop\CFD\01_CFD_Software_Development\ampersandCFD\src")
 # get the absolute path of the current directory
 src = os.path.dirname(os.path.abspath(__file__))
 
@@ -194,7 +191,7 @@ class mainWindow(QMainWindow):
 
     def load_ui(self):
         loader = QUiLoader()
-        ui_path = os.path.join(src, "ampersandInputForm.ui")
+        ui_path = os.path.join(src, "SplashCaseCreatorInputForm.ui")
         ui_file = QFile(ui_path)
         ui_file.open(QFile.ReadOnly)
         self.window = loader.load(ui_file, None)
@@ -218,6 +215,9 @@ class mainWindow(QMainWindow):
         
         # Initialize VTKManager
         self.vtk_manager = VTKManager(self.ren, self.vtkWidget)
+
+        # Change Steady/Transient button into toggle button
+        self.window.pushButtonSteadyTransient.setCheckable(True)
         
         # Prepare sub-windows and event connections
         self.prepare_subWindows()
@@ -272,6 +272,14 @@ class mainWindow(QMainWindow):
         #print(f"Global Dark Mode: {global_darkmode}")
         apply_theme(self.window, self.vtk_manager, dark_mode)
         
+        # Update color for property table
+        if dark_mode:
+            print("Dark mode selected")
+            self.window.tableViewProperties.horizontalHeader().setStyleSheet("color: black")
+        else:
+            print("Light mode selected")
+            self.window.tableViewProperties.horizontalHeader().setStyleSheet("color: black")
+        
 
     # FLAG! For that purpose is this?    
     def __del__(self):
@@ -291,7 +299,7 @@ class mainWindow(QMainWindow):
         self.createCaseWindow = None
     
     def loadSTL(self,stlFile = r"C:\Users\mrtha\Desktop\GitHub\foamAutoGUI\src\pipe.stl"):
-        ampersandIO.printMessage("Loading STL file")
+        SplashCaseCreatorIO.printMessage("Loading STL file")
         stl_name = stlFile.split("/")[-1]
         if(stl_name in self.surfaces):
             self.updateStatusBar("STL file already loaded")
@@ -344,10 +352,10 @@ class mainWindow(QMainWindow):
 
             # Unpack STL properties
             purpose, refMin, refMax, featureEdges, featureLevel, nLayers, property, bounds = stl_properties
-            print(f"STL Properties for {self.current_stl_file}:")
-            print(f"Purpose: {purpose}, RefMin: {refMin}, RefMax: {refMax}")
-            print(f"FeatureEdges: {featureEdges}, FeatureLevel: {featureLevel}")
-            print(f"nLayers: {nLayers}, Property: {property}, Bounds: {bounds}")
+            #print(f"STL Properties for {self.current_stl_file}:")
+            #print(f"Purpose: {purpose}, RefMin: {refMin}, RefMax: {refMax}")
+            #print(f"FeatureEdges: {featureEdges}, FeatureLevel: {featureLevel}")
+            #print(f"nLayers: {nLayers}, Property: {property}, Bounds: {bounds}")
             
             # Update the property box with the retrieved properties
             self.window.tableViewProperties.clearContents()
@@ -368,11 +376,22 @@ class mainWindow(QMainWindow):
             
             # Additional rows for other properties
             additional_row = 4
-            self.window.tableViewProperties.setRowCount(additional_row + 2)
+            self.window.tableViewProperties.setRowCount(additional_row + 8)
             self.window.tableViewProperties.setItem(additional_row, 0, QtWidgets.QTableWidgetItem("Number of Layers"))
             self.window.tableViewProperties.setItem(additional_row, 1, QtWidgets.QTableWidgetItem(str(nLayers)))
-            self.window.tableViewProperties.setItem(additional_row + 1, 0, QtWidgets.QTableWidgetItem("Bounds"))
-            self.window.tableViewProperties.setItem(additional_row + 1, 1, QtWidgets.QTableWidgetItem(str(bounds)))
+            self.window.tableViewProperties.setItem(additional_row + 1, 0, QtWidgets.QTableWidgetItem("Min X"))
+            self.window.tableViewProperties.setItem(additional_row + 1, 1, QtWidgets.QTableWidgetItem(f"{bounds[0]:.2f}"))
+            self.window.tableViewProperties.setItem(additional_row + 2, 0, QtWidgets.QTableWidgetItem("Max X"))
+            self.window.tableViewProperties.setItem(additional_row + 2, 1, QtWidgets.QTableWidgetItem(f"{bounds[1]:.2f}"))
+            self.window.tableViewProperties.setItem(additional_row + 3, 0, QtWidgets.QTableWidgetItem("Min Y")) 
+            self.window.tableViewProperties.setItem(additional_row + 3, 1, QtWidgets.QTableWidgetItem(f"{bounds[2]:.2f}")) 
+            self.window.tableViewProperties.setItem(additional_row + 4, 0, QtWidgets.QTableWidgetItem("Max Y")) 
+            self.window.tableViewProperties.setItem(additional_row + 4, 1, QtWidgets.QTableWidgetItem(f"{bounds[3]:.2f}")) 
+            self.window.tableViewProperties.setItem(additional_row + 5, 0, QtWidgets.QTableWidgetItem("Min Z")) 
+            self.window.tableViewProperties.setItem(additional_row + 5, 1, QtWidgets.QTableWidgetItem(f"{bounds[4]:.2f}"))
+            self.window.tableViewProperties.setItem(additional_row + 6, 0, QtWidgets.QTableWidgetItem("Max Z")) 
+            self.window.tableViewProperties.setItem(additional_row + 6, 1, QtWidgets.QTableWidgetItem(f"{bounds[5]:.2f}"))
+
 
         except Exception as e:
             print(f"Error in listClicked: {e}")
@@ -606,7 +625,7 @@ class mainWindow(QMainWindow):
         for stl in stlList[0]:
             status = self.project.add_one_stl_file(stl)
             if status==-1:
-                ampersandIO.printError(f"STL file {stl} not loaded",GUIMode=True,window=self)
+                SplashCaseCreatorIO.printError(f"STL file {stl} not loaded",GUIMode=True,window=self)
                 #return
             self.project.add_stl_to_project()
             self.vtk_manager.showSTL(stlFile=stl)
@@ -620,41 +639,21 @@ class mainWindow(QMainWindow):
         idx = self.window.listWidgetObjList.row(item)
         stl = item.text()
         self.project.remove_stl_file_by_name(stl)
+        self.vtk_manager.remove_stl(stl)
         self.update_list()
         self.readyStatusBar()
 
     def createSphere(self):
-        ampersandIO.printMessage("Creating Sphere",GUIMode=True,window=self)
+        SplashCaseCreatorIO.printMessage("Creating Sphere",GUIMode=True,window=self)
         # create a sphere dialog
         sphereData = sphereDialogDriver()
         if sphereData == None:
-            ampersandIO.printError("Sphere Dialog Box Closed",GUIMode=True)
+            SplashCaseCreatorIO.printError("Sphere Dialog Box Closed",GUIMode=True)
         else:
             x,y,z,r = sphereData
             print("Center: ",x,y,z)
             print("Radius: ",r)
-        self.readyStatusBar()
-
-##    def resizeEvent(self, event):
-##        terminalHeight = 302
-##        vtkWidgetWidth = self.window.width()-560
-##        vtkWidgetHeight = self.window.height()-terminalHeight-20
-##        terminalX = self.window.widget.pos().x()
-##        terminalY = self.window.widget.pos().y()+vtkWidgetHeight+10
-##        terminalWidth = vtkWidgetWidth
-##        
-##        self.window.widget.resize(vtkWidgetWidth,vtkWidgetHeight)
-##        self.vtkWidget.resize(vtkWidgetWidth,vtkWidgetHeight)
-##        self.vtkWidget.GetRenderWindow().Render()
-##        self.window.plainTextTerminal.resize(self.window.width()-560,self.window.plainTextTerminal.height())
-##       
-##        self.window.plainTextTerminal.move(terminalX,terminalY)
-##        self.window.plainTextTerminal.resize(terminalWidth,terminalHeight-20)
-##        self.window.plainTextTerminal.update()
-##        self.window.plainTextTerminal.repaint()
-##        self.readyStatusBar()
-
-    
+        self.readyStatusBar()   
 
     def resizeEvent(self, event):
         """
@@ -703,12 +702,18 @@ class mainWindow(QMainWindow):
         buttonText = self.window.pushButtonSteadyTransient.text()
         if buttonText=="Steady-State":
             self.window.pushButtonSteadyTransient.setText("Transient")
-            ampersandIO.printMessage("Transient Flow Selected",GUIMode=True,window=self)
+            SplashCaseCreatorIO.printMessage("Transient Flow Selected",GUIMode=True,window=self)
             self.project.transient = True
+            # this is to ensure that the ddtSchemes is set to Euler if the current value is steadyState
+            if self.project.numericalSettings['ddtSchemes']['default'] == "steadyState":
+                self.project.numericalSettings['ddtSchemes'] = "Euler"
         else:
             self.window.pushButtonSteadyTransient.setText("Steady-State")
-            ampersandIO.printMessage("Steady-State Flow Selected",GUIMode=True,window=self)
+            SplashCaseCreatorIO.printMessage("Steady-State Flow Selected",GUIMode=True,window=self)
             self.project.transient = False
+            # this is to ensure that the ddtSchemes is set to steadyState if the current value is not steadyState
+            if self.project.numericalSettings['ddtSchemes']['default'] != "steadyState":
+                self.project.numericalSettings['ddtSchemes'] = "steadyState"
         self.project.set_transient_settings()
         self.readyStatusBar()
 
@@ -728,7 +733,7 @@ class mainWindow(QMainWindow):
         self.project.meshSettings['onGround'] = self.window.checkBoxOnGround.isChecked()
         self.project.onGround = self.window.checkBoxOnGround.isChecked()
         self.updateStatusBar("Choosing External Flow")
-        sleep(0.001)
+        #sleep(0.001)
         self.readyStatusBar()
 
     def createCase(self):
@@ -758,25 +763,25 @@ class mainWindow(QMainWindow):
         # clear the list widget
         self.window.listWidgetObjList.clear()
         self.project = None # clear the project
-        self.project = ampersandProject(GUIMode=True,window=self)
+        self.project = SplashCaseCreatorProject(GUIMode=True,window=self)
         
-        self.project.set_project_directory(ampersandPrimitives.ask_for_directory(qt=True))
+        self.project.set_project_directory(SplashCaseCreatorPrimitives.ask_for_directory(qt=True))
         if self.project.project_directory_path == None:
-            ampersandIO.printMessage("No project directory selected.",GUIMode=True,window=self)
+            SplashCaseCreatorIO.printMessage("No project directory selected.",GUIMode=True,window=self)
             self.updateTerminal("Canceled creating new case")
             self.readyStatusBar()
             return
-        project_name = ampersandIO.get_input("Enter the project name: ",GUIMode=True)
+        project_name = SplashCaseCreatorIO.get_input("Enter the project name: ",GUIMode=True)
         if project_name == None:
-            ampersandIO.printError("Project Name not entered",GUIMode=True)
+            SplashCaseCreatorIO.printError("Project Name not entered",GUIMode=True)
             self.updateTerminal("Canceled creating new case")
             self.readyStatusBar()
             return
         self.project.set_project_name(project_name)
         
         self.project.create_project_path()
-        ampersandIO.printMessage("Creating the project",GUIMode=True,window=self)
-        ampersandIO.printMessage(f"Project path: {self.project.project_path}",GUIMode=True,window=self)
+        SplashCaseCreatorIO.printMessage("Creating the project",GUIMode=True,window=self)
+        SplashCaseCreatorIO.printMessage(f"Project path: {self.project.project_path}",GUIMode=True,window=self)
         self.project.create_project()
         self.project.create_settings()
         
@@ -785,7 +790,7 @@ class mainWindow(QMainWindow):
         self.enableButtons()
         self.readyStatusBar()
         self.project_opened = True
-        ampersandIO.printMessage(f"Project {project_name} created",GUIMode=True,window=self)
+        SplashCaseCreatorIO.printMessage(f"Project {project_name} created",GUIMode=True,window=self)
         
         # change window title
         self.setWindowTitle(f"Case Creator: {project_name}")
@@ -842,26 +847,26 @@ class mainWindow(QMainWindow):
         self.ren.RemoveAllViewProps()
 
         # Reset the project
-        self.project = ampersandProject(GUIMode=True, window=self)
+        self.project = SplashCaseCreatorProject(GUIMode=True, window=self)
         self.window.listWidgetObjList.clear()  # Clear the object list
 
-        project_found = self.project.set_project_path(ampersandPrimitives.ask_for_directory(qt=True))
+        project_found = self.project.set_project_path(SplashCaseCreatorPrimitives.ask_for_directory(qt=True))
         if project_found == -1:
-            ampersandIO.printWarning("No project found. Failed to open case directory.", GUIMode=True)
+            SplashCaseCreatorIO.printWarning("No project found. Failed to open case directory.", GUIMode=True)
             self.updateTerminal("No project found. Failed to open case directory.")
             self.readyStatusBar()
             # reset the background by adding initial grid
             self.vtk_manager.add_initial_grid()
             return -1
 
-        ampersandIO.printMessage(f"Project path: {self.project.project_path}", GUIMode=True, window=self)
-        ampersandIO.printMessage("Loading the project", GUIMode=True, window=self)
+        SplashCaseCreatorIO.printMessage(f"Project path: {self.project.project_path}", GUIMode=True, window=self)
+        SplashCaseCreatorIO.printMessage("Loading the project", GUIMode=True, window=self)
 
         # Load settings and validate the case structure
         self.project.go_inside_directory()
         self.project.load_settings()
         self.project.check_0_directory()
-        ampersandIO.printMessage("Project loaded successfully", GUIMode=True, window=self)
+        SplashCaseCreatorIO.printMessage("Project loaded successfully", GUIMode=True, window=self)
 
         # Render all STL files in the case
         stl_file_paths = self.project.list_stl_paths()
@@ -889,10 +894,9 @@ class mainWindow(QMainWindow):
         # Update window title and status
         self.project_opened = True
         self.setWindowTitle(f"Case Creator: {self.project.project_name}")
-        ampersandIO.printMessage(f"Project {self.project.project_name} opened", GUIMode=True, window=self)
+        SplashCaseCreatorIO.printMessage(f"Project {self.project.project_name} opened", GUIMode=True, window=self)
         self.readyStatusBar()
     
-
     # Generate a case of the current config. 
     def generateCase(self):
         self.updateStatusBar("Analyzing Case")
@@ -980,11 +984,11 @@ class mainWindow(QMainWindow):
         ny = int(self.window.lineEdit_nY.text())
         nz = int(self.window.lineEdit_nZ.text())
         if(nx<=0 or ny<=0 or nz<=0):
-            ampersandIO.printError("Invalid Domain Size",GUIMode=True)
+            SplashCaseCreatorIO.printError("Invalid Domain Size",GUIMode=True)
             self.readyStatusBar()
             return
         if(minx>maxx or miny>maxy or minz>maxz):
-            ampersandIO.printError("Invalid Domain Size",GUIMode=True)
+            SplashCaseCreatorIO.printError("Invalid Domain Size",GUIMode=True)
             self.readyStatusBar()
             return
         self.project.meshSettings['domain']['minx'] = minx
@@ -1018,7 +1022,7 @@ class mainWindow(QMainWindow):
         # update the properties
         status = self.project.set_stl_properties(stl,stlProperties)
         if status==-1:
-            ampersandIO.printError("STL Properties not updated",GUIMode=True)   
+            SplashCaseCreatorIO.printError("STL Properties not updated",GUIMode=True)   
         else:
             #self.updateStatusBar(f"{stl}: Properties Updated")
             self.updateTerminal(f"{stl} Properties Updated")
@@ -1031,25 +1035,25 @@ class mainWindow(QMainWindow):
         cp = self.project.physicalProperties['Cp']
         turbulence_model = self.project.physicalProperties['turbulenceModel']
         fluid = self.project.physicalProperties['fluid']
-        initialProperties = (fluid,rho,nu,cp,turbulence_model)
+        initialProperties = (fluid,rho,nu,cp)
         
-        physicalProperties = physicalPropertiesDialogDriver(initialProperties)
+        physicalProperties = physicalModelsDialogDriver(initialProperties)
         if physicalProperties==None:
             return 
-        fluid,rho,nu,cp,turbulence_model = physicalProperties
+        fluid,rho,nu,cp = physicalProperties
         # update the project physical properties
-        ampersandIO.printMessage("Updating Physical Properties",GUIMode=True)
-        ampersandIO.printMessage(f"Updated Properties: {physicalProperties}",GUIMode=True,window=self)
+        SplashCaseCreatorIO.printMessage("Updating Physical Properties",GUIMode=True)
+        SplashCaseCreatorIO.printMessage(f"Updated Properties: {physicalProperties}",GUIMode=True,window=self)
         self.project.physicalProperties['fluid'] = fluid
         self.project.physicalProperties['rho'] = rho
         self.project.physicalProperties['nu'] = nu
         self.project.physicalProperties['Cp'] = cp
-        self.project.physicalProperties['turbulenceModel'] = turbulence_model
+        #self.project.physicalProperties['turbulenceModel'] = turbulence_model
 
     def boundaryConditionDialog(self):
         stl = self.project.get_stl(self.current_stl_file)
         if stl==None:
-            ampersandIO.printError("STL not found",GUIMode=True)
+            SplashCaseCreatorIO.printError("STL not found",GUIMode=True)
             return
         
         boundaryConditions = boundaryConditionDialogDriver(stl)
@@ -1059,16 +1063,17 @@ class mainWindow(QMainWindow):
         self.project.set_boundary_condition(self.current_stl_file,boundaryConditions)
 
     def numericsDialog(self):
-        self.current_mode,self.project.numericalSettings = numericsDialogDriver(self.current_mode,self.project.numericalSettings)  
+        self.current_mode,self.project.numericalSettings,turbulence_model = numericsDialogDriver(self.current_mode,self.project.numericalSettings,
+                                                                                                 self.project.physicalProperties['turbulenceModel'],
+                                                                                                 transient=self.project.transient)  
+        self.project.physicalProperties['turbulenceModel'] = turbulence_model
 
     def controlsDialog(self):
-        controls = controlsDialogDriver()
+        self.project.simulationSettings,self.project.parallelSettings = controlsDialogDriver(self.project.simulationSettings,self.project.parallelSettings,self.project.transient)
 
     
     def postProcessDialog(self):
-        print("Post Process Dialog")
-        pass
-        
+        postProcessDialogDriver()
 
     def summarizeProject(self):
         self.project.summarize_project()
@@ -1078,7 +1083,7 @@ class mainWindow(QMainWindow):
     def setMeshPoint(self):
         # open the mesh point dialog
         meshPoint = meshPointDialogDriver(self.project.get_location_in_mesh())
-        ampersandIO.printMessage("Mesh Point: ",meshPoint,GUIMode=True,window=self)
+        SplashCaseCreatorIO.printMessage("Mesh Point: ",meshPoint,GUIMode=True,window=self)
         if meshPoint==None:
             return
         

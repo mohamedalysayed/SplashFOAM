@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -18,10 +18,10 @@
 """
 
 #from constants import parallelSettings
-from primitives import ampersandPrimitives
+from primitives import SplashCaseCreatorPrimitives
 
 def createDecomposeParDict(parallelSettings):
-    decomposeParDict = ampersandPrimitives.createFoamHeader(className='dictionary', objectName='decomposeParDict')
+    decomposeParDict = SplashCaseCreatorPrimitives.createFoamHeader(className='dictionary', objectName='decomposeParDict')
     decomposeParDict += f"""
 numberOfSubdomains {parallelSettings['numberOfSubdomains']};
 method {parallelSettings['method']};

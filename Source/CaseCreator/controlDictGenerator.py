@@ -8,7 +8,7 @@
 *     *  *     *  *        *        *    *   *     *  *     *  *    **  *     *  
 *     *  *     *  *        *******  *     *   *****   *     *  *     *  ******   
 -------------------------------------------------------------------------------
- * AmpersandCFD is a minimalist streamlined OpenFOAM generation tool.
+ * SplashCaseCreator is a minimalist streamlined OpenFOAM generation tool.
  * Copyright (c) 2024 THAW TAR
  * All rights reserved.
  *
@@ -18,11 +18,11 @@
 """
 
 from constants import meshSettings, physicalProperties, numericalSettings, inletValues, boundaryConditions
-from primitives import ampersandPrimitives
+from primitives import SplashCaseCreatorPrimitives
 from constants import simulationSettings
 
 def createControlDict(simulationSettings):
-    controlDict = ampersandPrimitives.createFoamHeader(className='dictionary', objectName='controlDict')
+    controlDict = SplashCaseCreatorPrimitives.createFoamHeader(className='dictionary', objectName='controlDict')
     controlDict += f"""
 application     {simulationSettings['application']};
 startFrom       {simulationSettings['startFrom']};
