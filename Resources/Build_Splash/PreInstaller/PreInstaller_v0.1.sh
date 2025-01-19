@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Author: Mohamed Aly Sayed (muhammmedaly@gmail.com) 
+# Version: v0.1
 # Interactive installation script using Zenity ...
 # It installs the required CFD-related packages on Ubuntu!
 

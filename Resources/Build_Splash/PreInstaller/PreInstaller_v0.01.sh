@@ -1,4 +1,7 @@
 #!/bin/bash
+ 
+# Author: Mohamed Aly Sayed (muhammmedaly@gmail.com) 
+# Version: v0.01
 # Script to install the required CFD-related packages on Ubuntu
 
 echo "_________________________________________________________________________________"

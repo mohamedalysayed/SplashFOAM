@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Splash Pre-Installer Run Script 
-# Author: Mohamed A. Sayed 
-# Version: 0.2
+# Author: Mohamed Aly Sayed (muhammmedaly@gmail.com) 
+# Version: v0.2
 
 # Define required system and Python packages
 SYSTEM_PACKAGES=("python3" "python3-pip" "python3-setuptools" "python3-wheel" "gedit" "pipx" "gedit-plugins")

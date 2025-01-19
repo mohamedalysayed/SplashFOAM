@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Author: Mohamed Aly Sayed (muhammmedaly@gmail.com) 
+# Version: v0.2
 # Script to install the required CFD-related packages on Arch Linux
 
 echo "_________________________________________________________________________________"
