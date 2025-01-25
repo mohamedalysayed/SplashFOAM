@@ -362,7 +362,13 @@ from vtkmodules.vtkFiltersSources import vtkSphereSource, vtkCubeSource
 from vtkmodules.vtkRenderingAnnotation import vtkAxesActor
 from vtkmodules.vtkCommonColor import vtkNamedColors
 import os
+from enum import Enum
 
+# to store the vtk rendering mode
+class vtkMode(Enum):
+    VTK_WIREFRAME = 0
+    VTK_SURFACE = 1
+    VTK_EDGES = 2
 
 class VTKManager:
     """
@@ -615,6 +621,27 @@ class VTKManager:
                 else:
                     idx = stl_names.index(actor.GetObjectName())
                     actor.GetProperty().SetColor(colors.GetColor3d(self.listOfColors[idx % len(self.listOfColors)]))
+        self.render_all()
+
+    def highlight_boundary(self, boundary_name, boundary_names, colors, highlight_color=(1.0, 0.0, 1.0)):
+        """
+        Highlights a specific boundary based on its name.
+        """
+        actors = self.renderer.GetActors()
+        actors.InitTraversal()
+        for _ in range(actors.GetNumberOfItems()):
+            actor = actors.GetNextActor()
+            if actor.GetObjectName() in boundary_names:
+                if actor.GetObjectName() == boundary_name:
+                    actor.GetProperty().SetColor(*highlight_color)
+                else:
+                    
+                    idx = boundary_names.index(actor.GetObjectName())
+                    #print(f"Boundary names: {boundary_names}")
+                    #print(f"Boundary name: {boundary_name}")
+                    #print(f"Index: {idx}")
+                    # the color of the boundary is set to white
+                    actor.GetProperty().SetColor(colors.GetColor3d("White"))
         self.render_all()
 
     def draw_axes(self, char_len):
@@ -892,7 +919,286 @@ class VTKManager:
         # Add the grid actor to the renderer
         self.add_actor(actor)
         print(f"Initial grid added with spacing {grid_spacing} and size {grid_size}.")
-        
+
+    def add_x_grid(self, ny=10, nz=10, x=0, y1=-10, y2=10, z1=-10, z2=10, grid_name="XGrid", line_color=(0, 0, 0)):
+        """
+        Adds a grid in the X-direction to the VTK renderer.
+        :param ny: Number of grid lines in the Y-direction.
+        :param nz: Number of grid lines in the Z-direction.
+        :param x: X-coordinate of the grid.
+        :param y1: Start Y-coordinate of the grid.
+        :param y2: End Y-coordinate of the grid.
+        :param z1: Start Z-coordinate of the grid.
+        :param z2: End Z-coordinate of the grid.
+        :param grid_name: Name of the grid object for reference.
+        :param line_color: RGB tuple for the grid line color.
+        """
+        # Remove any existing grid with the same name
+        self.remove_actor_by_name(grid_name)
+
+        # Create grid lines in Y and Z directions
+        grid_lines = vtk.vtkPolyData()
+        points = vtk.vtkPoints()
+        lines = vtk.vtkCellArray()
+
+        # Generate grid points and lines
+        for i in range(ny + 1):
+            y = y1 + i * (y2 - y1) / ny
+            z = z1
+            points.InsertNextPoint(x, y, z)
+            z = z2
+            points.InsertNextPoint(x, y, z)
+            lines.InsertNextCell(2)
+            lines.InsertCellPoint(2 * i)
+            lines.InsertCellPoint(2 * i + 1)
+
+        for i in range(nz + 1):
+            y = y1
+            z = z1 + i * (z2 - z1) / nz
+            points.InsertNextPoint(x, y, z)
+            y = y2
+            points.InsertNextPoint(x, y, z)
+            lines.InsertNextCell(2)
+            lines.InsertCellPoint(2 * (i + ny + 1))
+            lines.InsertCellPoint(2 * (i + ny + 1) + 1)
+
+        # Set points and lines to the grid
+        grid_lines.SetPoints(points)
+        grid_lines.SetLines(lines)
+
+        # Create a mapper and actor for the grid
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputData(grid_lines)
+
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+        actor.GetProperty().SetColor(line_color)
+        actor.GetProperty().SetOpacity(1.0)
+        actor.GetProperty().SetLineWidth(1.0)
+        actor.SetObjectName(grid_name)
+
+        # Add the grid actor to the renderer
+        self.add_actor(actor)
+        #print(f"X-grid added at X={x} with {ny} lines in Y and {nz} lines in Z.")
+    
+    def add_y_grid(self, nx=10, nz=10, y=0, x1=-10, x2=10, z1=-10, z2=10, grid_name="YGrid", line_color=(0, 0, 0)):
+        """
+        Adds a grid in the Y-direction to the VTK renderer.
+        :param nx: Number of grid lines in the X-direction.
+        :param nz: Number of grid lines in the Z-direction.
+        :param y: Y-coordinate of the grid.
+        :param x1: Start X-coordinate of the grid.
+        :param x2: End X-coordinate of the grid.
+        :param z1: Start Z-coordinate of the grid.
+        :param z2: End Z-coordinate of the grid.
+        :param grid_name: Name of the grid object for reference.
+        :param line_color: RGB tuple for the grid line color.
+        """
+        # Remove any existing grid with the same name
+        self.remove_actor_by_name(grid_name)
+
+        # Create grid lines in X and Z directions
+        grid_lines = vtk.vtkPolyData()
+        points = vtk.vtkPoints()
+        lines = vtk.vtkCellArray()
+
+        # Generate grid points and lines
+        for i in range(nx + 1):
+            x = x1 + i * (x2 - x1) / nx
+            z = z1
+            points.InsertNextPoint(x, y, z)
+            z = z2
+            points.InsertNextPoint(x, y, z)
+            lines.InsertNextCell(2)
+            lines.InsertCellPoint(2 * i)
+            lines.InsertCellPoint(2 * i + 1)
+
+        for i in range(nz + 1):
+            x = x1
+            z = z1 + i * (z2 - z1) / nz
+            points.InsertNextPoint(x, y, z)
+            x = x2
+            points.InsertNextPoint(x, y, z)
+            lines.InsertNextCell(2)
+            lines.InsertCellPoint(2 * (i + nx + 1))
+            lines.InsertCellPoint(2 * (i + nx + 1) + 1)
+
+        # Set points and lines to the grid
+        grid_lines.SetPoints(points)
+        grid_lines.SetLines(lines)
+
+        # Create a mapper and actor for the grid
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputData(grid_lines)
+
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+        actor.GetProperty().SetColor(line_color)
+        actor.GetProperty().SetOpacity(1.0)
+        actor.GetProperty().SetLineWidth(1.0)
+        actor.SetObjectName(grid_name)
+
+        # Add the grid actor to the renderer
+        self.add_actor(actor)
+        #print(f"Y-grid added at Y={y} with {nx} lines in X and {nz} lines in Z.")
+
+    def add_z_grid(self, nx=10, ny=10, z=0, x1=-10, x2=10, y1=-10, y2=10, grid_name="ZGrid", line_color=(0, 0, 0)):
+        """
+        Adds a grid in the Z-direction to the VTK renderer.
+        :param nx: Number of grid lines in the X-direction.
+        :param ny: Number of grid lines in the Y-direction.
+        :param z: Z-coordinate of the grid.
+        :param x1: Start X-coordinate of the grid.
+        :param x2: End X-coordinate of the grid.
+        :param y1: Start Y-coordinate of the grid.
+        :param y2: End Y-coordinate of the grid.
+        :param grid_name: Name of the grid object for reference.
+        :param line_color: RGB tuple for the grid line color.
+        """
+        # Remove any existing grid with the same name
+        self.remove_actor_by_name(grid_name)
+
+        # Create grid lines in X and Y directions
+        grid_lines = vtk.vtkPolyData()
+        points = vtk.vtkPoints()
+        lines = vtk.vtkCellArray()
+
+        # Generate grid points and lines
+        for i in range(nx + 1):
+            x = x1 + i * (x2 - x1) / nx
+            y = y1
+            points.InsertNextPoint(x, y, z)
+            y = y2
+            points.InsertNextPoint(x, y, z)
+            lines.InsertNextCell(2)
+            lines.InsertCellPoint(2 * i)
+            lines.InsertCellPoint(2 * i + 1)
+
+        for i in range(ny + 1):
+            x = x1
+            y = y1 + i * (y2 - y1) / ny
+            points.InsertNextPoint(x, y, z)
+            x = x2
+            points.InsertNextPoint(x, y, z)
+            lines.InsertNextCell(2)
+            lines.InsertCellPoint(2 * (i + nx + 1))
+            lines.InsertCellPoint(2 * (i + nx + 1) + 1)
+
+        # Set points and lines to the grid
+        grid_lines.SetPoints(points)
+        grid_lines.SetLines(lines)
+
+        # Create a mapper and actor for the grid
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputData(grid_lines)
+
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+        actor.GetProperty().SetColor(line_color)
+        actor.GetProperty().SetOpacity(1.0)
+        actor.GetProperty().SetLineWidth(1.0)
+        actor.SetObjectName(grid_name)
+
+        # Add the grid actor to the renderer
+        self.add_actor(actor)
+        #print(f"Z-grid added at Z={z} with {nx} lines in X and {ny} lines in Y.")
+ 
+    def add_boundary_grid(self,grid_name="inlet",point1=(0,0,0),point2=(0,1,1),plane=0,nx=1,ny=10,nz=10,line_color=(1,1,1)):   
+        """
+        Adds a boundary grid to the VTK renderer.
+        :param grid_name: Name of the grid object for reference.
+        :param point1: First point of the boundary.
+        :param point2: Second point of the boundary.
+        :param plane: Plane of the boundary (0: X plane, 1: Y plane, 2: Z plane).
+        """
+        # Remove any existing grid with the same name
+        self.remove_actor_by_name(grid_name)
+
+        # Create grid lines in the specified plane
+        if plane == 0: # X-plane
+            self.add_x_grid(ny=ny, nz=nz, x=point1[0], y1=point1[1], y2=point2[1], z1=point1[2], z2=point2[2], grid_name=grid_name, line_color=line_color)
+        elif plane == 1: # Y-plane
+            self.add_y_grid(nx=nx, nz=nz, y=point1[1], x1=point1[0], x2=point2[0], z1=point1[2], z2=point2[2], grid_name=grid_name, line_color=line_color)
+        elif plane == 2: # Z-plane
+            self.add_z_grid(nx=nx, ny=ny, z=point1[2], x1=point1[0], x2=point2[0], y1=point1[1], y2=point2[1], grid_name=grid_name, line_color=line_color)
+        else:
+            print("Invalid plane for boundary grid. Must be 0, 1, or 2.")
+
+    # these are to add grids in the boundaries of the domain
+    def add_left_grid(self,domain_size):
+        minx,maxx,miny,maxy,minz,maxz,nx,ny,nz = domain_size
+        point1 = (minx,miny,minz)
+        point2 = (minx,maxy,maxz)
+        plane = 0 # X-plane
+        nx = 1
+        self.add_boundary_grid(grid_name="inlet",point1=point1,point2=point2,plane=plane,nx=nx,ny=ny,nz=nz)
+
+    def add_right_grid(self,domain_size):
+        minx,maxx,miny,maxy,minz,maxz,nx,ny,nz = domain_size
+        point1 = (maxx,miny,minz)
+        point2 = (maxx,maxy,maxz)
+        plane = 0
+        nx = 1
+        self.add_boundary_grid(grid_name="outlet",point1=point1,point2=point2,plane=plane,nx=nx,ny=ny,nz=nz)
+
+    def add_front_grid(self,domain_size):
+        minx,maxx,miny,maxy,minz,maxz,nx,ny,nz = domain_size
+        point1 = (minx,miny,minz)
+        point2 = (maxx,miny,maxz)
+        plane = 1
+        ny = 1
+        self.add_boundary_grid(grid_name="front",point1=point1,point2=point2,plane=plane,nx=nx,ny=ny,nz=nz)
+
+    def add_back_grid(self,domain_size):
+        minx,maxx,miny,maxy,minz,maxz,nx,ny,nz = domain_size
+        point1 = (minx,maxy,minz)
+        point2 = (maxx,maxy,maxz)
+        plane = 1
+        ny = 1
+        self.add_boundary_grid(grid_name="back",point1=point1,point2=point2,plane=plane,nx=nx,ny=ny,nz=nz)
+
+    def add_bottom_grid(self,domain_size):
+        minx,maxx,miny,maxy,minz,maxz,nx,ny,nz = domain_size
+        point1 = (minx,miny,minz)
+        point2 = (maxx,maxy,minz)
+        plane = 2
+        nz = 1
+        self.add_boundary_grid(grid_name="bottom",point1=point1,point2=point2,plane=plane,nx=nx,ny=ny,nz=nz)
+
+    def add_top_grid(self,domain_size):
+        minx,maxx,miny,maxy,minz,maxz,nx,ny,nz = domain_size
+        point1 = (minx,miny,maxz)
+        point2 = (maxx,maxy,maxz)
+        plane = 2
+        nz = 1
+        self.add_boundary_grid(grid_name="top",point1=point1,point2=point2,plane=plane,nx=nx,ny=ny,nz=nz)
+
+    def toggle_grids_visibility(self, visible):
+        """
+        Toggles the visibility of all grid actors in the renderer.
+        :param visible: Boolean indicating whether to show or hide the grids.
+        """
+        grid_names = ["inlet", "outlet", "front", "back", "bottom", "top"]
+        actors = self.renderer.GetActors()
+        actors.InitTraversal()
+        for _ in range(actors.GetNumberOfItems()):
+            actor = actors.GetNextActor()
+            if actor.GetObjectName() in grid_names:
+                actor.SetVisibility(visible)
+        self.render_all()
+
+    def hide_boundary_grids(self):
+        """
+        Hides all boundary grid actors in the renderer.
+        """
+        self.toggle_grids_visibility(False)
+    
+    def show_boundary_grids(self):
+        """
+        Shows all boundary grid actors in the renderer.
+        """
+        self.toggle_grids_visibility(True)
+
     def remove_initial_grid(self, grid_name="InitialGrid"):
         """
         Removes the initial grid from the renderer.
@@ -900,27 +1206,27 @@ class VTKManager:
         """
         self.remove_actor_by_name(grid_name)
         print(f"Initial grid '{grid_name}' removed.")
-        
-        
-    def rescale_axes_to_geometry(self):
-        """
-        Rescales the axes actor based on the bounds of the geometry loaded in the renderer.
-        """
-        # Compute the bounds of all visible props
-        bounds = self.renderer.ComputeVisiblePropBounds()
+           
+# Thaw: I removed this one due to duplication
+#    def rescale_axes_to_geometry(self):
+#        """
+#        Rescales the axes actor based on the bounds of the geometry loaded in the renderer.
+#        """
+#         Compute the bounds of all visible props
+#        bounds = self.renderer.ComputeVisiblePropBounds()
 
-        if bounds == (0, -1, 0, -1, 0, -1):
-            print("No geometry found to compute bounds. Axes will not be rescaled.")
-            return
+#        if bounds == (0, -1, 0, -1, 0, -1):
+#            print("No geometry found to compute bounds. Axes will not be rescaled.")
+#            return
 
         # Compute the largest extent of the geometry
         # added 1e-3 to prevent zero lengths
-        max_extent = max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4], 1e-3)
+#        max_extent = max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4], 1e-3)
         
         # Scale the axes length proportionally (e.g., 10% of the max extent)
-        axes_length = max_extent * 0.1
-        self.draw_axes(axes_length)
-        print(f"Axes rescaled to length {axes_length:.2f} based on geometry bounds.")
+#        axes_length = max_extent * 0.1
+#        self.draw_axes(axes_length)
+#        print(f"Axes rescaled to length {axes_length:.2f} based on geometry bounds.")
         
         
     # Attempt to rescale axes labels for better visuals     

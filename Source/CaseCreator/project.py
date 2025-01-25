@@ -485,6 +485,7 @@ class SplashCaseCreatorProject: # SplashCaseCreatorProject class to handle the p
         SplashCaseCreatorIO.printMessage("Loading project settings",GUIMode=self.GUIMode,window=self.window)
         settings = SplashCaseCreatorPrimitives.yaml_to_dict('project_settings.yaml')
         self.meshSettings = settings['meshSettings']
+        
         self.physicalProperties = settings['physicalProperties']
         self.numericalSettings = settings['numericalSettings']
         self.inletValues = settings['inletValues']
@@ -502,9 +503,14 @@ class SplashCaseCreatorProject: # SplashCaseCreatorProject class to handle the p
                     self.stl_files.append(geometry)
                     self.stl_names.append(geometry['name'])
         # Change project settings based on loaded settings
+        #print(self.meshSettings)
+        #print(self.physicalProperties)
+        #print(self.numericalSettings)
+        #print(self.simulationSettings)
         self.internalFlow = self.meshSettings['internalFlow']
         self.onGround = self.meshSettings['onGround']
         self.transient = self.simulationSettings['transient']
+        
         #self.parallel = self.parallelSettings['parallel']
         #self.snap = self.meshSettings['snap']
         self.refinement = self.meshSettings['fineLevel']
@@ -730,6 +736,12 @@ class SplashCaseCreatorProject: # SplashCaseCreatorProject class to handle the p
                 return stl
         return None
     
+    def get_boundary(self,boundary_name):
+        boundary_names = self.meshSettings['bcPatches'].keys()
+        if boundary_name in boundary_names:
+            return self.meshSettings['bcPatches'][boundary_name]
+        return None
+    
     def get_stl_index(self,stl_file_name):
         for idx,stl in enumerate(self.stl_files):
             if stl['name'] == stl_file_name:
@@ -920,7 +932,15 @@ class SplashCaseCreatorProject: # SplashCaseCreatorProject class to handle the p
                 return 0
         self.list_stl_files()
         return -1
-
+    
+    # check if the stl file is already in the project
+    def check_stl_file(self,stl_name):
+        stl_exists = False
+        for stl in self.stl_files:
+            if stl['name'] == stl_name:
+                stl_exists = True
+                break
+        return stl_exists
 
     def remove_stl_file(self,stl_file_number=0):
         #self.list_stl_files()

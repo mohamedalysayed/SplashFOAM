@@ -270,7 +270,7 @@ def get_word(word):
     return output
 
 def get_SplashCaseCreator_header():
-    word = get_word("SplashCaseCreator")
+    word = get_word("splash") # Changed from "SplashCaseCreator"
     output = "-------------------------------------------------------------------------------\n"
     output += word
     output += "-------------------------------------------------------------------------------\n"

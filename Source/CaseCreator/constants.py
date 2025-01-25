@@ -45,13 +45,14 @@ meshSettings = {
         {'name': 'top', 'type': 'symmetry','faces': [4, 5, 6, 7]},
     ],
     # bcPatches are for the boundary conditions and may be changed based on the case
+    # 2025/1/23: added faces to the bcPatches 
     'bcPatches': {
-        'inlet':    {'type': 'patch','purpose': 'inlet','property': (1,0,0)},
-        'outlet':   {'type': 'patch','purpose': 'outlet','property': None},
-        'front':    {'type': 'symmetry','purpose': 'symmetry','property': None},
-        'back':     {'type': 'symmetry','purpose': 'symmetry','property': None},
-        'bottom':   {'type': 'symmetry','purpose': 'symmetry','property': None},
-        'top':      {'type': 'symmetry','purpose': 'symmetry','property': None},
+        'inlet':    {'type': 'patch','purpose': 'inlet','property': (1,0,0),'faces': [0, 4, 7, 3]},
+        'outlet':   {'type': 'patch','purpose': 'outlet','property': None,'faces': [1, 5, 6, 2]},
+        'front':    {'type': 'symmetry','purpose': 'symmetry','property': None,'faces': [0, 1, 5, 4]},
+        'back':     {'type': 'symmetry','purpose': 'symmetry','property': None,'faces': [2, 3, 7, 6]},
+        'bottom':   {'type': 'symmetry','purpose': 'symmetry','property': None,'faces': [0, 1, 2, 3]},
+        'top':      {'type': 'symmetry','purpose': 'symmetry','property': None,'faces': [4, 5, 6, 7]},
 },
     'snappyHexSteps': {'castellatedMesh': 'true',
                        'snap': 'true',
